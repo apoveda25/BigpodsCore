@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libs\Shared\Bigpods.Shared.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.Types.NodaTime" Version="13.9.6" />
+    <PackageReference Include="Keycloak.AuthServices.OpenTelemetry" Version="1.0.0" />
+    <PackageReference Include="Keycloak.AuthServices.Sdk.Kiota" Version="25.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.Data.AutoMapper" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.Types.Scalars" Version="13.9.6" />
+    <PackageReference Include="HotChocolate.Subscriptions" Version="13.9.6" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Keycloak.AuthServices.Authentication" Version="2.5.2" />
+    <PackageReference Include="Keycloak.AuthServices.Authorization" Version="2.5.2" />
+    <PackageReference Include="Keycloak.AuthServices.Sdk" Version="2.5.2" />
+    <PackageReference Include="Keycloak.AuthServices.Common" Version="2.5.2" />
+    <PackageReference Include="MediatR" Version="12.3.0" />
+  </ItemGroup>
+
+</Project>

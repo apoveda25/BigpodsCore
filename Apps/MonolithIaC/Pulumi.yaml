@@ -1,0 +1,7 @@
+name: Bigpods.MonolithIaC
+runtime: dotnet
+description: Bigpods Monolith IaC
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: https://www.pulumi.com/ai/api/project/e0cecf54-1233-4e46-850d-ce0de8fda67d.zip
