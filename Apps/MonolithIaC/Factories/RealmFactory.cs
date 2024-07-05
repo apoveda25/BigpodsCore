@@ -4,26 +4,26 @@ public class RealmFactory
 {
     public static Pulumi.Keycloak.Realm Build(string name, Pulumi.Keycloak.RealmArgs? args)
     {
-        return new Pulumi.Keycloak.Realm(name.ToLower(), new()
+        return new Pulumi.Keycloak.Realm(name, new()
         {
-            RealmName = name.ToLower(),
-            // AccessCodeLifespan = "string",
-            // AccessCodeLifespanLogin = "string",
-            // AccessCodeLifespanUserAction = "string",
-            // AccessTokenLifespan = "string",
-            // AccessTokenLifespanForImplicitFlow = "string",
-            AccountTheme = args?.AccountTheme ?? "base",
-            // ActionTokenGeneratedByAdminLifespan = "string",
-            // ActionTokenGeneratedByUserLifespan = "string",
-            // AdminTheme = "string",
+            RealmName = args?.RealmName ?? name,
+            AccessCodeLifespan = args?.AccessCodeLifespan,
+            AccessCodeLifespanLogin = args?.AccessCodeLifespanLogin,
+            AccessCodeLifespanUserAction = args?.AccessCodeLifespanUserAction,
+            AccessTokenLifespan = args?.AccessTokenLifespan,
+            AccessTokenLifespanForImplicitFlow = args?.AccessTokenLifespanForImplicitFlow,
+            AccountTheme = args?.AccountTheme,
+            ActionTokenGeneratedByAdminLifespan = args?.ActionTokenGeneratedByAdminLifespan,
+            ActionTokenGeneratedByUserLifespan = args?.ActionTokenGeneratedByUserLifespan,
+            AdminTheme = args?.AdminTheme,
             // Attributes = 
             // {
             //     { "string", "any" },
             // },
-            // BrowserFlow = "string",
-            // ClientAuthenticationFlow = "string",
-            // ClientSessionIdleTimeout = "string",
-            // ClientSessionMaxLifespan = "string",
+            BrowserFlow = args?.BrowserFlow,
+            ClientAuthenticationFlow = args?.ClientAuthenticationFlow,
+            ClientSessionIdleTimeout = args?.ClientSessionIdleTimeout,
+            ClientSessionMaxLifespan = args?.ClientSessionMaxLifespan,
             // DefaultDefaultClientScopes = new[]
             // {
             //     "string",
@@ -32,32 +32,24 @@ public class RealmFactory
             // {
             //     "string",
             // },
-            // DefaultSignatureAlgorithm = "string",
-            // DirectGrantFlow = "string",
-            DisplayName = $"{name} Realm",
-            DisplayNameHtml = $"{name} Realm",
-            // DockerAuthenticationFlow = "string",
-            DuplicateEmailsAllowed = args?.DuplicateEmailsAllowed ?? false,
-            EditUsernameAllowed = args?.EditUsernameAllowed ?? false,
-            // EmailTheme = "string",
-            Enabled = args?.Enabled ?? true,
-            // InternalId = "string",
-            Internationalization = args?.Internationalization ?? new Pulumi.Keycloak.Inputs.RealmInternationalizationArgs
-            {
-                DefaultLocale = "es",
-                SupportedLocales = new[]
-                {
-                    "es",
-                    "en",
-                },
-            },
-            LoginTheme = args?.LoginTheme ?? "base",
-            LoginWithEmailAllowed = args?.LoginWithEmailAllowed ?? true,
-            // Oauth2DeviceCodeLifespan = "string",
-            // Oauth2DevicePollingInterval = 0,
-            // OfflineSessionIdleTimeout = "string",
-            // OfflineSessionMaxLifespan = "string",
-            // OfflineSessionMaxLifespanEnabled = false,
+            DefaultSignatureAlgorithm = args?.DefaultSignatureAlgorithm,
+            DirectGrantFlow = args?.DirectGrantFlow,
+            DisplayName = args?.DisplayName,
+            DisplayNameHtml = args?.DisplayNameHtml,
+            DockerAuthenticationFlow = args?.DockerAuthenticationFlow,
+            DuplicateEmailsAllowed = args?.DuplicateEmailsAllowed,
+            EditUsernameAllowed = args?.EditUsernameAllowed,
+            EmailTheme = args?.EmailTheme,
+            Enabled = args?.Enabled,
+            InternalId = args?.InternalId,
+            Internationalization = args?.Internationalization,
+            LoginTheme = args?.LoginTheme,
+            LoginWithEmailAllowed = args?.LoginWithEmailAllowed,
+            Oauth2DeviceCodeLifespan = args?.Oauth2DeviceCodeLifespan,
+            Oauth2DevicePollingInterval = args?.Oauth2DevicePollingInterval,
+            OfflineSessionIdleTimeout = args?.OfflineSessionIdleTimeout,
+            OfflineSessionMaxLifespan = args?.OfflineSessionMaxLifespan,
+            OfflineSessionMaxLifespanEnabled = args?.OfflineSessionMaxLifespanEnabled,
             // OtpPolicy = new Pulumi.Keycloak.Inputs.RealmOtpPolicyArgs
             // {
             //     Algorithm = "string",
@@ -67,38 +59,16 @@ public class RealmFactory
             //     Period = 0,
             //     Type = "string",
             // },
-            PasswordPolicy = args?.PasswordPolicy ?? "upperCase(1) and length(8) and forceExpiredPasswordChange(365) and notUsername",
-            // RefreshTokenMaxReuse = 0,
-            RegistrationAllowed = args?.RegistrationAllowed ?? true,
-            // RegistrationEmailAsUsername = false,
-            // RegistrationFlow = "string",
+            PasswordPolicy = args?.PasswordPolicy,
+            RefreshTokenMaxReuse = args?.RefreshTokenMaxReuse,
+            RegistrationAllowed = args?.RegistrationAllowed,
+            RegistrationEmailAsUsername = args?.RegistrationEmailAsUsername,
+            RegistrationFlow = args?.RegistrationFlow,
             RememberMe = args?.RememberMe ?? true,
-            // ResetCredentialsFlow = "string",
-            ResetPasswordAllowed = args?.ResetPasswordAllowed ?? true,
-            // RevokeRefreshToken = false,
-            SecurityDefenses = args?.SecurityDefenses ?? new Pulumi.Keycloak.Inputs.RealmSecurityDefensesArgs
-            {
-                BruteForceDetection = new Pulumi.Keycloak.Inputs.RealmSecurityDefensesBruteForceDetectionArgs
-                {
-                    FailureResetTimeSeconds = 43200,
-                    MaxFailureWaitSeconds = 900,
-                    MaxLoginFailures = 30,
-                    MinimumQuickLoginWaitSeconds = 60,
-                    PermanentLockout = false,
-                    QuickLoginCheckMilliSeconds = 1000,
-                    WaitIncrementSeconds = 60,
-                },
-                Headers = new Pulumi.Keycloak.Inputs.RealmSecurityDefensesHeadersArgs
-                {
-                    ContentSecurityPolicy = "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
-                    ContentSecurityPolicyReportOnly = "",
-                    StrictTransportSecurity = "max-age=31536000; includeSubDomains",
-                    XContentTypeOptions = "nosniff",
-                    XFrameOptions = "DENY",
-                    XRobotsTag = "none",
-                    XXssProtection = "1; mode=block",
-                },
-            },
+            ResetCredentialsFlow = args?.ResetCredentialsFlow,
+            ResetPasswordAllowed = args?.ResetPasswordAllowed,
+            RevokeRefreshToken = args?.RevokeRefreshToken,
+            SecurityDefenses = args?.SecurityDefenses,
             // SmtpServer = new Pulumi.Keycloak.Inputs.RealmSmtpServerArgs
             // {
             //     From = "string",
@@ -116,13 +86,13 @@ public class RealmFactory
             //     Ssl = false,
             //     Starttls = false,
             // },
-            // SslRequired = "string",
-            // SsoSessionIdleTimeout = "string",
-            // SsoSessionIdleTimeoutRememberMe = "string",
-            // SsoSessionMaxLifespan = "string",
-            // SsoSessionMaxLifespanRememberMe = "string",
-            // UserManagedAccess = false,
-            VerifyEmail = args?.VerifyEmail ?? true,
+            SslRequired = args?.SslRequired,
+            SsoSessionIdleTimeout = args?.SsoSessionIdleTimeout,
+            SsoSessionIdleTimeoutRememberMe = args?.SsoSessionIdleTimeoutRememberMe,
+            SsoSessionMaxLifespan = args?.SsoSessionMaxLifespan,
+            SsoSessionMaxLifespanRememberMe = args?.SsoSessionMaxLifespanRememberMe,
+            UserManagedAccess = args?.UserManagedAccess,
+            VerifyEmail = args?.VerifyEmail,
             // WebAuthnPasswordlessPolicy = new Pulumi.Keycloak.Inputs.RealmWebAuthnPasswordlessPolicyArgs
             // {
             //     AcceptableAaguids = new[]

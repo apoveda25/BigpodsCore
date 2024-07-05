@@ -144,7 +144,7 @@ services:
       - ${REDPANDA_QUEUE_PORT}:19092
       - 19644:9644
 
-  console:
+  redpanda-console:
     container_name: bigpods-redpanda-console
     image: docker.redpanda.com/redpandadata/console:v2.6.0
     networks:

@@ -33,6 +33,17 @@ using Bigpods.Monolith.Modules.AttributeTypes.Infrastructure.FindOne.Queries;
 using Bigpods.Monolith.Modules.AttributeTypes.Infrastructure.UpdateOne.Mutations;
 using Bigpods.Monolith.Modules.Attributes.Infrastructure.FindMany.Queries;
 using Bigpods.Monolith.Modules.Attributes.Infrastructure.FindOne.Queries;
+using Bigpods.Monolith.Modules.AttributeTypes.Application.Common.Services;
+using Bigpods.Monolith.Modules.Attributes.Application.Common.Services;
+using Bigpods.Monolith.Modules.Variants.Application.Common.Services;
+using Bigpods.Monolith.Modules.Products.Application.Common.Services;
+using Bigpods.Monolith.Modules.Warehouses.Application.Common.Services;
+using Bigpods.Monolith.Modules.Warehouses.Application.Common.Policies;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.CreateOne.Mutations;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.UpdateOne.Mutations;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.DeleteOne.Mutations;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.FindMany.Queries;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.FindOne.Queries;
 
 
 namespace Bigpods.Monolith.Config.Services;
@@ -108,6 +119,9 @@ public static class CoreDependencyInjectionService
             .AddTypeExtension<DeleteOneVariantsMutation>()
             .AddTypeExtension<CreateOneProductsMutation>()
             .AddTypeExtension<UpdateOneProductsMutation>()
+            .AddTypeExtension<CreateOneWarehousesMutation>()
+            .AddTypeExtension<UpdateOneWarehousesMutation>()
+            .AddTypeExtension<DeleteOneWarehousesMutation>()
             .AddQueryType()
             .AddTypeExtension<FindManyAttributeTypesQuery>()
             .AddTypeExtension<FindOneAttributeTypesQuery>()
@@ -117,6 +131,8 @@ public static class CoreDependencyInjectionService
             .AddTypeExtension<FindOneVariantsQuery>()
             .AddTypeExtension<FindManyProductsQuery>()
             .AddTypeExtension<FindOneProductsQuery>()
+            .AddTypeExtension<FindManyWarehousesQuery>()
+            .AddTypeExtension<FindOneWarehousesQuery>()
             .AddType<DateTimeZoneType>()
             .AddProjections()
             .AddFiltering()
@@ -159,6 +175,7 @@ public static class CoreDependencyInjectionService
             .AddAuthorization(configure: AttributesPolicies.ConfigurePolicies)
             .AddAuthorization(configure: VariantsPolicies.ConfigurePolicies)
             .AddAuthorization(configure: ProductsPolicies.ConfigurePolicies)
+            .AddAuthorization(configure: WarehousesPolicies.ConfigurePolicies)
             .AddKeycloakAuthorization();
 
         services.AddAuthorizationServer(
@@ -167,5 +184,15 @@ public static class CoreDependencyInjectionService
         );
 
         return services;
+    }
+
+    public static IServiceCollection AddModulesConfiguration(this IServiceCollection services)
+    {
+        return services
+            .AddAttributeTypesDependenciesConfiguration()
+            .AddAttributesDependenciesConfiguration()
+            .AddVariantsDependenciesConfiguration()
+            .AddProductsDependenciesConfiguration()
+            .AddWarehousesDependenciesConfiguration();
     }
 }

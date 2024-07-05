@@ -1,8 +1,4 @@
 using Bigpods.Monolith.Config.Services;
-using Bigpods.Monolith.Modules.AttributeTypes.Application.Common.Services;
-using Bigpods.Monolith.Modules.Attributes.Application.Common.Services;
-using Bigpods.Monolith.Modules.Products.Application.Common.Services;
-using Bigpods.Monolith.Modules.Variants.Application.Common.Services;
 
 var builder = WebApplication.CreateBuilder(args: args);
 
@@ -16,10 +12,7 @@ builder.Services
     .AddMappersConfiguration()
     .AddMediatorConfiguration()
     .AddGraphQLConfiguration()
-    .AddAttributeTypesDependenciesConfiguration()
-    .AddAttributesDependenciesConfiguration()
-    .AddVariantsDependenciesConfiguration()
-    .AddProductsDependenciesConfiguration();
+    .AddModulesConfiguration();
 
 var app = builder.Build();
 

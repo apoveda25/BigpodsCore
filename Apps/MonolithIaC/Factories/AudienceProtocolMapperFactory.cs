@@ -7,13 +7,13 @@ public class AudienceProtocolMapperFactory
         return new Pulumi.Keycloak.OpenId.AudienceProtocolMapper(name, new()
         {
             RealmId = args.RealmId,
-            AddToAccessToken = args.AddToAccessToken ?? false,
-            AddToIdToken = args.AddToIdToken ?? false,
+            AddToAccessToken = args.AddToAccessToken,
+            AddToIdToken = args.AddToIdToken,
             ClientId = args.ClientId,
             ClientScopeId = args.ClientScopeId,
             IncludedClientAudience = args.IncludedClientAudience,
             IncludedCustomAudience = args.IncludedCustomAudience,
-            Name = args.Name ?? name,
+            Name = args.Name,
         });
     }
 }

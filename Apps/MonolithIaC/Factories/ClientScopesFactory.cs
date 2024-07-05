@@ -9,9 +9,9 @@ public class ClientScopesFactory
             RealmId = args.RealmId,
             ConsentScreenText = args.ConsentScreenText,
             Description = args.Description,
-            GuiOrder = args.GuiOrder ?? 0,
-            IncludeInTokenScope = args.IncludeInTokenScope ?? false,
-            Name = args.Name ?? name,
+            GuiOrder = args.GuiOrder,
+            IncludeInTokenScope = args.IncludeInTokenScope,
+            Name = args.Name,
         });
     }
 }

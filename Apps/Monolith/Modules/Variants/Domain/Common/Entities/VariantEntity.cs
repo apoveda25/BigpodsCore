@@ -175,7 +175,7 @@ public sealed class VariantEntity
 
         if (variantFoundById.Id != variant.Id)
         {
-            throw new ConflictException("Variant id not match");
+            throw new ConflictException("Variant id does not match");
         }
 
         var entity = new VariantEntity

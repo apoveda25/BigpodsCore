@@ -20,7 +20,10 @@ public sealed class UpdateOneVariantHandler(
     private readonly IMapper _mapper = mapper;
     private readonly IUpdateOneVariantService _updateOneVariantService = updateOneVariantService;
 
-    public async Task<VariantModel> Handle(UpdateOneVariantCommand command, CancellationToken cancellationToken = default)
+    public async Task<VariantModel> Handle(
+        UpdateOneVariantCommand command,
+        CancellationToken cancellationToken = default
+    )
     {
         var fetchResponse = await _updateOneVariantService.ExecuteAsync(command: command, cancellationToken: cancellationToken);
 

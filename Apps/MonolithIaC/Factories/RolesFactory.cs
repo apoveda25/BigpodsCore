@@ -9,7 +9,7 @@ public class RolesFactory
             RealmId = args.RealmId,
             Attributes = args.Attributes,
             ClientId = args.ClientId,
-            CompositeRoles = args.CompositeRoles,
+            // CompositeRoles = args.CompositeRoles,
             Description = args.Description,
             Name = args.Name ?? name,
         });

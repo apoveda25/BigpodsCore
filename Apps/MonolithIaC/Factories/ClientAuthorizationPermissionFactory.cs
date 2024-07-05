@@ -8,7 +8,7 @@ public class ClientAuthorizationPermissionFactory
         {
             RealmId = args.RealmId,
             ResourceServerId = args.ResourceServerId,
-            DecisionStrategy = args.DecisionStrategy ?? "UNANIMOUS",
+            DecisionStrategy = args.DecisionStrategy,
             Description = args.Description,
             Name = args.Name ?? name,
             Policies = args.Policies,

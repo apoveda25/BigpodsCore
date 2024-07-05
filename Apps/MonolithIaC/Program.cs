@@ -1,882 +1,213 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Bigpods.MonolithIaC.Data.AudienceProtocolMappers;
+
+using Bigpods.MonolithIaC.Data.ClientAuthorizationPermissions;
+
+using Bigpods.MonolithIaC.Data.ClientAuthorizationResources;
+
+using Bigpods.MonolithIaC.Data.ClientAuthorizationScopes;
+using Bigpods.MonolithIaC.Data.ClientRolePolicies;
+
+using Bigpods.MonolithIaC.Data.Clients;
+using Bigpods.MonolithIaC.Data.ClientScopes;
+using Bigpods.MonolithIaC.Data.DefaultClientScopes;
+using Bigpods.MonolithIaC.Data.Realms;
+using Bigpods.MonolithIaC.Data.Roles;
+using Bigpods.MonolithIaC.Data.Users;
+using Bigpods.MonolithIaC.Data.UsersRoles;
+
 using Bigpods.MonolithIaC.Factories;
-using Bigpods.MonolithIaC.Permissions;
-using Bigpods.MonolithIaC.Policies;
-using Bigpods.MonolithIaC.Resources;
-using Bigpods.MonolithIaC.Roles;
-using Bigpods.MonolithIaC.Scopes;
-using Bigpods.MonolithIaC.Utils;
 
 using Pulumi;
 
 return await Deployment.RunAsync(() =>
 {
-    // Create a Keycloak realm
-    string realmName = "Bigpods";
+    // Create Keycloak realms
+    var realmsCreated = RealmsData
+        .GetRealms()
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => RealmFactory.Build(item.Value.Name, item.Value.Config));
 
-    var realm = RealmFactory.Build(realmName, new()
-    {
-        RealmName = realmName.ToLower(),
-        AccountTheme = "base",
-        DisplayName = $"{realmName} Realm",
-        DisplayNameHtml = $"{realmName} Realm",
-        DuplicateEmailsAllowed = false,
-        EditUsernameAllowed = false,
-        Enabled = true,
-        Internationalization = new Pulumi.Keycloak.Inputs.RealmInternationalizationArgs
-        {
-            DefaultLocale = "es",
-            SupportedLocales = new[]
-            {
-                "es",
-                "en",
-            },
-        },
-        LoginTheme = "base",
-        LoginWithEmailAllowed = true,
-        PasswordPolicy = "upperCase(1) and length(8) and forceExpiredPasswordChange(365) and notUsername",
-        RegistrationAllowed = true,
-        RememberMe = true,
-        ResetPasswordAllowed = true,
-        SecurityDefenses = new Pulumi.Keycloak.Inputs.RealmSecurityDefensesArgs
-        {
-            BruteForceDetection = new Pulumi.Keycloak.Inputs.RealmSecurityDefensesBruteForceDetectionArgs
-            {
-                FailureResetTimeSeconds = 43200,
-                MaxFailureWaitSeconds = 900,
-                MaxLoginFailures = 30,
-                MinimumQuickLoginWaitSeconds = 60,
-                PermanentLockout = false,
-                QuickLoginCheckMilliSeconds = 1000,
-                WaitIncrementSeconds = 60,
-            },
-            Headers = new Pulumi.Keycloak.Inputs.RealmSecurityDefensesHeadersArgs
-            {
-                ContentSecurityPolicy = "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
-                ContentSecurityPolicyReportOnly = "",
-                StrictTransportSecurity = "max-age=31536000; includeSubDomains",
-                XContentTypeOptions = "nosniff",
-                XFrameOptions = "DENY",
-                XRobotsTag = "none",
-                XXssProtection = "1; mode=block",
-            },
-        },
-        VerifyEmail = true,
-    });
+    // Create Keycloak clients
+    var clientsCreated = ClientsData
+        .GetClients(realms: realmsCreated)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => ClientFactory.Build(item.Value.Name, item.Value.Config));
 
-    // Create a Keycloak clients
-    string guiAPIClientName = "Bigpods GUI API Client";
-    string monolithAPIClientName = "Bigpods Monolith API Client";
+    // Create a Keycloak users
+    var usersCreated = UsersData
+        .GetUsers(realms: realmsCreated)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => UserFactory.Build(item.Value.Name, item.Value.Config));
 
-    string baseUrlKeycloakServer = "http://localhost:8082";
+    // Get Keycloak default roles
+    var gettingRoles = RolesData
+        .InvokeRoles(realms: realmsCreated);
 
-    var clientsWithoutResources = new[] {
-        ClientFactory.Build(guiAPIClientName, new()
-        {
-            AccessType = "CONFIDENTIAL",
-            RealmId = realm.Id,
-            ClientAuthenticatorType = "client-secret",
-            FrontchannelLogoutEnabled = false,
-            DirectAccessGrantsEnabled = false,
-            BackchannelLogoutSessionRequired = true,
-            ImplicitFlowEnabled = false,
-            LoginTheme = "keycloak",
-            Oauth2DeviceAuthorizationGrantEnabled = false,
-            PkceCodeChallengeMethod = "S256",
-            ServiceAccountsEnabled = false,
-            StandardFlowEnabled = true,
-            UseRefreshTokens = true,
-            ValidRedirectUris = new[]
-            {
-                "*",
-            },
-            WebOrigins = new[]
-            {
-                "*",
-            },
-        }),
-    };
+    // Create Keycloak roles
+    var rolesCreated = RolesData
+        .GetRoles(realms: realmsCreated, clients: clientsCreated, gettingRoles: gettingRoles)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => RolesFactory.Build(item.Value.Name, item.Value.Config));
 
-    var clientsWithResources = new[] {
-        ClientFactory.Build(monolithAPIClientName, new()
-        {
-            AccessType = "CONFIDENTIAL",
-            RealmId = realm.Id,
-            ClientAuthenticatorType = "client-secret",
-            FrontchannelLogoutEnabled = false,
-            DirectAccessGrantsEnabled = true,
-            BackchannelLogoutSessionRequired = true,
-            Authorization = new Pulumi.Keycloak.OpenId.Inputs.ClientAuthorizationArgs
-            {
-                PolicyEnforcementMode = "ENFORCING",
-                AllowRemoteResourceManagement = true,
-                DecisionStrategy = "UNANIMOUS",
-            },
-            ImplicitFlowEnabled = false,
-            LoginTheme = "keycloak",
-            Oauth2DeviceAuthorizationGrantEnabled = false,
-            RootUrl = baseUrlKeycloakServer,
-            ServiceAccountsEnabled = true,
-            StandardFlowEnabled = false,
-            WebOrigins = new[]
-            {
-                "*",
-            },
-        }),
-    };
+    // Create Keycloak user roles
+    var userRolesCreated = UsersRolesData
+        .GetUsersRoles(realms: realmsCreated, users: usersCreated, roles: rolesCreated, gettingRoles: gettingRoles)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => UserRolesFactory.Build(item.Value.Name, item.Value.Config));
 
-    // Create a Keycloak user admin
-    string adminUserName = "admin";
-    var adminUser = UserFactory.Build(adminUserName, new()
-    {
-        RealmId = realm.Id,
-        Username = adminUserName,
-        Email = $"{adminUserName}@bigpods.com",
-        EmailVerified = true,
-        Enabled = true,
-        FirstName = adminUserName,
-        LastName = "",
-        InitialPassword = new Pulumi.Keycloak.Inputs.UserInitialPasswordArgs
-        {
-            Value = "Secret123",
-            Temporary = false,
-        },
-    });
+    // Create Keycloak client authorization scopes
+    var clientAuthorizationScopesCreated = ClientAuthorizationScopesData
+        .GetClientAuthorizationScopes(realms: realmsCreated, clients: clientsCreated)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => ClientAuthorizationScopeFactory.Build(item.Value.Name, item.Value.Config));
 
-    // Create a Keycloak user product team
-    string productTeamUserNameAproveda25 = "apoveda25";
-    var productTeamUserApoveda25 = UserFactory.Build(productTeamUserNameAproveda25, new()
-    {
-        RealmId = realm.Id,
-        Username = productTeamUserNameAproveda25,
-        Email = "alfpovsistemas@gmail.com",
-        EmailVerified = true,
-        Enabled = true,
-        FirstName = "Alfredo",
-        LastName = "Poveda",
-        InitialPassword = new Pulumi.Keycloak.Inputs.UserInitialPasswordArgs
-        {
-            Value = "Secret123",
-            Temporary = false,
-        },
-    });
+    // Create Keycloak client authorization resources
+    var clientAuthorizationResourcesCreated = ClientAuthorizationResourcesData
+        .GetClientAuthorizationResources(realms: realmsCreated, clients: clientsCreated, scopes: clientAuthorizationScopesCreated)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => ClientAuthorizationResourceFactory.Build(item.Value.Name, item.Value.Config));
 
-    // Get a Keycloak default role
-    var defaultRole = Pulumi.Keycloak.GetRole.Invoke(new()
-    {
-        RealmId = realm.Id,
-        Name = AuthorizationRoles.Default,
-    });
+    // Create Keycloak client role policies
+    var clientRolePoliciesCreated = ClientRolePoliciesData
+        .GetClientRolePolicies(realms: realmsCreated, clients: clientsCreated, roles: rolesCreated)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => ClientRolePolicyFactory.Build(item.Value.Name, item.Value.Config));
 
-    // Create a Keycloak role admin
-    var adminRole = RolesFactory.Build(AuthorizationRoles.Admin, new()
-    {
-        RealmId = realm.Id,
-        ClientId = clientsWithResources[0].Id,
-        Name = $"roles:{AuthorizationRoles.Admin}",
-        Description = StringUtils.ToCapitalCase(AuthorizationRoles.Admin.Split('-')),
-        CompositeRoles = new[] { defaultRole.Apply(role => role.Id) },
-    });
-
-    // Create a Keycloak role product team
-    var productTeamRole = RolesFactory.Build(AuthorizationRoles.ProductTeam, new()
-    {
-        RealmId = realm.Id,
-        ClientId = clientsWithResources[0].Id,
-        Name = $"roles:{AuthorizationRoles.ProductTeam}",
-        Description = StringUtils.ToCapitalCase(AuthorizationRoles.ProductTeam.Split('-')),
-        CompositeRoles = new[] { defaultRole.Apply(role => role.Id) },
-    });
-
-    // Create a Keycloak user roles admin
-    var adminUserToAdminRole = UserRolesFactory.Build($"user-roles:{adminUserName}:{AuthorizationRoles.Admin}", new()
-    {
-        RealmId = realm.Id,
-        UserId = adminUser.Id,
-        RoleIds = new[] { adminRole.Id, defaultRole.Apply(role => role.Id) },
-    });
-
-    // Create a Keycloak user roles product team
-    var productTeamUserToProductTeamRoleAproveda25 = UserRolesFactory.Build($"user-roles:{productTeamUserNameAproveda25}:{AuthorizationRoles.ProductTeam}", new()
-    {
-        RealmId = realm.Id,
-        UserId = productTeamUserApoveda25.Id,
-        RoleIds = new[] { productTeamRole.Id, defaultRole.Apply(role => role.Id) },
-    });
-
-    // Create a Keycloak client authorization scopes
-    var scopesNames = AuthorizationScopes.All();
-    var clientAuthorizationScopes = clientsWithResources.SelectMany(
-        client => scopesNames.Select(
-            scope => ClientAuthorizationScopeFactory.Build($"scopes:{scope}", new()
-            {
-                RealmId = realm.Id.Apply(id => id),
-                ResourceServerId = client.Id.Apply(id => id),
-                DisplayName = StringUtils.ToCapitalCase(scope.Split('-')),
-            })
+    // Create Keycloak client authorization permissions
+    var clientAuthorizationPermissionsCreated = ClientAuthorizationPermissionsData
+        .GetClientAuthorizationPermissions(
+            realms: realmsCreated,
+            clients: clientsCreated,
+            policies: clientRolePoliciesCreated,
+            resources: clientAuthorizationResourcesCreated,
+            scopes: clientAuthorizationScopesCreated
         )
-    );
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => ClientAuthorizationPermissionFactory.Build(item.Value.Name, item.Value.Config));
 
-    // Create a Keycloak client authorization resources client authorization permissions
-    var resourcesNames = AuthorizationResources.All();
-    var authorizationResourcesMapping = new Dictionary<string, Pulumi.Keycloak.OpenId.ClientAuthorizationResourceArgs>()
-    {
-        [AuthorizationResources.Products] = new Pulumi.Keycloak.OpenId.ClientAuthorizationResourceArgs
-        {
-            Scopes = AuthorizationScopes.All().Select(scope => $"scopes:{scope}").ToArray(),
-        },
-        [AuthorizationResources.Variants] = new Pulumi.Keycloak.OpenId.ClientAuthorizationResourceArgs
-        {
-            Scopes = AuthorizationScopes.All().Select(scope => $"scopes:{scope}").ToArray(),
-        },
-        [AuthorizationResources.Attributes] = new Pulumi.Keycloak.OpenId.ClientAuthorizationResourceArgs
-        {
-            Scopes = AuthorizationScopes.All().Select(scope => $"scopes:{scope}").ToArray(),
-        },
-        [AuthorizationResources.AttributeTypes] = new Pulumi.Keycloak.OpenId.ClientAuthorizationResourceArgs
-        {
-            Scopes = AuthorizationScopes.All().Select(scope => $"scopes:{scope}").ToArray(),
-        },
-    };
-    var clientAuthorizationResources = clientsWithResources.SelectMany(
-        client => resourcesNames.Select(
-            resource => ClientAuthorizationResourceFactory.Build($"resources:{resource}", new()
-            {
-                RealmId = realm.Id.Apply(id => id),
-                ResourceServerId = client.Id.Apply(id => id),
-                DisplayName = StringUtils.ToCapitalCase(resource.Split('-')),
-                OwnerManagedAccess = true,
-                Scopes = authorizationResourcesMapping[resource].Scopes,
-            })
-        )
-    );
+    // Create Keycloak client scopes
+    var clientScopesCreated = ClientScopesData
+        .GetClientScopes(realms: realmsCreated)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => ClientScopesFactory.Build(item.Value.Name, item.Value.Config));
 
-    // Create a Keycloak client role policies and 
-    var clientRolePolicyNames = AuthorizationPolicies.All();
-    var clientRolePolicyMapping = new Dictionary<string, Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs[]>()
-    {
-        [AuthorizationPolicies.ProductsCreateOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.ProductsCreateMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.ProductsReadOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.ProductsReadMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.ProductsUpdateOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.ProductsUpdateMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.ProductsDeleteOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.ProductsDeleteMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
+    // Create Keycloak audience protocol mappers
+    var audienceProtocolMappersCreated = AudienceProtocolMappersData
+        .GetAudienceProtocolMappers(realms: realmsCreated, clients: clientsCreated, clientScopes: clientScopesCreated)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => AudienceProtocolMapperFactory.Build(item.Value.Name, item.Value.Config));
 
-        [AuthorizationPolicies.VariantsCreateOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.VariantsCreateMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.VariantsReadOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.VariantsReadMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.VariantsUpdateOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.VariantsUpdateMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.VariantsDeleteOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.VariantsDeleteMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-
-        [AuthorizationPolicies.AttributesCreateOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.AttributesCreateMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.AttributesReadOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.AttributesReadMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.AttributesUpdateOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.AttributesUpdateMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.AttributesDeleteOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = productTeamRole.Id.Apply(id => id),
-                Required = false,
-            }
-        },
-        [AuthorizationPolicies.AttributesDeleteMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-
-        [AuthorizationPolicies.AttributeTypesCreateOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.AttributeTypesCreateMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.AttributeTypesReadOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.AttributeTypesReadMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.AttributeTypesUpdateOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.AttributeTypesUpdateMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.AttributeTypesDeleteOne] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-        [AuthorizationPolicies.AttributeTypesDeleteMany] = new[] {
-            new Pulumi.Keycloak.OpenId.Inputs.ClientRolePolicyRoleArgs
-            {
-                Id = adminRole.Id.Apply(id => id),
-                Required = false,
-            },
-        },
-    };
-    var clientAuthorizationPermissionsMapping = new Dictionary<string, Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs>()
-    {
-        [AuthorizationPermissions.ProductsCreateOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Products}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.CreateOne}" },
-        },
-        [AuthorizationPermissions.ProductsCreateMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Products}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.CreateMany}" },
-        },
-        [AuthorizationPermissions.ProductsReadOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Products}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.ReadOne}" },
-        },
-        [AuthorizationPermissions.ProductsReadMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Products}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.ReadMany}" },
-        },
-        [AuthorizationPermissions.ProductsUpdateOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Products}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.UpdateOne}" },
-        },
-        [AuthorizationPermissions.ProductsUpdateMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Products}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.UpdateMany}" },
-        },
-        [AuthorizationPermissions.ProductsDeleteOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Products}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.DeleteOne}" },
-        },
-        [AuthorizationPermissions.ProductsDeleteMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Products}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.DeleteMany}" },
-        },
-
-        [AuthorizationPermissions.VariantsCreateOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Variants}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.CreateOne}" },
-        },
-        [AuthorizationPermissions.VariantsCreateMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Variants}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.CreateMany}" },
-        },
-        [AuthorizationPermissions.VariantsReadOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Variants}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.ReadOne}" },
-        },
-        [AuthorizationPermissions.VariantsReadMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Variants}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.ReadMany}" },
-        },
-        [AuthorizationPermissions.VariantsUpdateOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Variants}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.UpdateOne}" },
-        },
-        [AuthorizationPermissions.VariantsUpdateMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Variants}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.UpdateMany}" },
-        },
-        [AuthorizationPermissions.VariantsDeleteOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Variants}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.DeleteOne}" },
-        },
-        [AuthorizationPermissions.VariantsDeleteMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Variants}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.DeleteMany}" },
-        },
-
-        [AuthorizationPermissions.AttributesCreateOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Attributes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.CreateOne}" },
-        },
-        [AuthorizationPermissions.AttributesCreateMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Attributes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.CreateMany}" },
-        },
-        [AuthorizationPermissions.AttributesReadOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Attributes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.ReadOne}" },
-        },
-        [AuthorizationPermissions.AttributesReadMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Attributes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.ReadMany}" },
-        },
-        [AuthorizationPermissions.AttributesUpdateOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Attributes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.UpdateOne}" },
-        },
-        [AuthorizationPermissions.AttributesUpdateMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Attributes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.UpdateMany}" },
-        },
-        [AuthorizationPermissions.AttributesDeleteOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Attributes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.DeleteOne}" },
-        },
-        [AuthorizationPermissions.AttributesDeleteMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.Attributes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.DeleteMany}" },
-        },
-
-        [AuthorizationPermissions.AttributeTypesCreateOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.AttributeTypes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.CreateOne}" },
-        },
-        [AuthorizationPermissions.AttributeTypesCreateMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.AttributeTypes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.CreateMany}" },
-        },
-        [AuthorizationPermissions.AttributeTypesReadOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.AttributeTypes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.ReadOne}" },
-        },
-        [AuthorizationPermissions.AttributeTypesReadMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.AttributeTypes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.ReadMany}" },
-        },
-        [AuthorizationPermissions.AttributeTypesUpdateOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.AttributeTypes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.UpdateOne}" },
-        },
-        [AuthorizationPermissions.AttributeTypesUpdateMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.AttributeTypes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.UpdateMany}" },
-        },
-        [AuthorizationPermissions.AttributeTypesDeleteOne] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.AttributeTypes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.DeleteOne}" },
-        },
-        [AuthorizationPermissions.AttributeTypesDeleteMany] = new Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs
-        {
-            Resources = new[] { $"resources:{AuthorizationResources.AttributeTypes}" },
-            Scopes = new[] { $"scopes:{AuthorizationScopes.DeleteMany}" },
-        },
-    };
-
-    var clientRolePoliciesClientAuthorizationPermissionsMonolithAPIClient = clientRolePolicyNames.Select((policy, index) =>
-        {
-            string permission = AuthorizationPermissions.All()[index];
-
-            var clientRolePolicy = ClientRolePolicyFactory.Build($"policies:{policy}", new()
-            {
-                RealmId = realm.Id.Apply(id => id),
-                ResourceServerId = clientsWithResources[0].Id.Apply(id => id),
-                Roles = clientRolePolicyMapping[policy],
-                Type = "role",
-                DecisionStrategy = "UNANIMOUS",
-                Description = StringUtils.ToCapitalCase(policy.Replace(":", "-").Split('-')),
-                Logic = "POSITIVE",
-            });
-
-            var clientAuthorizationPermission = ClientAuthorizationPermissionFactory.Build($"permissions:{permission}", new()
-            {
-                RealmId = realm.Id.Apply(id => id),
-                ResourceServerId = clientsWithResources[0].Id.Apply(id => id),
-                DecisionStrategy = "UNANIMOUS",
-                Description = StringUtils.ToCapitalCase(permission.Replace(":", "-").Split('-')),
-                Policies = clientRolePolicy.Id.Apply(id => new[] { id }),
-                Resources = clientAuthorizationPermissionsMapping[permission].Resources,
-                Scopes = clientAuthorizationPermissionsMapping[permission].Scopes,
-                Type = "scope"
-            });
-
-            return Output.All(clientRolePolicy.Id, clientRolePolicy.Name, clientAuthorizationPermission.Id, clientAuthorizationPermission.Name);
-        }
-    );
-
-    // Create a Keycloak client scopes
-    var clientScopesMonolithAPIClient = ClientScopesFactory.Build($"client-scopes:{ClientScopes.Audience}", new()
-    {
-        RealmId = realm.Id.Apply(id => id),
-        Description = StringUtils.ToCapitalCase(ClientScopes.Audience),
-        IncludeInTokenScope = false,
-    });
-
-    // Create a Keycloak audience protocol mapper
-    var audienceProtocolMapperMonolithAPIClient = AudienceProtocolMapperFactory.Build(
-        $"protocol-mapper:{ClientScopes.Audience}:{monolithAPIClientName.ToLower().Replace(" ", "-")}",
-        new()
-        {
-            RealmId = realm.Id.Apply(id => id),
-            AddToAccessToken = true,
-            AddToIdToken = false,
-            ClientScopeId = clientScopesMonolithAPIClient.Id.Apply(id => id),
-            IncludedClientAudience = clientsWithResources[0].ClientId.Apply(id => id),
-        }
-    );
+    // Create Keycloak client default scopes
+    var clientDefaultScopesCreated = ClientDefaultScopesData
+        .GetClientDefaultScopes(realms: realmsCreated, clients: clientsCreated, clientScopes: clientScopesCreated)
+        .AsParallel()
+        .ToDictionary(item => item.Key, item => ClientDefaultScopeFactory.Build(item.Value.Name, item.Value.Config));
 
     return new Dictionary<string, object?>
     {
-        ["realmId"] = realm.RealmName,
-        ["clientsWithoutResourcesIds"] = Output.All(
-            clientsWithoutResources.Select(
-                client => Output.All(
-                    client.ClientId,
-                    client.Id
-                )
-                .Apply(client => client)
+        ["realmsId"] = Output.All(
+            realmsCreated.Select(
+                realm => Output.All(
+                    realm.Value.Id
+                ).Apply(realm => realm)
             )
         ),
-        ["clientsWithResourcesIds"] = Output.All(
-            clientsWithResources.Select(
+        ["clients"] = Output.All(
+            clientsCreated.Select(
                 client => Output.All(
-                    client.ClientId,
-                    client.Id
-                )
-                .Apply(client => client)
+                    client.Value.Id,
+                    client.Value.ClientId
+                ).Apply(client => client)
             )
         ),
         ["usersIds"] = Output.All(
-            new[] { adminUser, productTeamUserApoveda25 }
-                .Select(
-                    user => Output.All(
-                        user.Username,
-                        user.Id
-                    )
-                    .Apply(user => user)
-                )
+            usersCreated.Select(
+                user => Output.All(
+                    user.Value.Id,
+                    user.Value.FirstName.Apply(x => x ?? string.Empty),
+                    user.Value.LastName.Apply(x => x ?? string.Empty)
+                ).Apply(user => user)
+            )
         ),
         ["rolesIds"] = Output.All(
-            new[] {
-                adminRole,
-                productTeamRole
-            }
-                .Select(
-                    role => Output.All(
-                        role.Name,
-                        role.Id
-                    )
-                    .Apply(role => role)
-                )
+            rolesCreated.Select(
+                role => Output.All(
+                    role.Value.Id,
+                    role.Value.Name,
+                    role.Value.RealmId
+                ).Apply(role => role)
+            )
         ),
         ["userRolesIds"] = Output.All(
-            new[] {
-                adminUserToAdminRole,
-                productTeamUserToProductTeamRoleAproveda25
-            }
-                .Select(
-                    userRole => Output.All(
-                        userRole.Id,
-                        userRole.UserId
-                    )
-                    .Apply(userRole => userRole)
-                )
-        ),
-        ["clientRolePoliciesClientAuthorizationPermissionsIds"] = Output.All(
-            clientRolePoliciesClientAuthorizationPermissionsMonolithAPIClient
+            userRolesCreated.Select(
+                userRole => Output.All(
+                    userRole.Value.Id,
+                    userRole.Value.RoleIds.Apply(x => string.Join(",", x)),
+                    userRole.Value.UserId
+                ).Apply(userRole => userRole)
+            )
         ),
         ["clientAuthorizationScopesIds"] = Output.All(
-            clientAuthorizationScopes.Select(
+            clientAuthorizationScopesCreated.Select(
                 scope => Output.All(
-                    scope.Name,
-                    scope.Id
-                )
-                .Apply(scope => scope)
+                    scope.Value.Id,
+                    scope.Value.Name
+                ).Apply(scope => scope)
             )
         ),
         ["clientAuthorizationResourcesIds"] = Output.All(
-            clientAuthorizationResources.Select(
+            clientAuthorizationResourcesCreated.Select(
                 resource => Output.All(
-                    resource.Name,
-                    resource.Id
-                )
-                .Apply(resource => resource)
+                    resource.Value.Id,
+                    resource.Value.Name
+                ).Apply(resource => resource)
+            )
+        ),
+        ["clientRolePoliciesIds"] = Output.All(
+            clientRolePoliciesCreated.Select(
+                policy => Output.All(
+                    policy.Value.Id,
+                    policy.Value.Name
+                ).Apply(policy => policy)
+            )
+        ),
+        ["clientAuthorizationPermissionsIds"] = Output.All(
+            clientAuthorizationPermissionsCreated.Select(
+                permission => Output.All(
+                    permission.Value.Id,
+                    permission.Value.Name
+                ).Apply(permission => permission)
             )
         ),
         ["clientScopesIds"] = Output.All(
-            new[] { clientScopesMonolithAPIClient }
-                .Select(clientScope =>
-                    Output.All(
-                        clientScope.Id,
-                        clientScope.Name
-                    )
-                    .Apply(clientScope => clientScope)
-                )
+            clientScopesCreated.Select(clientScope =>
+                Output.All(
+                    clientScope.Value.Id,
+                    clientScope.Value.Name,
+                    clientScope.Value.RealmId
+                ).Apply(clientScope => clientScope)
+            )
         ),
         ["audienceProtocolMapperIds"] = Output.All(
-            new[] { audienceProtocolMapperMonolithAPIClient }
-                .Select(protocolMapper =>
-                    Output.All(
-                        protocolMapper.Id,
-                        protocolMapper.Name
-                    )
-                    .Apply(protocolMapper => protocolMapper)
-                )
+            audienceProtocolMappersCreated.Select(protocolMapper =>
+                Output.All(
+                    protocolMapper.Value.Id,
+                    protocolMapper.Value.Name,
+                    protocolMapper.Value.RealmId
+                ).Apply(protocolMapper => protocolMapper)
+            )
+        ),
+        ["clientDefaultScopesIds"] = Output.All(
+            clientDefaultScopesCreated.Select(clientScope =>
+                Output.All(
+                    clientScope.Value.Id,
+                    clientScope.Value.RealmId,
+                    clientScope.Value.ClientId
+                ).Apply(clientScope => clientScope)
+            )
         ),
     };
 });

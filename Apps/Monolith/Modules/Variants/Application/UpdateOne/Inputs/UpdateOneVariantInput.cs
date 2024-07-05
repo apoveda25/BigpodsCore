@@ -9,11 +9,11 @@ public sealed record UpdateOneVariantInput : IUpdateOneVariantInput
 {
     public Guid Id { get; set; } = Guid.Empty;
 
-    public string? Name { get; set; } = string.Empty;
+    public string? Name { get; set; }
 
-    public float? Price { get; set; } = 0;
+    public float? Price { get; set; }
 
-    public float? Cost { get; set; } = 0;
+    public float? Cost { get; set; }
 
     public DateTimeZone UpdatedAtTimezone { get; set; } = DateTimeZone.Utc;
 

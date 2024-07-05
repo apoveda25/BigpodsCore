@@ -9,7 +9,7 @@ namespace Bigpods.Monolith.Modules.AttributeTypes.Application.Common.Policies;
 
 public sealed class AttributeTypesPolicies
 {
-    private const string Resource = "resources:attribute-classes";
+    private const string Resource = "resources:attribute-types";
 
     public const string CreateOneAttributeTypesPolicy = "CreateOneAttributeTypesPolicy";
     public const string UpdateOneAttributeTypesPolicy = "UpdateOneAttributeTypesPolicy";
