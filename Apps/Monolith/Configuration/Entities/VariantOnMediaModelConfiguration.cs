@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Bigpods.Monolith.Configuration.Entities;
 
-public class MediaOnVariantModelConfiguration : IEntityTypeConfiguration<MediaOnVariantModel>
+public class MediaOnVariantModelConfiguration : IEntityTypeConfiguration<VariantOnMediaModel>
 {
-    public void Configure(EntityTypeBuilder<MediaOnVariantModel> builder)
+    public void Configure(EntityTypeBuilder<VariantOnMediaModel> builder)
     {
-        builder.ToTable(name: "medias_on_variants");
+        builder.ToTable(name: "variants_on_medias");
 
         builder.HasKey(keyExpression: x => x.Id);
 

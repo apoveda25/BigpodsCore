@@ -111,7 +111,7 @@ public sealed class VariantEntity
             sku: string.Empty,
             price: variant.Price,
             cost: variant.Cost,
-            stock: variant.Stock,
+            stock: 0,
             isDeleted: false,
             createdAtDatetime: DateTime.Now,
             updatedAtDatetime: null,
@@ -209,7 +209,8 @@ public sealed class VariantEntity
 
     public static VariantEntity DeleteOne(
         IDeleteOneVariantDto variant,
-        IVariantModel? variantFoundById
+        IVariantModel? variantFoundById,
+        IInventoryModel? inventoryFoundByVariantId
     )
     {
         if (variantFoundById is null)
@@ -225,6 +226,11 @@ public sealed class VariantEntity
         if (variantFoundById.Id != variant.Id)
         {
             throw new ConflictException("Variant id not match");
+        }
+
+        if (inventoryFoundByVariantId is not null)
+        {
+            throw new ConflictException("Variant with inventory can not deleted");
         }
 
         return new VariantEntity

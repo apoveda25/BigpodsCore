@@ -18,6 +18,7 @@ public partial class ClientAuthorizationPermissionsData
     public static string ResourceAttributesName { get; } = ClientAuthorizationResourcesData.AttributesName;
     public static string ResourceVariantsName { get; } = ClientAuthorizationResourcesData.VariantsName;
     public static string ResourceProductsName { get; } = ClientAuthorizationResourcesData.ProductsName;
+    public static string ResourceInventoriesName { get; } = ClientAuthorizationResourcesData.InventoriesName;
     public static string ResourceWarehousesName { get; } = ClientAuthorizationResourcesData.WarehousesName;
 
     private static Dictionary<string, ClientAuthorizationPermission> GetClientAuthorizationPermissionsTypeResource(
@@ -34,12 +35,14 @@ public partial class ClientAuthorizationPermissionsData
         var attributesPolicies = policies.Where(policy => policy.Key.Contains(ClientAuthorizationResourcesData.AttributesName)).Select(policy => policy.Value.Name);
         var variantsPolicies = policies.Where(policy => policy.Key.Contains(ClientAuthorizationResourcesData.VariantsName)).Select(policy => policy.Value.Name);
         var productsPolicies = policies.Where(policy => policy.Key.Contains(ClientAuthorizationResourcesData.ProductsName)).Select(policy => policy.Value.Name);
+        var inventoriesPolicies = policies.Where(policy => policy.Key.Contains(ClientAuthorizationResourcesData.InventoriesName)).Select(policy => policy.Value.Name);
         var warehousesPolicies = policies.Where(policy => policy.Key.Contains(ClientAuthorizationResourcesData.WarehousesName)).Select(policy => policy.Value.Name);
 
         string resourceAttributeTypesNameKebabCase = StringUtils.ToKebabCase(ResourceAttributeTypesName);
         string resourceAttributesNameKebabCase = StringUtils.ToKebabCase(ResourceAttributesName);
         string resourceVariantsNameKebabCase = StringUtils.ToKebabCase(ResourceVariantsName);
         string resourceProductsNameKebabCase = StringUtils.ToKebabCase(ResourceProductsName);
+        string resourceInventoriesNameKebabCase = StringUtils.ToKebabCase(ResourceInventoriesName);
         string resourceWarehousesNameKebabCase = StringUtils.ToKebabCase(ResourceWarehousesName);
 
         return new Dictionary<string, ClientAuthorizationPermission>
@@ -82,6 +85,16 @@ public partial class ClientAuthorizationPermissionsData
                 Description = $"{ResourceProductsName} Permission",
                 Policies = Output.All(productsPolicies),
                 Resources = resources[ClientAuthorizationResourcesData.ProductsName].Name.Apply(name => new[] { name }),
+                Type = "resource"
+            }),
+            [ResourceInventoriesName] = new ClientAuthorizationPermission(Name: $"permissions:{resourceInventoriesNameKebabCase}", Config: new()
+            {
+                RealmId = bigpodsRealm.Id.Apply(id => id),
+                ResourceServerId = bigpodsMonolithAPIClient.Id.Apply(id => id),
+                DecisionStrategy = "UNANIMOUS",
+                Description = $"{ResourceInventoriesName} Permission",
+                Policies = Output.All(inventoriesPolicies),
+                Resources = resources[ClientAuthorizationResourcesData.InventoriesName].Name.Apply(name => new[] { name }),
                 Type = "resource"
             }),
             [ResourceWarehousesName] = new ClientAuthorizationPermission(Name: $"permissions:{resourceWarehousesNameKebabCase}", Config: new()

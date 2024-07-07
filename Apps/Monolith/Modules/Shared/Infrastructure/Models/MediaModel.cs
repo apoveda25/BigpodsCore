@@ -10,4 +10,5 @@ public sealed class MediaModel : BaseModel, IMediaModel
     public int Position { get; set; } = default!;
     public string ContentType { get; set; } = default!;
     public string Extension { get; set; } = default!;
+    public ICollection<VariantOnMediaModel> VariantsOnMedias { get; set; } = default!;
 }

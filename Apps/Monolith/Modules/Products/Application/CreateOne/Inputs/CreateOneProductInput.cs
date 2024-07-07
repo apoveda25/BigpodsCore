@@ -42,8 +42,6 @@ public record CreateOneVariantInput : ICreateOneVariantInput<CreateOneVariantOnA
 
     public float Cost { get; set; } = 0;
 
-    public int Stock { get; set; } = 0;
-
     [GraphQLIgnore]
     public DateTimeZone CreatedAtTimezone { get; set; } = DateTimeZone.Utc;
 

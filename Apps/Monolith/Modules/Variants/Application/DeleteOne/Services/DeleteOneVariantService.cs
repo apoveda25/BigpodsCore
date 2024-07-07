@@ -20,6 +20,7 @@ public sealed class DeleteOneVariantService(
         var productsRepository = _unitOfWork.GetRepository<ProductModel>();
         var variantsRepository = _unitOfWork.GetRepository<VariantModel>();
         var variantsOnAttributesRepository = _unitOfWork.GetRepository<VariantOnAttributeModel>();
+        var inventoriesRepository = _unitOfWork.GetRepository<InventoryModel>();
 
         var variantFoundById = await variantsRepository.FindOneAsync(
             filter: x => x.Id == command.VariantDto.Id && x.IsDeleted == false,
@@ -36,10 +37,16 @@ public sealed class DeleteOneVariantService(
             cancellationToken: cancellationToken
         );
 
+        var inventoryFoundByVariantId = variantFoundById is null ? null : await inventoriesRepository.FindOneAsync(
+            filter: x => x.VariantId == variantFoundById.Id,
+            cancellationToken: cancellationToken
+        );
+
         return new DeleteOneVariantServiceResponse(
             ProductFoundById: productFoundById,
             VariantFoundById: variantFoundById,
-            VariantsOnAttributesFoundByVariantId: variantsOnAttributesFoundByVariantId.ToArray()
+            VariantsOnAttributesFoundByVariantId: variantsOnAttributesFoundByVariantId.ToArray(),
+            InventoryFoundByVariantId: inventoryFoundByVariantId
         );
     }
 }
@@ -47,5 +54,6 @@ public sealed class DeleteOneVariantService(
 public sealed record DeleteOneVariantServiceResponse(
     IProductModel? ProductFoundById,
     IVariantModel? VariantFoundById,
-    IVariantOnAttributeModel[] VariantsOnAttributesFoundByVariantId
+    IVariantOnAttributeModel[] VariantsOnAttributesFoundByVariantId,
+    IInventoryModel? InventoryFoundByVariantId
 ) : IDeleteOneVariantServiceResponse;

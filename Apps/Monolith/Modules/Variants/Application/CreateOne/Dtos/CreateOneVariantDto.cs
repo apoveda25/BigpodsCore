@@ -7,7 +7,6 @@ public sealed record CreateOneVariantDto(
     string Name,
     float Price,
     float Cost,
-    int Stock,
     string CreatedAtTimezone,
     Guid CreatedBy,
     Guid ProductId

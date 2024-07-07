@@ -36,7 +36,8 @@ public sealed class DeleteOneVariantHandler(
 
         var variantEntity = VariantEntity.DeleteOne(
             variant: command.VariantDto,
-            variantFoundById: fetchResponse.VariantFoundById
+            variantFoundById: fetchResponse.VariantFoundById,
+            inventoryFoundByVariantId: fetchResponse.InventoryFoundByVariantId
         );
 
         var variantOnAttributeEntities = fetchResponse.VariantsOnAttributesFoundByVariantId.Select(

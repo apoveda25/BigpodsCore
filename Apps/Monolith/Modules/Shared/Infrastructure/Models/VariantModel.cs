@@ -13,4 +13,5 @@ public sealed class VariantModel : BaseModel, IVariantModel
     public Guid ProductId { get; set; } = default!;
     public ProductModel Product { get; set; } = default!;
     public ICollection<VariantOnAttributeModel> VariantsOnAttributes { get; set; } = default!;
+    public ICollection<VariantOnMediaModel> VariantsOnMedias { get; set; } = default!;
 }

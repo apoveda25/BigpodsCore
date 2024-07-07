@@ -20,7 +20,6 @@ public interface ICreateOneVariantInput<T>
     public string Name { get; set; }
     public float Price { get; set; }
     public float Cost { get; set; }
-    public int Stock { get; set; }
     public DateTimeZone CreatedAtTimezone { get; set; }
     public Guid CreatedBy { get; set; }
     public Guid ProductId { get; set; }

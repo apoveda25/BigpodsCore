@@ -44,6 +44,12 @@ using Bigpods.Monolith.Modules.Warehouses.Infrastructure.UpdateOne.Mutations;
 using Bigpods.Monolith.Modules.Warehouses.Infrastructure.DeleteOne.Mutations;
 using Bigpods.Monolith.Modules.Warehouses.Infrastructure.FindMany.Queries;
 using Bigpods.Monolith.Modules.Warehouses.Infrastructure.FindOne.Queries;
+using Bigpods.Monolith.Modules.Inventories.Application.Common.Policies;
+using Bigpods.Monolith.Modules.Inventories.Infrastructure.CreateOne.Mutations;
+using Bigpods.Monolith.Modules.Inventories.Infrastructure.DeleteOne.Mutations;
+using Bigpods.Monolith.Modules.Inventories.Infrastructure.FindMany.Queries;
+using Bigpods.Monolith.Modules.Inventories.Infrastructure.FindOne.Queries;
+using Bigpods.Monolith.Modules.Inventories.Application.Common.Services;
 
 
 namespace Bigpods.Monolith.Config.Services;
@@ -119,6 +125,8 @@ public static class CoreDependencyInjectionService
             .AddTypeExtension<DeleteOneVariantsMutation>()
             .AddTypeExtension<CreateOneProductsMutation>()
             .AddTypeExtension<UpdateOneProductsMutation>()
+            .AddTypeExtension<CreateOneInventoryMutation>()
+            .AddTypeExtension<DeleteOneInventoryMutation>()
             .AddTypeExtension<CreateOneWarehousesMutation>()
             .AddTypeExtension<UpdateOneWarehousesMutation>()
             .AddTypeExtension<DeleteOneWarehousesMutation>()
@@ -131,6 +139,8 @@ public static class CoreDependencyInjectionService
             .AddTypeExtension<FindOneVariantsQuery>()
             .AddTypeExtension<FindManyProductsQuery>()
             .AddTypeExtension<FindOneProductsQuery>()
+            .AddTypeExtension<FindManyInventoriesQuery>()
+            .AddTypeExtension<FindOneInventoryQuery>()
             .AddTypeExtension<FindManyWarehousesQuery>()
             .AddTypeExtension<FindOneWarehousesQuery>()
             .AddType<DateTimeZoneType>()
@@ -175,6 +185,7 @@ public static class CoreDependencyInjectionService
             .AddAuthorization(configure: AttributesPolicies.ConfigurePolicies)
             .AddAuthorization(configure: VariantsPolicies.ConfigurePolicies)
             .AddAuthorization(configure: ProductsPolicies.ConfigurePolicies)
+            .AddAuthorization(configure: InventoriesPolicies.ConfigurePolicies)
             .AddAuthorization(configure: WarehousesPolicies.ConfigurePolicies)
             .AddKeycloakAuthorization();
 
@@ -193,6 +204,7 @@ public static class CoreDependencyInjectionService
             .AddAttributesDependenciesConfiguration()
             .AddVariantsDependenciesConfiguration()
             .AddProductsDependenciesConfiguration()
+            .AddInventoriesDependenciesConfiguration()
             .AddWarehousesDependenciesConfiguration();
     }
 }

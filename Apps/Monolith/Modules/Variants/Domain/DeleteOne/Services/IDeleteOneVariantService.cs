@@ -16,4 +16,5 @@ public interface IDeleteOneVariantServiceResponse
     public IProductModel? ProductFoundById { get; init; }
     public IVariantModel? VariantFoundById { get; init; }
     public IVariantOnAttributeModel[] VariantsOnAttributesFoundByVariantId { get; init; }
+    public IInventoryModel? InventoryFoundByVariantId { get; init; }
 }

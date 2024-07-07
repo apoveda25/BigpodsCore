@@ -16,6 +16,7 @@ public sealed record ClientAuthorizationResource(string Name, Pulumi.Keycloak.Op
 public class ClientAuthorizationResourcesData
 {
     public static string WarehousesName { get; } = "Warehouses";
+    public static string InventoriesName { get; } = "Inventories";
     public static string ProductsName { get; } = "Products";
     public static string VariantsName { get; } = "Variants";
     public static string AttributesName { get; } = "Attributes";
@@ -32,6 +33,7 @@ public class ClientAuthorizationResourcesData
         var createOneScope = scopes[ClientAuthorizationScopesData.CreateOneName];
 
         string warehousesNameKebabCase = StringUtils.ToKebabCase(WarehousesName);
+        string inventoriesNameKebabCase = StringUtils.ToKebabCase(InventoriesName);
         string productsNameKebabCase = StringUtils.ToKebabCase(ProductsName);
         string variantsNameKebabCase = StringUtils.ToKebabCase(VariantsName);
         string attributesNameKebabCase = StringUtils.ToKebabCase(AttributesName);
@@ -44,6 +46,14 @@ public class ClientAuthorizationResourcesData
                 RealmId = bigpodsRealm.Id.Apply(id => id),
                 ResourceServerId = bigpodsMonolithAPIClient.Id.Apply(id => id),
                 DisplayName = WarehousesName,
+                OwnerManagedAccess = true,
+                Scopes = scopes.AsParallel().Select(x => x.Value.Name).ToArray(),
+            }),
+            [InventoriesName] = new ClientAuthorizationResource(Name: $"resources:{inventoriesNameKebabCase}", Config: new()
+            {
+                RealmId = bigpodsRealm.Id.Apply(id => id),
+                ResourceServerId = bigpodsMonolithAPIClient.Id.Apply(id => id),
+                DisplayName = InventoriesName,
                 OwnerManagedAccess = true,
                 Scopes = scopes.AsParallel().Select(x => x.Value.Name).ToArray(),
             }),

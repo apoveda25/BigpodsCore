@@ -18,8 +18,6 @@ public sealed record CreateOneVariantInput : ICreateOneVariantInput<CreateOneVar
 
     public float Cost { get; set; } = 0;
 
-    public int Stock { get; set; } = 0;
-
     public DateTimeZone CreatedAtTimezone { get; set; } = DateTimeZone.Utc;
 
     [GraphQLIgnore]

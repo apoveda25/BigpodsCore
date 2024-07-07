@@ -114,7 +114,7 @@ public sealed class ProductAggregateRoot
                 throw new ConflictException("Variant exist with this id");
             }
 
-            if (!VariantBelongToProduct(variant.ProductId))
+            if (!IsVariantBelongToProduct(variant.ProductId))
             {
                 throw new ConflictException("Variant not belong to this product");
             }
@@ -130,7 +130,7 @@ public sealed class ProductAggregateRoot
         return Variants.Any(variant => variant.Id == variantId);
     }
 
-    private bool VariantBelongToProduct(Guid productId)
+    private bool IsVariantBelongToProduct(Guid productId)
     {
         return productId == Id;
     }

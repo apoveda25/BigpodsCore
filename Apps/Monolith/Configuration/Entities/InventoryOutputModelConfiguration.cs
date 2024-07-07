@@ -37,6 +37,8 @@ public class InventoryOutputModelConfiguration : IEntityTypeConfiguration<Invent
 
         builder.Property(propertyExpression: x => x.DeletedBy).UseCollation(collation: "utf8mb4_general_ci");
 
+        builder.Property(propertyExpression: x => x.ProductId).UseCollation(collation: "utf8mb4_general_ci");
+
         builder.Property(propertyExpression: x => x.VariantId).UseCollation(collation: "utf8mb4_general_ci");
 
         builder.Property(propertyExpression: x => x.WarehouseId).UseCollation(collation: "utf8mb4_general_ci");

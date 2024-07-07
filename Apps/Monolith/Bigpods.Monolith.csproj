@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\..\Libs\Shared\Bigpods.Shared.csproj" />
@@ -8,6 +8,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>18c10e10-7210-4d93-b918-baec4f9ac34d</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="13.9.6" />

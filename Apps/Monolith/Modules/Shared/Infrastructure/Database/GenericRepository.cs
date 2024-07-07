@@ -148,7 +148,7 @@ public class GenericRepository<T>(DatabaseService context, ILogger logger) : IGe
     {
         try
         {
-            _model.Update(entity);
+            _model.Remove(entity);
 
             return entity;
         }
@@ -163,7 +163,7 @@ public class GenericRepository<T>(DatabaseService context, ILogger logger) : IGe
     {
         try
         {
-            _model.UpdateRange(entities);
+            _model.RemoveRange(entities);
 
             return entities;
         }

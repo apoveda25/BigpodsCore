@@ -83,7 +83,7 @@ public sealed class VariantEntity
             sku: string.Empty,
             price: variant.Price,
             cost: variant.Cost,
-            stock: variant.Stock,
+            stock: 0,
             isDeleted: false,
             createdAtDatetime: DateTime.Now,
             updatedAtDatetime: null,
