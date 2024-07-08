@@ -1,8 +1,9 @@
 using Bigpods.Monolith.Modules.Attributes.Domain.Common.Entities;
 using Bigpods.Monolith.Modules.Attributes.Domain.CreateOne.Dtos;
+using Bigpods.Monolith.Modules.Attributes.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.Attributes.Domain.DeleteOne.Dtos;
+using Bigpods.Monolith.Modules.Attributes.Domain.DeleteOne.Services;
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
-using Bigpods.Monolith.Modules.Shared.Domain.Models;
 using Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
 
 namespace Bigpods.Monolith.Modules.Attributes.Domain.Common.Aggregates;
@@ -61,20 +62,30 @@ public sealed class AttributeAggregateRoot
 
     public static AttributeAggregateRoot CreateOne(
         ICreateOneAttributeDto attribute,
-        AttributeTypeEntity attributeType,
-        IAttributeModel? attributeFoundById,
-        IAttributeModel? attributeFoundByValueMeasuringUnitAttributeTypeId
+        ICreateOneAttributeServiceResponse data
     )
     {
-        if (attributeFoundById is not null)
+        if (data.AttributeFoundById is not null)
         {
             throw new ConflictException("Attribute already exists with this id");
         }
 
-        if (attributeFoundByValueMeasuringUnitAttributeTypeId is not null && attributeFoundByValueMeasuringUnitAttributeTypeId?.IsDeleted == false)
+        if (data.AttributeFoundByValueMeasuringUnitAttributeTypeId is not null)
         {
-            throw new ConflictException("Attribute already exists with this type");
+            throw new ConflictException("Attribute already exists with this value, measuring unit and attribute type");
         }
+
+        if (data.AttributeTypeFoundById is null)
+        {
+            throw new NotFoundException("Attribute type not exist with this id");
+        }
+
+        if (data.AttributeTypeFoundById.Id != attribute.AttributeTypeId)
+        {
+            throw new ConflictException("Attribute type not belong to this attribute");
+        }
+
+        var attributeTypeEntity = AttributeTypeEntity.BuildOne(data.AttributeTypeFoundById);
 
         return new AttributeAggregateRoot(
             id: attribute.Id,
@@ -90,46 +101,47 @@ public sealed class AttributeAggregateRoot
             createdBy: attribute.CreatedBy,
             updatedBy: null,
             deletedBy: null,
-            attributeType: attributeType
+            attributeType: attributeTypeEntity
         );
     }
 
     public static AttributeAggregateRoot DeleteOne(
         IDeleteOneAttributeDto attribute,
-        AttributeTypeEntity attributeType,
-        IAttributeModel? attributeFoundById
+        IDeleteOneAttributeServiceResponse data
     )
     {
-        if (attributeFoundById is null)
+        if (data.AttributeFoundById is null)
         {
             throw new NotFoundException("Attribute not exist with this id");
         }
 
-        if (attributeFoundById.IsDeleted == true)
+        if (data.AttributeFoundById.IsDeleted == true)
         {
             throw new ConflictException("Attribute is deleted");
         }
 
-        if (attributeFoundById.Id != attribute.Id)
+        if (data.AttributeFoundById.Id != attribute.Id)
         {
             throw new ConflictException("Attribute id not match");
         }
 
+        var attributeTypeEntity = AttributeTypeEntity.BuildOne(data.AttributeTypeFoundById);
+
         return new AttributeAggregateRoot(
-            id: attributeFoundById.Id,
-            value: attributeFoundById.Value,
-            measuringUnit: attributeFoundById.MeasuringUnit,
+            id: data.AttributeFoundById.Id,
+            value: data.AttributeFoundById.Value,
+            measuringUnit: data.AttributeFoundById.MeasuringUnit,
             isDeleted: true,
-            createdAtDatetime: attributeFoundById.CreatedAtDatetime,
-            updatedAtDatetime: attributeFoundById.UpdatedAtDatetime,
+            createdAtDatetime: data.AttributeFoundById.CreatedAtDatetime,
+            updatedAtDatetime: data.AttributeFoundById.UpdatedAtDatetime,
             deletedAtDatetime: DateTime.Now,
-            createdAtTimezone: attributeFoundById.CreatedAtTimezone,
-            updatedAtTimezone: attributeFoundById.UpdatedAtTimezone,
+            createdAtTimezone: data.AttributeFoundById.CreatedAtTimezone,
+            updatedAtTimezone: data.AttributeFoundById.UpdatedAtTimezone,
             deletedAtTimezone: attribute.DeletedAtTimezone,
-            createdBy: attributeFoundById.CreatedBy,
-            updatedBy: attributeFoundById.UpdatedBy,
+            createdBy: data.AttributeFoundById.CreatedBy,
+            updatedBy: data.AttributeFoundById.UpdatedBy,
             deletedBy: attribute.DeletedBy,
-            attributeType: attributeType
+            attributeType: attributeTypeEntity
         );
     }
 }

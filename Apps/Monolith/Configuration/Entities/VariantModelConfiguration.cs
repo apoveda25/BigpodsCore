@@ -23,8 +23,6 @@ public class VariantModelConfiguration : IEntityTypeConfiguration<VariantModel>
 
         builder.Property(propertyExpression: x => x.Cost).IsRequired().HasColumnType("decimal(10,2)");
 
-        builder.Property(propertyExpression: x => x.Stock).IsRequired().HasColumnType("int(11)");
-
         builder.Property(propertyExpression: x => x.IsDeleted).IsRequired().HasDefaultValue(value: false);
 
         builder.Property(propertyExpression: x => x.CreatedAtDatetime).IsRequired();

@@ -20,11 +20,11 @@ public sealed class UpdateOneAttributeTypeService(
         var attributeTypesRepository = _unitOfWork.GetRepository<AttributeTypeModel>();
 
         var attributeTypeFoundById = await attributeTypesRepository.FindOneAsync(
-            filter: x => x.Id == command.AttributeTypeDto.Id && x.IsDeleted == false,
+            filter: x => x.Id == command.AttributeTypeDto.Id,
             cancellationToken: cancellationToken
         );
         var attributeTypeFoundByName = await attributeTypesRepository.FindOneAsync(
-            filter: x => x.Name == command.AttributeTypeDto.Name && x.IsDeleted == false,
+            filter: x => x.Name == command.AttributeTypeDto.Name,
             cancellationToken: cancellationToken
         );
 

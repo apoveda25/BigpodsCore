@@ -3,7 +3,6 @@ using AutoMapper;
 using Bigpods.Monolith.Modules.Shared.Domain.Database;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Products.Domain.Common.Aggregates;
-using Bigpods.Monolith.Modules.Products.Domain.Common.Entities;
 using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Services;
 
 using MediatR;
@@ -30,27 +29,14 @@ public sealed class CreateOneProductHandler(
 
         var aggregateRoot = ProductAggregateRoot.CreateOne(
             product: command.ProductDto,
-            productFoundById: fetchResponse.ProductFoundById
+            variants: command.VariantDtos,
+            variantsOnAttributes: command.VariantOnAttributeDtos,
+            data: fetchResponse
         );
 
-        var variantEntities = command.VariantDtos.Select(dto => VariantEntity.CreateOne(
-            variant: dto,
-            variantsFoundById: fetchResponse.VariantsFoundById
-        )).ToArray();
-
-        aggregateRoot.AttachVariants(variants: variantEntities);
-
-        var variantOnAttributeEntities = command.VariantOnAttributeDtos.Select(dto => VariantOnAttributeEntity.CreateOne(
-            variantOnAttribute: dto,
-            variantsOnAttributesFoundById: fetchResponse.VariantsOnAttributesFoundById,
-            attributesFoundById: fetchResponse.AttributesFoundById
-        )).ToArray();
-
-        aggregateRoot.AttachVariantsOnAttributes(variantOnAttributeEntities);
-
         var productModel = _mapper.Map<ProductModel>(source: aggregateRoot);
-        var variantModels = _mapper.Map<VariantModel[]>(source: variantEntities);
-        var variantOnAttributeModels = _mapper.Map<VariantOnAttributeModel[]>(source: variantOnAttributeEntities);
+        var variantModels = _mapper.Map<VariantModel[]>(source: aggregateRoot.Variants);
+        var variantOnAttributeModels = _mapper.Map<VariantOnAttributeModel[]>(source: aggregateRoot.Variants.SelectMany(v => v.VariantsOnAttributes));
 
         await productsRepository.CreateOneAsync(entity: productModel, cancellationToken: token);
         await variantsRepository.CreateManyAsync(entities: variantModels, cancellationToken: token);

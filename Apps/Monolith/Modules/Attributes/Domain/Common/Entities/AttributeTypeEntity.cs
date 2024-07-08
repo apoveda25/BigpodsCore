@@ -57,7 +57,7 @@ public sealed class AttributeTypeEntity
         DeletedBy = deletedBy;
     }
 
-    public static AttributeTypeEntity Build(
+    public static AttributeTypeEntity BuildOne(
         IAttributeTypeModel? attributeType
     )
     {

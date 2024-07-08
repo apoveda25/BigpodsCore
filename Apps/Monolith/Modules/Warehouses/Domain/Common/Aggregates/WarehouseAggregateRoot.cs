@@ -1,9 +1,11 @@
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
-using Bigpods.Monolith.Modules.Shared.Domain.Models;
 using Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
 using Bigpods.Monolith.Modules.Warehouses.Domain.CreateOne.Dtos;
+using Bigpods.Monolith.Modules.Warehouses.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.Warehouses.Domain.DeleteOne.Dtos;
+using Bigpods.Monolith.Modules.Warehouses.Domain.DeleteOne.Services;
 using Bigpods.Monolith.Modules.Warehouses.Domain.UpdateOne.Dtos;
+using Bigpods.Monolith.Modules.Warehouses.Domain.UpdateOne.Services;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Domain.Common.Aggregates;
 
@@ -56,16 +58,15 @@ public sealed class WarehouseAggregateRoot
 
     public static WarehouseAggregateRoot CreateOne(
         ICreateOneWarehouseDto warehouse,
-        IWarehouseModel? warehouseFoundById,
-        IWarehouseModel? warehouseFoundByName
+        ICreateOneWarehouseServiceResponse data
     )
     {
-        if (warehouseFoundById is not null)
+        if (data.WarehouseFoundById is not null)
         {
             throw new ConflictException("Warehouse already exist with this id");
         }
 
-        if (warehouseFoundByName is not null && warehouseFoundByName.IsDeleted == false)
+        if (data.WarehouseFoundByName is not null)
         {
             throw new ConflictException("Warehouse already exist with this name");
         }
@@ -89,93 +90,89 @@ public sealed class WarehouseAggregateRoot
 
     public static WarehouseAggregateRoot UpdateOne(
         IUpdateOneWarehouseDto warehouse,
-        IWarehouseModel? warehouseFoundById,
-        IWarehouseModel? warehouseFoundByName
+        IUpdateOneWarehouseServiceResponse data
     )
     {
-        if (warehouseFoundById is null)
+        if (data.WarehouseFoundById is null)
         {
             throw new NotFoundException("Warehouse not found with this id");
         }
 
-        if (warehouseFoundById.IsDeleted == true)
+        if (data.WarehouseFoundById.IsDeleted == true)
         {
             throw new NotFoundException("Warehouse is deleted");
         }
 
-        if (warehouseFoundById.Id != warehouse.Id)
+        if (data.WarehouseFoundById.Id != warehouse.Id)
         {
             throw new ConflictException("Warehouse id does not match");
         }
 
-        if (warehouseFoundByName is not null && warehouseFoundByName.IsDeleted == false && warehouseFoundByName.Id != warehouse.Id)
+        if (data.WarehouseFoundByName is not null && data.WarehouseFoundByName.Id != warehouse.Id)
         {
             throw new ConflictException("Warehouse already exist with this name");
         }
 
         return new WarehouseAggregateRoot(
-            id: warehouseFoundById.Id,
-            name: warehouse?.Name ?? warehouseFoundById.Name,
-            description: warehouse?.Description ?? warehouseFoundById.Description,
-            isDeleted: false,
-            createdAtDatetime: warehouseFoundById.CreatedAtDatetime,
+            id: data.WarehouseFoundById.Id,
+            name: warehouse?.Name ?? data.WarehouseFoundById.Name,
+            description: warehouse?.Description ?? data.WarehouseFoundById.Description,
+            isDeleted: data.WarehouseFoundById.IsDeleted,
+            createdAtDatetime: data.WarehouseFoundById.CreatedAtDatetime,
             updatedAtDatetime: DateTime.Now,
-            deletedAtDatetime: null,
-            createdAtTimezone: warehouseFoundById.CreatedAtTimezone,
+            deletedAtDatetime: data.WarehouseFoundById.DeletedAtDatetime,
+            createdAtTimezone: data.WarehouseFoundById.CreatedAtTimezone,
             updatedAtTimezone: warehouse?.UpdatedAtTimezone,
-            deletedAtTimezone: null,
-            createdBy: warehouseFoundById.CreatedBy,
+            deletedAtTimezone: data.WarehouseFoundById.DeletedAtTimezone,
+            createdBy: data.WarehouseFoundById.CreatedBy,
             updatedBy: warehouse?.UpdatedBy,
-            deletedBy: null
+            deletedBy: data.WarehouseFoundById.DeletedBy
         );
     }
 
     public static WarehouseAggregateRoot DeleteOne(
         IDeleteOneWarehouseDto warehouse,
-        IWarehouseModel? warehouseFoundById,
-        IInventoryModel[] inventoriesFoundByWarehouseId,
-        IInventoryInputModel[] inventoryInputsFoundByWarehouseId,
-        IInventoryOutputModel[] inventoryOutputsFoundByWarehouseId
+        IDeleteOneWarehouseServiceResponse data
     )
     {
-        if (warehouseFoundById is null)
+        if (data.WarehouseFoundById is null)
         {
             throw new NotFoundException("Warehouse not found with this id");
         }
 
-        if (warehouseFoundById.IsDeleted == true)
+        if (data.WarehouseFoundById.IsDeleted == true)
         {
             throw new NotFoundException("Warehouse not found with this id");
         }
 
-        if (inventoriesFoundByWarehouseId.Length != 0)
+        if (data.InventoriesFoundByWarehouseId.Length != 0)
         {
             throw new ConflictException("Inventories exist with this warehouse id");
         }
 
-        if (inventoryInputsFoundByWarehouseId.Length != 0)
+        if (data.InventoryInputsFoundByWarehouseId.Length != 0)
         {
             throw new ConflictException("Inventory inputs exist with this warehouse id");
         }
 
-        if (inventoryOutputsFoundByWarehouseId.Length != 0)
+        if (data.InventoryOutputsFoundByWarehouseId.Length != 0)
         {
             throw new ConflictException("Inventory outputs exist with this warehouse id");
         }
 
         return new WarehouseAggregateRoot(
-            id: warehouseFoundById.Id,
-            name: warehouseFoundById.Name,
-            description: warehouseFoundById.Description,
+            id: data.WarehouseFoundById.Id,
+            name: data.WarehouseFoundById.Name,
+            description: data.WarehouseFoundById.Description,
             isDeleted: true,
-            createdAtDatetime: warehouseFoundById.CreatedAtDatetime,
-            updatedAtDatetime: warehouseFoundById.UpdatedAtDatetime,
+            createdAtDatetime: data.WarehouseFoundById.CreatedAtDatetime,
+            updatedAtDatetime: data.WarehouseFoundById.UpdatedAtDatetime,
             deletedAtDatetime: DateTime.Now,
-            createdAtTimezone: warehouseFoundById.CreatedAtTimezone,
-            updatedAtTimezone: warehouseFoundById.UpdatedAtTimezone,
+            createdAtTimezone: data.WarehouseFoundById.CreatedAtTimezone,
+            updatedAtTimezone: data.WarehouseFoundById.UpdatedAtTimezone,
             deletedAtTimezone: warehouse.DeletedAtTimezone,
-            createdBy: warehouseFoundById.CreatedBy,
-            updatedBy: warehouseFoundById.UpdatedBy,
+            createdBy: data.WarehouseFoundById.CreatedBy,
+            updatedBy: data.WarehouseFoundById.UpdatedBy,
             deletedBy: warehouse.DeletedBy
         );
     }

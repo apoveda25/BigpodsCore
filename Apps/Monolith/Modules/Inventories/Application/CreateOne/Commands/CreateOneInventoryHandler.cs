@@ -28,19 +28,13 @@ public sealed class CreateOneInventoryHandler(
 
         var inventoriesRepository = _unitOfWork.GetRepository<InventoryModel>();
 
-        var aggregateRoot = WarehouseAggregateRoot.Build(warehouse: fetchResponse.WarehouseFoundById);
-
-        var inventoryEntity = aggregateRoot.CreateOneVariant(
+        var aggregateRoot = WarehouseAggregateRoot.CreateOneVariant(
             inventory: command.InventoryDto,
-            inventoryFoundById: fetchResponse.InventoryFoundById,
-            productFoundById: fetchResponse.ProductFoundById,
-            variantFoundById: fetchResponse.VariantFoundById,
-            warehouseFoundById: fetchResponse.WarehouseFoundById,
-            inventoriesFoundByProductIdWarehouseId: fetchResponse.InventoriesFoundByProductIdWarehouseId
+            data: fetchResponse
         );
 
         var inventoryModel = _mapper.Map<InventoryModel>(
-            source: inventoryEntity
+            source: aggregateRoot.Inventories.FirstOrDefault(x => x.Id == command.InventoryDto.Id)
         );
 
         await inventoriesRepository.CreateOneAsync(

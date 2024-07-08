@@ -29,18 +29,13 @@ public sealed class DeleteOneInventoryHandler(
 
         var inventoriesRepository = _unitOfWork.GetRepository<InventoryModel>();
 
-        var aggregateRoot = WarehouseAggregateRoot.Build(warehouse: fetchResponse.WarehouseFoundById);
-
-        var inventoryEntity = aggregateRoot.DeleteOneVariant(
+        var aggregateRoot = WarehouseAggregateRoot.DeleteOneVariant(
             inventory: command.InventoryDto,
-            inventoryFoundById: fetchResponse.InventoryFoundById,
-            inventoriesFoundByProductIdWarehouseId: fetchResponse.InventoriesFoundByProductIdWarehouseId,
-            inventoryInputsFoundByInventoryId: fetchResponse.InventoryInputsFoundByInventoryId,
-            inventoryOutputsFoundByInventoryId: fetchResponse.InventoryOutputsFoundByInventoryId
+            data: fetchResponse
         );
 
         var inventoryModel = _mapper.Map<InventoryModel>(
-            source: inventoryEntity
+            source: aggregateRoot.Inventories.FirstOrDefault(x => x.Id == command.InventoryDto.Id)
         );
 
         inventoriesRepository.DeleteOne(

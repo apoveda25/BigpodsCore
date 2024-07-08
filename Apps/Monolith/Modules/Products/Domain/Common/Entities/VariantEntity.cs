@@ -12,7 +12,6 @@ public sealed class VariantEntity
     public string Sku { get; private set; }
     public PriceVO Price { get; private set; }
     public CostVO Cost { get; private set; }
-    public StockVO Stock { get; private set; }
     public bool IsDeleted { get; private set; }
     public DateTime CreatedAtDatetime { get; private set; }
     public DateTime? UpdatedAtDatetime { get; private set; }
@@ -30,9 +29,8 @@ public sealed class VariantEntity
         Guid id,
         string name,
         string sku,
-        float price,
-        float cost,
-        int stock,
+        decimal price,
+        decimal cost,
         bool isDeleted,
         DateTime createdAtDatetime,
         DateTime? updatedAtDatetime,
@@ -51,7 +49,6 @@ public sealed class VariantEntity
         Sku = sku;
         Price = new PriceVO(price);
         Cost = new CostVO(cost);
-        Stock = new StockVO(stock);
         IsDeleted = isDeleted;
         CreatedAtDatetime = createdAtDatetime;
         UpdatedAtDatetime = updatedAtDatetime;
@@ -66,12 +63,34 @@ public sealed class VariantEntity
         VariantsOnAttributes = [];
     }
 
-    public static VariantEntity CreateOne(
-        ICreateOneVariantDto variant,
-        IVariantModel[] variantsFoundById
+    public static VariantEntity[] CreateMany(
+        ICreateOneVariantDto[] variants,
+        ICreateOneVariantOnAttributeDto[] variantsOnAttributes,
+        IVariantModel[] variantsFoundById,
+        IVariantOnAttributeModel[] variantsOnAttributesFoundById,
+        IAttributeModel[] attributesFoundById
     )
     {
-        if (variantsFoundById.Length != 0)
+        return variants.Select(variant =>
+            CreateOne(
+                variant: variant,
+                variantsOnAttributes: variantsOnAttributes,
+                variantFoundById: variantsFoundById.FirstOrDefault(v => v.Id == variant.Id),
+                variantsOnAttributesFoundById: variantsOnAttributesFoundById,
+                attributesFoundById: attributesFoundById
+            )
+        ).ToArray();
+    }
+
+    public static VariantEntity CreateOne(
+        ICreateOneVariantDto variant,
+        ICreateOneVariantOnAttributeDto[] variantsOnAttributes,
+        IVariantModel? variantFoundById,
+        IVariantOnAttributeModel[] variantsOnAttributesFoundById,
+        IAttributeModel[] attributesFoundById
+    )
+    {
+        if (variantFoundById is not null)
         {
             throw new ConflictException("Variants exist with this id");
         }
@@ -83,7 +102,6 @@ public sealed class VariantEntity
             sku: string.Empty,
             price: variant.Price,
             cost: variant.Cost,
-            stock: 0,
             isDeleted: false,
             createdAtDatetime: DateTime.Now,
             updatedAtDatetime: null,
@@ -102,10 +120,26 @@ public sealed class VariantEntity
             throw new ConflictException("Price must be greater than cost");
         }
 
+        var variantOnAttributeEntities = VariantOnAttributeEntity.CreateMany(
+            variantOnAttributes: variantsOnAttributes,
+            variantsOnAttributesFoundById: variantsOnAttributesFoundById,
+            attributesFoundById: attributesFoundById
+        );
+
+        entity.AttachManyVariantOnAttribute(variantOnAttributeEntities);
+
         return entity;
     }
 
-    public void AttachVariantOnAttribute(VariantOnAttributeEntity variantOnAttribute)
+    private void AttachManyVariantOnAttribute(VariantOnAttributeEntity[] variantsOnAttributes)
+    {
+        foreach (var variantOnAttribute in variantsOnAttributes)
+        {
+            AttachOneVariantOnAttribute(variantOnAttribute);
+        }
+    }
+
+    private void AttachOneVariantOnAttribute(VariantOnAttributeEntity variantOnAttribute)
     {
         if (IsVariantOnAttributeExist(variantOnAttribute))
         {

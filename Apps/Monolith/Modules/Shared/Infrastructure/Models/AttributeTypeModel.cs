@@ -9,5 +9,6 @@ public sealed class AttributeTypeModel : BaseModel, IAttributeTypeModel
     public string Description { get; set; } = default!;
     public string ValuePattern { get; set; } = default!;
     public string MeasuringUnitPattern { get; set; } = default!;
+
     public ICollection<AttributeModel> Attributes { get; set; } = default!;
 }

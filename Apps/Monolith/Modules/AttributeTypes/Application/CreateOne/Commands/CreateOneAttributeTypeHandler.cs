@@ -31,8 +31,7 @@ public sealed class CreateOneAttributeTypeHandler(
 
         var aggregateRoot = AttributeTypeAggregateRoot.CreateOne(
             attributeType: command.AttributeTypeDto,
-            attributeTypeFoundById: fetchResponse.AttributeTypeFoundById,
-            attributeTypeFoundByName: fetchResponse.AttributeTypeFoundByName
+            data: fetchResponse
         );
 
         var attributeTypeModel = _mapper.Map<AttributeTypeModel>(source: aggregateRoot);

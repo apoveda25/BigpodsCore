@@ -15,8 +15,8 @@ public record CreateOneProductDto(
 public record CreateOneVariantDto(
     Guid Id,
     string Name,
-    float Price,
-    float Cost,
+    decimal Price,
+    decimal Cost,
     string CreatedAtTimezone,
     Guid CreatedBy,
     Guid ProductId

@@ -1,5 +1,7 @@
 using Bigpods.Monolith.Modules.AttributeTypes.Domain.CreateOne.Dtos;
+using Bigpods.Monolith.Modules.AttributeTypes.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.AttributeTypes.Domain.UpdateOne.Dtos;
+using Bigpods.Monolith.Modules.AttributeTypes.Domain.UpdateOne.Services;
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Domain.Models;
 using Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
@@ -61,16 +63,15 @@ public sealed class AttributeTypeAggregateRoot
 
     public static AttributeTypeAggregateRoot CreateOne(
         ICreateOneAttributeTypeDto attributeType,
-        IAttributeTypeModel? attributeTypeFoundById,
-        IAttributeTypeModel? attributeTypeFoundByName
+        ICreateOneAttributeTypeServiceResponse data
     )
     {
-        if (attributeTypeFoundById is not null)
+        if (data.AttributeTypeFoundById is not null)
         {
             throw new ConflictException("Attribute type exist with this id");
         }
 
-        if (attributeTypeFoundByName is not null)
+        if (data.AttributeTypeFoundByName is not null)
         {
             throw new ConflictException("Attribute type exist with this name");
         }
@@ -96,46 +97,45 @@ public sealed class AttributeTypeAggregateRoot
 
     public static AttributeTypeAggregateRoot UpdateOne(
         IUpdateOneAttributeTypeDto attributeType,
-        IAttributeTypeModel? attributeTypeFoundById,
-        IAttributeTypeModel? attributeTypeFoundByName
+        IUpdateOneAttributeTypeServiceResponse data
     )
     {
-        if (attributeTypeFoundById is null)
+        if (data.AttributeTypeFoundById is null)
         {
             throw new NotFoundException("Attribute type not exist with this id");
         }
 
-        if (attributeTypeFoundByName is not null && attributeTypeFoundByName.Id != attributeType.Id)
+        if (data.AttributeTypeFoundByName is not null && data.AttributeTypeFoundByName.Id != attributeType.Id)
         {
             throw new ConflictException("Attribute type exist with this name");
         }
 
-        if (attributeTypeFoundById.IsDeleted)
+        if (data.AttributeTypeFoundById.IsDeleted)
         {
             throw new ConflictException("Attribute type is deleted");
         }
 
-        if (attributeTypeFoundById.Id != attributeType.Id)
+        if (data.AttributeTypeFoundById.Id != attributeType.Id)
         {
             throw new ConflictException("Attribute type id does not match");
         }
 
         return new AttributeTypeAggregateRoot(
-            id: attributeTypeFoundById.Id,
-            name: attributeType.Name ?? attributeTypeFoundById.Name,
-            description: attributeType.Description ?? attributeTypeFoundById.Description,
-            valuePattern: attributeType.ValuePattern ?? attributeTypeFoundById.ValuePattern,
-            measuringUnitPattern: attributeType.MeasuringUnitPattern ?? attributeTypeFoundById.MeasuringUnitPattern,
-            isDeleted: attributeTypeFoundById.IsDeleted,
-            createdAtDatetime: attributeTypeFoundById.CreatedAtDatetime,
+            id: data.AttributeTypeFoundById.Id,
+            name: attributeType.Name ?? data.AttributeTypeFoundById.Name,
+            description: attributeType.Description ?? data.AttributeTypeFoundById.Description,
+            valuePattern: attributeType.ValuePattern ?? data.AttributeTypeFoundById.ValuePattern,
+            measuringUnitPattern: attributeType.MeasuringUnitPattern ?? data.AttributeTypeFoundById.MeasuringUnitPattern,
+            isDeleted: data.AttributeTypeFoundById.IsDeleted,
+            createdAtDatetime: data.AttributeTypeFoundById.CreatedAtDatetime,
             updatedAtDatetime: DateTime.Now,
-            deletedAtDatetime: attributeTypeFoundById.DeletedAtDatetime,
-            createdAtTimezone: attributeTypeFoundById.CreatedAtTimezone,
+            deletedAtDatetime: data.AttributeTypeFoundById.DeletedAtDatetime,
+            createdAtTimezone: data.AttributeTypeFoundById.CreatedAtTimezone,
             updatedAtTimezone: attributeType.UpdatedAtTimezone,
-            deletedAtTimezone: attributeTypeFoundById.DeletedAtTimezone,
-            createdBy: attributeTypeFoundById.CreatedBy,
+            deletedAtTimezone: data.AttributeTypeFoundById.DeletedAtTimezone,
+            createdBy: data.AttributeTypeFoundById.CreatedBy,
             updatedBy: attributeType.UpdatedBy,
-            deletedBy: attributeTypeFoundById.DeletedBy
+            deletedBy: data.AttributeTypeFoundById.DeletedBy
         );
     }
 }

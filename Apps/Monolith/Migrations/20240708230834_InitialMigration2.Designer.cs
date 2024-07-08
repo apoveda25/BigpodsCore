@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bigpods.Monolith.Migrations
 {
     [DbContext(typeof(DatabaseService))]
-    [Migration("20240706193028_InitialMigration3")]
-    partial class InitialMigration3
+    [Migration("20240708230834_InitialMigration2")]
+    partial class InitialMigration2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -204,6 +204,10 @@ namespace Bigpods.Monolith.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
 
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)")
+                        .UseCollation("utf8mb4_general_ci");
+
                     b.Property<int>("Stock")
                         .HasColumnType("int(11)");
 
@@ -229,6 +233,8 @@ namespace Bigpods.Monolith.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("InventoryId");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("VariantId");
 
@@ -272,6 +278,10 @@ namespace Bigpods.Monolith.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
 
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)")
+                        .UseCollation("utf8mb4_general_ci");
+
                     b.Property<int>("Stock")
                         .HasColumnType("int(11)");
 
@@ -295,6 +305,8 @@ namespace Bigpods.Monolith.Migrations
                         .UseCollation("utf8mb4_general_ci");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("WarehouseId");
 
@@ -342,6 +354,10 @@ namespace Bigpods.Monolith.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
 
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)")
+                        .UseCollation("utf8mb4_general_ci");
+
                     b.Property<int>("Stock")
                         .HasColumnType("int(11)");
 
@@ -367,6 +383,8 @@ namespace Bigpods.Monolith.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("InventoryId");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("VariantId");
 
@@ -520,9 +538,6 @@ namespace Bigpods.Monolith.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("int(11)");
-
                     b.Property<DateTime?>("UpdatedAtDatetime")
                         .HasColumnType("datetime(6)");
 
@@ -597,9 +612,6 @@ namespace Bigpods.Monolith.Migrations
                         .IsRequired()
                         .HasMaxLength(36)
                         .HasColumnType("varchar(36)");
-
-                    b.Property<int>("Stock")
-                        .HasColumnType("int(11)");
 
                     b.Property<DateTime?>("UpdatedAtDatetime")
                         .HasColumnType("datetime(6)");
@@ -827,6 +839,12 @@ namespace Bigpods.Monolith.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Bigpods.Monolith.Modules.Shared.Infrastructure.Models.ProductModel", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Bigpods.Monolith.Modules.Shared.Infrastructure.Models.VariantModel", "Variant")
                         .WithMany()
                         .HasForeignKey("VariantId")
@@ -841,6 +859,8 @@ namespace Bigpods.Monolith.Migrations
 
                     b.Navigation("Inventory");
 
+                    b.Navigation("Product");
+
                     b.Navigation("Variant");
 
                     b.Navigation("Warehouse");
@@ -848,6 +868,12 @@ namespace Bigpods.Monolith.Migrations
 
             modelBuilder.Entity("Bigpods.Monolith.Modules.Shared.Infrastructure.Models.InventoryModel", b =>
                 {
+                    b.HasOne("Bigpods.Monolith.Modules.Shared.Infrastructure.Models.ProductModel", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Bigpods.Monolith.Modules.Shared.Infrastructure.Models.VariantModel", "Variant")
                         .WithMany()
                         .HasForeignKey("VariantId")
@@ -860,6 +886,8 @@ namespace Bigpods.Monolith.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Product");
+
                     b.Navigation("Variant");
 
                     b.Navigation("Warehouse");
@@ -870,6 +898,12 @@ namespace Bigpods.Monolith.Migrations
                     b.HasOne("Bigpods.Monolith.Modules.Shared.Infrastructure.Models.InventoryModel", "Inventory")
                         .WithMany("InventoryOutputs")
                         .HasForeignKey("InventoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bigpods.Monolith.Modules.Shared.Infrastructure.Models.ProductModel", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -886,6 +920,8 @@ namespace Bigpods.Monolith.Migrations
                         .IsRequired();
 
                     b.Navigation("Inventory");
+
+                    b.Navigation("Product");
 
                     b.Navigation("Variant");
 

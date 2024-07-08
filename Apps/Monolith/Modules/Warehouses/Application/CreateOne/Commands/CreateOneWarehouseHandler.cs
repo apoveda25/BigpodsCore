@@ -30,8 +30,7 @@ public sealed class CreateOneWarehouseHandler(
 
         var aggregateRoot = WarehouseAggregateRoot.CreateOne(
             warehouse: command.WarehouseDto,
-            warehouseFoundById: fetchResponse.WarehouseFoundById,
-            warehouseFoundByName: fetchResponse.WarehouseFoundByName
+            data: fetchResponse
         );
 
         var warehouseModel = _mapper.Map<WarehouseModel>(source: aggregateRoot);

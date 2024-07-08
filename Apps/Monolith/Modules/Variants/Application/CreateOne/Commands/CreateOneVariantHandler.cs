@@ -24,62 +24,24 @@ public sealed class CreateOneVariantHandler(
     {
         var fetchResponse = await _createOneVariantService.ExecuteAsync(command: command, cancellationToken: token);
 
-        var productsRepository = _unitOfWork.GetRepository<ProductModel>();
         var variantsRepository = _unitOfWork.GetRepository<VariantModel>();
         var variantsOnAttributesRepository = _unitOfWork.GetRepository<VariantOnAttributeModel>();
 
-        var aggregateRoot = ProductAggregateRoot.Build(
-            product: fetchResponse.ProductFoundById
-        );
-
-        var variantEntitiesExisting = fetchResponse.VariantsFoundByProductId.Select(
-            VariantEntity.Build
-        );
-
-        var variantEntityNotExisting = VariantEntity.CreateOne(
+        var aggregateRoot = ProductAggregateRoot.CreateOneVariant(
             variant: command.VariantDto,
-            variantFoundById: fetchResponse.VariantFoundById
+            variantsOnAttributes: command.VariantOnAttributeDtos,
+            data: fetchResponse
         );
 
-        var variantOnAttributeEntitiesExisting = fetchResponse.VariantsOnAttributesFoundByVariantId.Select(
-            VariantOnAttributeEntity.Build
-        );
-
-        var variantOnAttributeEntitiesNotExisting = command.VariantOnAttributeDtos
-            .Select(dto => VariantOnAttributeEntity.CreateOne(
-                variantOnAttribute: dto,
-                variantsOnAttributesFoundById: fetchResponse.VariantsOnAttributesFoundById,
-                attributesFoundById: fetchResponse.AttributesFoundById
-            )
-        );
-
-        aggregateRoot.AttachVariants(
-            variants: variantEntitiesExisting.ToArray()
-        );
-
-        aggregateRoot.AttachVariants(
-            variants: [variantEntityNotExisting]
-        );
-
-        aggregateRoot.AttachVariantsOnAttributes(
-            variantsOnAttributes: variantOnAttributeEntitiesExisting.ToArray()
-        );
-
-        aggregateRoot.AttachVariantsOnAttributes(
-            variantsOnAttributes: variantOnAttributeEntitiesNotExisting.ToArray()
-        );
-
-        var productModel = _mapper.Map<ProductModel>(
-            source: aggregateRoot
-        );
         var variantModel = _mapper.Map<VariantModel>(
-            source: variantEntityNotExisting
+            source: aggregateRoot.Variants.FirstOrDefault(x => x.Id == command.VariantDto.Id)
         );
         var variantOnAttributeModels = _mapper.Map<VariantOnAttributeModel[]>(
-            source: variantOnAttributeEntitiesNotExisting
+            source: aggregateRoot.Variants
+                .SelectMany(x => x.VariantsOnAttributes)
+                .Where(x => command.VariantOnAttributeDtos.Any(dto => dto.Id == x.Id))
         );
 
-        productsRepository.UpdateOne(entity: productModel);
         await variantsRepository.CreateOneAsync(
             entity: variantModel,
             cancellationToken: token

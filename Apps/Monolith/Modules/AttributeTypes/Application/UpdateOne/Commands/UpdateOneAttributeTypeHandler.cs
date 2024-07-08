@@ -28,8 +28,7 @@ public sealed class UpdateOneAttributeTypeHandler(
 
         var aggregateRoot = AttributeTypeAggregateRoot.UpdateOne(
             attributeType: command.AttributeTypeDto,
-            attributeTypeFoundById: fetchResponse.AttributeTypeFoundById,
-            attributeTypeFoundByName: fetchResponse.AttributeTypeFoundByName
+            data: fetchResponse
         );
 
         var attributeTypeModel = _mapper.Map<AttributeTypeModel>(source: aggregateRoot);

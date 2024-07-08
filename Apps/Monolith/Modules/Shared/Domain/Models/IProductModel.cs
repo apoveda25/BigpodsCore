@@ -6,7 +6,6 @@ public interface IProductModel : IBaseModel
     public string Description { get; set; }
     public string Brand { get; set; }
     public string Model { get; set; }
-    public int Stock { get; set; }
     public bool IsCompleted { get; set; }
     public bool IsPublished { get; set; }
 }

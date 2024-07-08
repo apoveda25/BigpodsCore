@@ -1,6 +1,8 @@
 using Bigpods.Monolith.Modules.Products.Domain.Common.Entities;
 using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Dtos;
+using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.Products.Domain.UpdateOne.Dtos;
+using Bigpods.Monolith.Modules.Products.Domain.UpdateOne.Services;
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Domain.Models;
 using Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
@@ -14,7 +16,6 @@ public sealed class ProductAggregateRoot
     public SentenceVO Description { get; private set; }
     public BrandVO Brand { get; private set; }
     public ModelVO Model { get; private set; }
-    public StockVO Stock { get; private set; }
     public bool IsCompleted { get; private set; }
     public bool IsPublished { get; private set; }
     public bool IsDeleted { get; private set; }
@@ -35,7 +36,6 @@ public sealed class ProductAggregateRoot
         string description,
         string brand,
         string model,
-        int stock,
         bool isCompleted,
         bool isPublished,
         bool isDeleted,
@@ -55,7 +55,6 @@ public sealed class ProductAggregateRoot
         Description = new SentenceVO(description);
         Brand = new BrandVO(brand);
         Model = new ModelVO(model);
-        Stock = new StockVO(stock);
         IsCompleted = isCompleted;
         IsPublished = isPublished;
         IsDeleted = isDeleted;
@@ -73,21 +72,22 @@ public sealed class ProductAggregateRoot
 
     public static ProductAggregateRoot CreateOne(
         ICreateOneProductDto product,
-        IProductModel? productFoundById
+        ICreateOneVariantDto[] variants,
+        ICreateOneVariantOnAttributeDto[] variantsOnAttributes,
+        ICreateOneProductServiceResponse data
     )
     {
-        if (productFoundById is not null)
+        if (data.ProductFoundById is not null)
         {
             throw new ConflictException("Product exist with this id");
         }
 
-        return new ProductAggregateRoot(
+        var productAggregateRoot = new ProductAggregateRoot(
             id: product.Id,
             name: product.Name,
             description: product.Description,
             brand: product.Brand,
             model: product.Model,
-            stock: 0,
             isCompleted: false,
             isPublished: false,
             isDeleted: false,
@@ -101,26 +101,79 @@ public sealed class ProductAggregateRoot
             updatedBy: null,
             deletedBy: null
         );
+
+        var variantEntities = VariantEntity.CreateMany(
+            variants: variants,
+            variantsOnAttributes: variantsOnAttributes,
+            variantsFoundById: data.VariantsFoundById,
+            variantsOnAttributesFoundById: data.VariantsOnAttributesFoundById,
+            attributesFoundById: data.AttributesFoundById
+        );
+
+        productAggregateRoot.AttachManyVariants(variantEntities);
+
+        return productAggregateRoot;
     }
 
-    public void AttachVariants(VariantEntity[] variants)
+    public static ProductAggregateRoot UpdateOne(
+        IUpdateOneProductDto product,
+        IUpdateOneProductServiceResponse data
+    )
     {
-        foreach (var variant in variants)
+        if (data.ProductFoundById is null)
         {
-            if (IsVariantExist(variant.Id))
-            {
-                throw new ConflictException("Variant exist with this id");
-            }
-
-            if (!VariantBelongToProduct(variant.ProductId))
-            {
-                throw new ConflictException("Variant not belong to this product");
-            }
+            throw new NotFoundException("Product does not exist with this id");
         }
 
-        Variants = [.. Variants, .. variants];
+        if (data.ProductFoundById.IsDeleted)
+        {
+            throw new ConflictException("Product is deleted");
+        }
 
-        AddStocks();
+        if (data.ProductFoundById.Id != product.Id)
+        {
+            throw new ConflictException("Product id does not match");
+        }
+
+        return new ProductAggregateRoot(
+            id: data.ProductFoundById.Id,
+            name: product.Name ?? data.ProductFoundById.Name,
+            description: product.Description ?? data.ProductFoundById.Description,
+            brand: product.Brand ?? data.ProductFoundById.Brand,
+            model: product.Model ?? data.ProductFoundById.Model,
+            isCompleted: data.ProductFoundById.IsCompleted,
+            isPublished: data.ProductFoundById.IsPublished,
+            isDeleted: data.ProductFoundById.IsDeleted,
+            createdAtDatetime: data.ProductFoundById.CreatedAtDatetime,
+            updatedAtDatetime: DateTime.Now,
+            deletedAtDatetime: data.ProductFoundById.DeletedAtDatetime,
+            createdAtTimezone: data.ProductFoundById.CreatedAtTimezone,
+            updatedAtTimezone: product.UpdatedAtTimezone,
+            deletedAtTimezone: data.ProductFoundById.DeletedAtTimezone,
+            createdBy: data.ProductFoundById.CreatedBy,
+            updatedBy: product.UpdatedBy,
+            deletedBy: data.ProductFoundById.DeletedBy
+        );
+    }
+
+    private void AttachManyVariants(VariantEntity[] variants)
+    {
+        foreach (var variant in variants) AttachOneVariant(variant);
+    }
+
+    private void AttachOneVariant(VariantEntity variant)
+    {
+        if (IsVariantExist(variant.Id))
+        {
+            throw new ConflictException("Variant exist with this id");
+        }
+
+        if (!VariantBelongToProduct(variant.ProductId))
+        {
+            throw new ConflictException("Variant not belong to this product");
+        }
+
+        Variants = [.. Variants, variant];
     }
 
     private bool IsVariantExist(Guid variantId)
@@ -131,67 +184,5 @@ public sealed class ProductAggregateRoot
     private bool VariantBelongToProduct(Guid productId)
     {
         return productId == Id;
-    }
-
-    private void AddStocks()
-    {
-        Stock = new StockVO(Variants.Sum(variant => variant.Stock.Value));
-    }
-
-    public void AttachVariantsOnAttributes(VariantOnAttributeEntity[] variantsOnAttributes)
-    {
-        foreach (var variantOnAttribute in variantsOnAttributes)
-        {
-            var variant = Variants.FirstOrDefault(variant => variant.Id == variantOnAttribute.VariantId);
-
-            if (variant is null)
-            {
-                throw new NotFoundException("Variant not found");
-            }
-
-            variant.AttachVariantOnAttribute(variantOnAttribute);
-        }
-    }
-
-    public static ProductAggregateRoot UpdateOne(
-        IUpdateOneProductDto product,
-        IProductModel? productFoundById
-    )
-    {
-        if (productFoundById is null)
-        {
-            throw new NotFoundException("Product does not exist with this id");
-        }
-
-        if (productFoundById.IsDeleted)
-        {
-            throw new ConflictException("Product is deleted");
-        }
-
-        if (productFoundById.Id != product.Id)
-        {
-            throw new ConflictException("Product id does not match");
-        }
-
-        return new ProductAggregateRoot(
-            id: productFoundById.Id,
-            name: product.Name ?? productFoundById.Name,
-            description: product.Description ?? productFoundById.Description,
-            brand: product.Brand ?? productFoundById.Brand,
-            model: product.Model ?? productFoundById.Model,
-            stock: productFoundById.Stock,
-            isCompleted: productFoundById.IsCompleted,
-            isPublished: productFoundById.IsPublished,
-            isDeleted: productFoundById.IsDeleted,
-            createdAtDatetime: productFoundById.CreatedAtDatetime,
-            updatedAtDatetime: DateTime.Now,
-            deletedAtDatetime: productFoundById.DeletedAtDatetime,
-            createdAtTimezone: productFoundById.CreatedAtTimezone,
-            updatedAtTimezone: product.UpdatedAtTimezone,
-            deletedAtTimezone: productFoundById.DeletedAtTimezone,
-            createdBy: productFoundById.CreatedBy,
-            updatedBy: product.UpdatedBy,
-            deletedBy: productFoundById.DeletedBy
-        );
     }
 }

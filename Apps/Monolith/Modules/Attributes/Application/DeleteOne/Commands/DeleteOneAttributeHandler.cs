@@ -30,14 +30,9 @@ public sealed class DeleteOneAttributeHandler(
 
         var attributesRepository = _unitOfWork.GetRepository<AttributeModel>();
 
-        var attributeTypeEntity = AttributeTypeEntity.Build(
-            attributeType: fetchResponse.AttributeTypeFoundById
-        );
-
         var aggregateRoot = AttributeAggregateRoot.DeleteOne(
             attribute: command.AttributeDto,
-            attributeType: attributeTypeEntity,
-            attributeFoundById: fetchResponse.AttributeFoundById
+            data: fetchResponse
         );
 
         var attributeModel = _mapper.Map<AttributeModel>(source: aggregateRoot);

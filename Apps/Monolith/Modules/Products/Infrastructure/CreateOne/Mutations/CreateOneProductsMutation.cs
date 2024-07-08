@@ -50,16 +50,8 @@ public sealed class CreateOneProductsMutation
 
         var productDto = mapper.Map<CreateOneProductDto>(source: normalizedInput);
         var variantDtos = mapper.Map<CreateOneVariantDto[]>(source: normalizedInput.Variants);
-        var variantOnAttributeDtos = mapper.Map<CreateOneVariantOnAttributeDto[]>(
-            source: normalizedInput.Variants.SelectMany(variant => variant.VariantsOnAttributes)
-        );
+        var variantOnAttributeDtos = mapper.Map<CreateOneVariantOnAttributeDto[]>(source: normalizedInput.Variants.SelectMany(v => v.VariantsOnAttributes));
 
-        return await mediator.Send(
-            new CreateOneProductCommand(
-                productDto,
-                variantDtos,
-                variantOnAttributeDtos
-            )
-        );
+        return await mediator.Send(new CreateOneProductCommand(productDto, variantDtos, variantOnAttributeDtos));
     }
 }

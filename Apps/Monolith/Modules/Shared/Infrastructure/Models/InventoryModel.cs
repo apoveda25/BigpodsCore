@@ -9,6 +9,7 @@ public sealed class InventoryModel : BaseModel, IInventoryModel
     public Guid ProductId { get; set; } = default!;
     public Guid VariantId { get; set; } = default!;
     public Guid WarehouseId { get; set; } = default!;
+
     public ProductModel Product { get; set; } = default!;
     public VariantModel Variant { get; set; } = default!;
     public WarehouseModel Warehouse { get; set; } = default!;

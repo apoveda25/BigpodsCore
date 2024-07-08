@@ -24,7 +24,7 @@ public sealed class CreateOneWarehouseService(
             cancellationToken: cancellationToken
         );
         var warehouseFoundByName = await warehousesRepository.FindOneAsync(
-            filter: x => x.Name == command.WarehouseDto.Name && x.IsDeleted == false,
+            filter: x => x.Name == command.WarehouseDto.Name,
             cancellationToken: cancellationToken
         );
 

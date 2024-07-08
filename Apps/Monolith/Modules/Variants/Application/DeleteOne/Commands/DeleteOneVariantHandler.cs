@@ -30,29 +30,18 @@ public sealed class DeleteOneVariantHandler(
         var variantsRepository = _unitOfWork.GetRepository<VariantModel>();
         var variantsOnAttributesRepository = _unitOfWork.GetRepository<VariantOnAttributeModel>();
 
-        var aggregateRoot = ProductAggregateRoot.Build(
-            product: fetchResponse.ProductFoundById
-        );
-
-        var variantEntity = VariantEntity.DeleteOne(
+        var aggregateRoot = ProductAggregateRoot.DeleteOneVariant(
             variant: command.VariantDto,
-            variantFoundById: fetchResponse.VariantFoundById,
-            inventoryFoundByVariantId: fetchResponse.InventoryFoundByVariantId
+            data: fetchResponse
         );
 
-        var variantOnAttributeEntities = fetchResponse.VariantsOnAttributesFoundByVariantId.Select(
-            variantOnAttribute => VariantOnAttributeEntity.DeleteOne(
-                variant: command.VariantDto,
-                variantOnAttributeFoundByVariantId: variantOnAttribute
-            )
+        var variantEntity = aggregateRoot.Variants.FirstOrDefault(x => x.Id == command.VariantDto.Id);
+
+        var variantModel = _mapper.Map<VariantModel>(
+            source: variantEntity
         );
-
-        aggregateRoot.AttachVariants(variants: [variantEntity]);
-        aggregateRoot.AttachVariantsOnAttributes(variantsOnAttributes: variantOnAttributeEntities.ToArray());
-
-        var variantModel = _mapper.Map<VariantModel>(source: variantEntity);
         var variantOnAttributeModels = _mapper.Map<VariantOnAttributeModel[]>(
-            source: variantOnAttributeEntities
+            source: variantEntity?.VariantsOnAttributes ?? []
         );
 
         variantsRepository.DeleteOne(entity: variantModel);

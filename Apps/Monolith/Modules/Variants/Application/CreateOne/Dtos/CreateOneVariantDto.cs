@@ -5,8 +5,8 @@ namespace Bigpods.Monolith.Modules.Variants.Application.CreateOne.Dtos;
 public sealed record CreateOneVariantDto(
     Guid Id,
     string Name,
-    float Price,
-    float Cost,
+    decimal Price,
+    decimal Cost,
     string CreatedAtTimezone,
     Guid CreatedBy,
     Guid ProductId

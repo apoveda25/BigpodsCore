@@ -23,17 +23,22 @@ public sealed class DeleteOneVariantService(
         var inventoriesRepository = _unitOfWork.GetRepository<InventoryModel>();
 
         var variantFoundById = await variantsRepository.FindOneAsync(
-            filter: x => x.Id == command.VariantDto.Id && x.IsDeleted == false,
+            filter: x => x.Id == command.VariantDto.Id,
             cancellationToken: cancellationToken
         );
 
         var productFoundById = variantFoundById is null ? null : await productsRepository.FindOneAsync(
-            filter: x => x.Id == variantFoundById.ProductId && x.IsDeleted == false,
+            filter: x => x.Id == variantFoundById.ProductId,
+            cancellationToken: cancellationToken
+        );
+
+        var variantsFoundByProductId = productFoundById is null ? [] : await variantsRepository.FindManyAsync(
+            filter: x => x.ProductId == productFoundById.Id,
             cancellationToken: cancellationToken
         );
 
         var variantsOnAttributesFoundByVariantId = variantFoundById is null ? [] : await variantsOnAttributesRepository.FindManyAsync(
-            filter: x => x.VariantId == variantFoundById.Id && x.IsDeleted == false,
+            filter: x => x.VariantId == variantFoundById.Id,
             cancellationToken: cancellationToken
         );
 
@@ -45,6 +50,7 @@ public sealed class DeleteOneVariantService(
         return new DeleteOneVariantServiceResponse(
             ProductFoundById: productFoundById,
             VariantFoundById: variantFoundById,
+            VariantsFoundByProductId: variantsFoundByProductId.ToArray(),
             VariantsOnAttributesFoundByVariantId: variantsOnAttributesFoundByVariantId.ToArray(),
             InventoryFoundByVariantId: inventoryFoundByVariantId
         );
@@ -54,6 +60,7 @@ public sealed class DeleteOneVariantService(
 public sealed record DeleteOneVariantServiceResponse(
     IProductModel? ProductFoundById,
     IVariantModel? VariantFoundById,
+    IVariantModel[] VariantsFoundByProductId,
     IVariantOnAttributeModel[] VariantsOnAttributesFoundByVariantId,
     IInventoryModel? InventoryFoundByVariantId
 ) : IDeleteOneVariantServiceResponse;

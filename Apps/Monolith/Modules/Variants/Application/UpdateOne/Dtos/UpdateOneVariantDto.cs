@@ -5,8 +5,8 @@ namespace Bigpods.Monolith.Modules.Variants.Application.UpdateOne.Dtos;
 public sealed record UpdateOneVariantDto(
     Guid Id,
     string? Name,
-    float? Price,
-    float? Cost,
+    decimal? Price,
+    decimal? Cost,
     string UpdatedAtTimezone,
     Guid UpdatedBy
 ) : IUpdateOneVariantDto;

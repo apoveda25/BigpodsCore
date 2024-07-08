@@ -24,7 +24,7 @@ public sealed class CreateOneAttributeTypeService(
             cancellationToken: cancellationToken
         );
         var attributeTypeFoundByName = await attributeTypesRepository.FindOneAsync(
-            filter: x => x.Name == command.AttributeTypeDto.Name && x.IsDeleted == false,
+            filter: x => x.Name == command.AttributeTypeDto.Name,
             cancellationToken: cancellationToken
         );
 

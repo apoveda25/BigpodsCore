@@ -30,8 +30,7 @@ public sealed class UpdateOneWarehouseHandler(
 
         var aggregateRoot = WarehouseAggregateRoot.UpdateOne(
             warehouse: request.WarehouseDto,
-            warehouseFoundById: fetchResponse.WarehouseFoundById,
-            warehouseFoundByName: fetchResponse.WarehouseFoundByName
+            data: fetchResponse
         );
 
         var warehouseModel = _mapper.Map<WarehouseModel>(source: aggregateRoot);

@@ -29,18 +29,14 @@ public sealed class UpdateOneVariantHandler(
 
         var variantsRepository = _unitOfWork.GetRepository<VariantModel>();
 
-        var aggregateRoot = ProductAggregateRoot.Build(
-            product: fetchResponse.ProductFoundById
-        );
-
-        var variantEntity = VariantEntity.UpdateOne(
+        var aggregateRoot = ProductAggregateRoot.UpdateOneVariant(
             variant: command.VariantDto,
-            variantFoundById: fetchResponse.VariantFoundById
+            data: fetchResponse
         );
 
-        aggregateRoot.AttachVariants(variants: [variantEntity]);
-
-        var variantModel = _mapper.Map<VariantModel>(source: variantEntity);
+        var variantModel = _mapper.Map<VariantModel>(
+            source: aggregateRoot.Variants.FirstOrDefault(x => x.Id == command.VariantDto.Id)
+        );
 
         variantsRepository.UpdateOne(entity: variantModel);
 

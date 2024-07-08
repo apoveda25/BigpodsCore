@@ -14,7 +14,6 @@ public sealed class VariantEntity
     public string Sku { get; private set; }
     public PriceVO Price { get; private set; }
     public CostVO Cost { get; private set; }
-    public StockVO Stock { get; private set; }
     public bool IsDeleted { get; private set; }
     public DateTime CreatedAtDatetime { get; private set; }
     public DateTime? UpdatedAtDatetime { get; private set; }
@@ -32,9 +31,8 @@ public sealed class VariantEntity
         Guid id,
         string name,
         string sku,
-        float price,
-        float cost,
-        int stock,
+        decimal price,
+        decimal cost,
         bool isDeleted,
         DateTime createdAtDatetime,
         DateTime? updatedAtDatetime,
@@ -53,7 +51,6 @@ public sealed class VariantEntity
         Sku = sku;
         Price = new PriceVO(price);
         Cost = new CostVO(cost);
-        Stock = new StockVO(stock);
         IsDeleted = isDeleted;
         CreatedAtDatetime = createdAtDatetime;
         UpdatedAtDatetime = updatedAtDatetime;
@@ -68,7 +65,14 @@ public sealed class VariantEntity
         VariantsOnAttributes = [];
     }
 
-    public static VariantEntity Build(
+    public static VariantEntity[] BuildMany(
+        IVariantModel[] variants
+    )
+    {
+        return variants.Select(BuildOne).ToArray();
+    }
+
+    public static VariantEntity BuildOne(
         IVariantModel variant
     )
     {
@@ -79,7 +83,6 @@ public sealed class VariantEntity
             sku: variant.Sku,
             price: variant.Price,
             cost: variant.Cost,
-            stock: variant.Stock,
             isDeleted: variant.IsDeleted,
             createdAtDatetime: variant.CreatedAtDatetime,
             updatedAtDatetime: variant.UpdatedAtDatetime,
@@ -96,7 +99,10 @@ public sealed class VariantEntity
 
     public static VariantEntity CreateOne(
         ICreateOneVariantDto variant,
-        IVariantModel? variantFoundById
+        ICreateOneVariantOnAttributeDto[] variantsOnAttributes,
+        IVariantModel? variantFoundById,
+        IVariantOnAttributeModel[] variantsOnAttributesFoundById,
+        IAttributeModel[] attributesFoundById
     )
     {
         if (variantFoundById is not null)
@@ -104,14 +110,13 @@ public sealed class VariantEntity
             throw new ConflictException("Variant exist with this id");
         }
 
-        var entity = new VariantEntity
+        var variantEntity = new VariantEntity
         (
             id: variant.Id,
             name: variant.Name,
             sku: string.Empty,
             price: variant.Price,
             cost: variant.Cost,
-            stock: 0,
             isDeleted: false,
             createdAtDatetime: DateTime.Now,
             updatedAtDatetime: null,
@@ -125,37 +130,20 @@ public sealed class VariantEntity
             productId: variant.ProductId
         );
 
-        if (entity.Price.Value <= entity.Cost.Value)
+        if (variantEntity.Price.Value <= variantEntity.Cost.Value)
         {
             throw new ConflictException("Price must be greater than cost");
         }
 
-        return entity;
-    }
+        var variantOnAttributeEntities = VariantOnAttributeEntity.CreateMany(
+            variantsOnAttributes: variantsOnAttributes,
+            variantsOnAttributesFoundById: variantsOnAttributesFoundById,
+            attributesFoundById: attributesFoundById
+        );
 
-    public void AttachVariantOnAttribute(VariantOnAttributeEntity variantOnAttribute)
-    {
-        if (IsVariantOnAttributeExist(variantOnAttribute))
-        {
-            throw new ConflictException("VariantOnAttribute exist with this id or attributeId");
-        }
+        variantEntity.AttachManyVariantOnAttribute(variantOnAttributeEntities);
 
-        if (!VariantOnAttributeBelongToVariant(variantOnAttribute.VariantId))
-        {
-            throw new ConflictException("VariantOnAttribute not belong to this variant");
-        }
-
-        VariantsOnAttributes = [.. VariantsOnAttributes, variantOnAttribute];
-    }
-
-    private bool IsVariantOnAttributeExist(VariantOnAttributeEntity entity)
-    {
-        return VariantsOnAttributes.Any(entity.IsEquals);
-    }
-
-    private bool VariantOnAttributeBelongToVariant(Guid variantId)
-    {
-        return variantId == Id;
+        return variantEntity;
     }
 
     public static VariantEntity UpdateOne(
@@ -185,7 +173,6 @@ public sealed class VariantEntity
             sku: variantFoundById.Sku,
             price: variant.Price ?? variantFoundById.Price,
             cost: variant.Cost ?? variantFoundById.Cost,
-            stock: variantFoundById.Stock,
             isDeleted: variantFoundById.IsDeleted,
             createdAtDatetime: variantFoundById.CreatedAtDatetime,
             updatedAtDatetime: DateTime.Now,
@@ -210,7 +197,8 @@ public sealed class VariantEntity
     public static VariantEntity DeleteOne(
         IDeleteOneVariantDto variant,
         IVariantModel? variantFoundById,
-        IInventoryModel? inventoryFoundByVariantId
+        IInventoryModel? inventoryFoundByVariantId,
+        IVariantOnAttributeModel[] variantsOnAttributesFoundByVariantId
     )
     {
         if (variantFoundById is null)
@@ -233,14 +221,13 @@ public sealed class VariantEntity
             throw new ConflictException("Variant with inventory can not deleted");
         }
 
-        return new VariantEntity
+        var variantEntity = new VariantEntity
         (
             id: variantFoundById.Id,
             name: variantFoundById.Name,
             sku: variantFoundById.Sku,
             price: variantFoundById.Price,
             cost: variantFoundById.Cost,
-            stock: variantFoundById.Stock,
             isDeleted: true,
             createdAtDatetime: variantFoundById.CreatedAtDatetime,
             updatedAtDatetime: variantFoundById.UpdatedAtDatetime,
@@ -253,5 +240,80 @@ public sealed class VariantEntity
             deletedBy: variant.DeletedBy,
             productId: variantFoundById.ProductId
         );
+
+        variantEntity.AttachManyVariantOnAttribute(
+            VariantOnAttributeEntity.BuildMany(
+                variantsOnAttributes: variantsOnAttributesFoundByVariantId
+            )
+        );
+
+        var variantOnAttributeEntities = VariantOnAttributeEntity.DeleteMany(
+            variant: variant,
+            variantsOnAttributesFoundByVariantId: variantsOnAttributesFoundByVariantId
+        );
+
+        variantEntity.DettachManyVariantOnAttribute(variantOnAttributeEntities);
+
+        return variantEntity;
+    }
+
+    private void AttachManyVariantOnAttribute(VariantOnAttributeEntity[] variantsOnAttributes)
+    {
+        foreach (var variantOnAttribute in variantsOnAttributes) AttachOneVariantOnAttribute(variantOnAttribute);
+    }
+
+    private void AttachOneVariantOnAttribute(VariantOnAttributeEntity variantOnAttribute)
+    {
+        if (IsVariantOnAttributeExist(variantOnAttribute))
+        {
+            throw new ConflictException("VariantOnAttribute exist with this id or attributeId");
+        }
+
+        if (!VariantOnAttributeBelongToVariant(variantOnAttribute.VariantId))
+        {
+            throw new ConflictException("VariantOnAttribute not belong to this variant");
+        }
+
+        if (variantOnAttribute.IsDeleted)
+        {
+            throw new ConflictException("Do not attach variantOnAttribute marked as deleted");
+        }
+
+        VariantsOnAttributes = [.. VariantsOnAttributes, variantOnAttribute];
+    }
+
+    private void DettachManyVariantOnAttribute(VariantOnAttributeEntity[] variantsOnAttributes)
+    {
+        foreach (var variantOnAttribute in variantsOnAttributes) DettachOneVariantOnAttribute(variantOnAttribute);
+    }
+
+    private void DettachOneVariantOnAttribute(VariantOnAttributeEntity variantOnAttribute)
+    {
+        if (!IsVariantOnAttributeExist(variantOnAttribute))
+        {
+            throw new ConflictException("VariantOnAttribute not exist with this id or attributeId");
+        }
+
+        if (!VariantOnAttributeBelongToVariant(variantOnAttribute.VariantId))
+        {
+            throw new ConflictException("VariantOnAttribute not belong to this variant");
+        }
+
+        if (!variantOnAttribute.IsDeleted)
+        {
+            throw new ConflictException("Do not dettach variantOnAttribute marked as not deleted");
+        }
+
+        VariantsOnAttributes = VariantsOnAttributes.Select(x => x.Id == variantOnAttribute.Id ? variantOnAttribute : x).ToArray();
+    }
+
+    private bool IsVariantOnAttributeExist(VariantOnAttributeEntity entity)
+    {
+        return VariantsOnAttributes.Any(entity.IsEquals);
+    }
+
+    private bool VariantOnAttributeBelongToVariant(Guid variantId)
+    {
+        return variantId == Id;
     }
 }

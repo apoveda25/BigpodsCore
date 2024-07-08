@@ -25,7 +25,7 @@ public sealed class CreateOneAttributeService(
             cancellationToken: cancellationToken
         );
         var attributeFoundByValueMeasuringUnitAttributeTypeId = await attributesRepository.FindOneAsync(
-            filter: x => x.Value == command.AttributeDto.Value && x.MeasuringUnit == command.AttributeDto.MeasuringUnit && x.AttributeTypeId == command.AttributeDto.AttributeTypeId && x.IsDeleted == false,
+            filter: x => x.Value == command.AttributeDto.Value && x.MeasuringUnit == command.AttributeDto.MeasuringUnit && x.AttributeTypeId == command.AttributeDto.AttributeTypeId,
             cancellationToken: cancellationToken
         );
         var attributeTypeFoundById = await attributesClassesRepository.FindOneAsync(

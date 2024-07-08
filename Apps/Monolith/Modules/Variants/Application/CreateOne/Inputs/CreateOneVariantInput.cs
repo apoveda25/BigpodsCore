@@ -14,9 +14,9 @@ public sealed record CreateOneVariantInput : ICreateOneVariantInput<CreateOneVar
 
     public string Name { get; set; } = string.Empty;
 
-    public float Price { get; set; } = 0;
+    public decimal Price { get; set; } = 0;
 
-    public float Cost { get; set; } = 0;
+    public decimal Cost { get; set; } = 0;
 
     public DateTimeZone CreatedAtTimezone { get; set; } = DateTimeZone.Utc;
 

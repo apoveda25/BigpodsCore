@@ -23,8 +23,6 @@ public class ProductModelConfiguration : IEntityTypeConfiguration<ProductModel>
 
         builder.Property(propertyExpression: x => x.Model).IsRequired().HasMaxLength(maxLength: 36);
 
-        builder.Property(propertyExpression: x => x.Stock).IsRequired().HasColumnType("int(11)");
-
         builder.Property(propertyExpression: x => x.IsCompleted).IsRequired().HasDefaultValue(value: false);
 
         builder.Property(propertyExpression: x => x.IsPublished).IsRequired().HasDefaultValue(value: false);

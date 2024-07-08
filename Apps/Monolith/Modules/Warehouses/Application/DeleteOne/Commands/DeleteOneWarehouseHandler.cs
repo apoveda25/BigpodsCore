@@ -30,10 +30,7 @@ public sealed class DeleteOneWarehouseHandler(
 
         var aggregateRoot = WarehouseAggregateRoot.DeleteOne(
             warehouse: command.WarehouseDto,
-            warehouseFoundById: fetchResponse.WarehouseFoundById,
-            inventoriesFoundByWarehouseId: fetchResponse.InventoriesFoundByWarehouseId,
-            inventoryInputsFoundByWarehouseId: fetchResponse.InventoryInputsFoundByWarehouseId,
-            inventoryOutputsFoundByWarehouseId: fetchResponse.InventoryOutputsFoundByWarehouseId
+            data: fetchResponse
         );
 
         var warehouseModel = _mapper.Map<WarehouseModel>(source: aggregateRoot);

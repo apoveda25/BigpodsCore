@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bigpods.Monolith.Migrations
 {
     [DbContext(typeof(DatabaseService))]
-    [Migration("20240706200831_InitialMigration4")]
-    partial class InitialMigration4
+    [Migration("20240708223028_InitialMigration1")]
+    partial class InitialMigration1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -538,9 +538,6 @@ namespace Bigpods.Monolith.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("int(11)");
-
                     b.Property<DateTime?>("UpdatedAtDatetime")
                         .HasColumnType("datetime(6)");
 
@@ -615,9 +612,6 @@ namespace Bigpods.Monolith.Migrations
                         .IsRequired()
                         .HasMaxLength(36)
                         .HasColumnType("varchar(36)");
-
-                    b.Property<int>("Stock")
-                        .HasColumnType("int(11)");
 
                     b.Property<DateTime?>("UpdatedAtDatetime")
                         .HasColumnType("datetime(6)");

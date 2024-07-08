@@ -1,6 +1,8 @@
 using Bigpods.Monolith.Modules.Inventories.Domain.Common.Entities;
 using Bigpods.Monolith.Modules.Inventories.Domain.CreateOne.Dtos;
+using Bigpods.Monolith.Modules.Inventories.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.Inventories.Domain.DeleteOne.Dtos;
+using Bigpods.Monolith.Modules.Inventories.Domain.DeleteOne.Services;
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Domain.Models;
 using Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
@@ -56,64 +58,56 @@ public sealed class WarehouseAggregateRoot
         Inventories = [];
     }
 
-    public InventoryEntity CreateOneVariant(
+    public static WarehouseAggregateRoot CreateOneVariant(
         ICreateOneInventoryDto inventory,
-        IInventoryModel? inventoryFoundById,
-        IProductModel? productFoundById,
-        IVariantModel? variantFoundById,
-        IWarehouseModel? warehouseFoundById,
-        IInventoryModel[] inventoriesFoundByProductIdWarehouseId
+        ICreateOneInventoryServiceResponse data
     )
     {
-        AttachInventories(inventoriesFoundByProductIdWarehouseId.Select(InventoryEntity.Build).ToArray());
+        var aggregateRoot = BuildOne(data.WarehouseFoundById);
+
+        aggregateRoot.AttachManyInventory(data.InventoriesFoundByProductIdWarehouseId.Select(InventoryEntity.Build).ToArray());
 
         var inventoryEntity = InventoryEntity.CreateOne(
             inventory: inventory,
-            inventoryFoundById: inventoryFoundById,
-            productFoundById: productFoundById,
-            variantFoundById: variantFoundById,
-            warehouseFoundById: warehouseFoundById
+            inventoryFoundById: data.InventoryFoundById,
+            productFoundById: data.ProductFoundById,
+            variantFoundById: data.VariantFoundById,
+            warehouseFoundById: data.WarehouseFoundById
         );
 
-        AttachInventories([inventoryEntity]);
+        aggregateRoot.AttachOneInventory(inventoryEntity);
 
-        return inventoryEntity;
+        return aggregateRoot;
     }
 
-    public InventoryEntity DeleteOneVariant(
+    public static WarehouseAggregateRoot DeleteOneVariant(
         IDeleteOneInventoryDto inventory,
-        IInventoryModel? inventoryFoundById,
-        IInventoryModel[] inventoriesFoundByProductIdWarehouseId,
-        IInventoryInputModel[] inventoryInputsFoundByInventoryId,
-        IInventoryOutputModel[] inventoryOutputsFoundByInventoryId
+        IDeleteOneInventoryServiceResponse data
     )
     {
-        AttachInventories(inventoriesFoundByProductIdWarehouseId.Select(InventoryEntity.Build).ToArray());
+        var aggregateRoot = BuildOne(data.WarehouseFoundById);
+
+        aggregateRoot.AttachManyInventory(data.InventoriesFoundByProductIdWarehouseId.Select(InventoryEntity.Build).ToArray());
 
         var inventoryEntity = InventoryEntity.DeleteOne(
             inventory: inventory,
-            inventoryFoundById: inventoryFoundById,
-            inventoryInputsFoundByInventoryId: inventoryInputsFoundByInventoryId,
-            inventoryOutputsFoundByInventoryId: inventoryOutputsFoundByInventoryId
+            inventoryFoundById: data.InventoryFoundById,
+            inventoryInputsFoundByInventoryId: data.InventoryInputsFoundByInventoryId,
+            inventoryOutputsFoundByInventoryId: data.InventoryOutputsFoundByInventoryId
         );
 
-        DettachInventories([inventoryEntity]);
+        aggregateRoot.DettachOneInventory(inventoryEntity);
 
-        return inventoryEntity;
+        return aggregateRoot;
     }
 
-    public static WarehouseAggregateRoot Build(
+    private static WarehouseAggregateRoot BuildOne(
         IWarehouseModel? warehouse
     )
     {
         if (warehouse is null)
         {
-            throw new NotFoundException("Warehouse does not exist with this id");
-        }
-
-        if (warehouse.IsDeleted)
-        {
-            throw new ConflictException("Warehouse is deleted");
+            throw new NotFoundException("Warehouse not exist with this id");
         }
 
         return new WarehouseAggregateRoot(
@@ -133,27 +127,29 @@ public sealed class WarehouseAggregateRoot
         );
     }
 
-    private void AttachInventories(InventoryEntity[] inventories)
+    private void AttachManyInventory(InventoryEntity[] inventories)
     {
-        foreach (var inventory in inventories)
+        foreach (var inventory in inventories) AttachOneInventory(inventory);
+    }
+
+    private void AttachOneInventory(InventoryEntity inventory)
+    {
+        if (inventory.IsDeleted)
         {
-            if (inventory.IsDeleted)
-            {
-                throw new ConflictException("Inventory deleted can not be attached");
-            }
-
-            if (IsInventoryAttach(inventoryId: inventory.Id, variantId: inventory.VariantId))
-            {
-                throw new ConflictException("Inventory attached with this id or variant id");
-            }
-
-            if (IsNotInventoryBelongToWarehouse(warehouseId: inventory.WarehouseId))
-            {
-                throw new ConflictException("Inventory not belong to this warehouse");
-            }
+            throw new ConflictException("Inventory deleted can not be attached");
         }
 
-        Inventories = [.. Inventories, .. inventories];
+        if (IsInventoryAttach(inventoryId: inventory.Id, variantId: inventory.VariantId))
+        {
+            throw new ConflictException("Inventory attached with this id or variant id");
+        }
+
+        if (IsNotInventoryBelongToWarehouse(warehouseId: inventory.WarehouseId))
+        {
+            throw new ConflictException("Inventory not belong to this warehouse");
+        }
+
+        Inventories = [.. Inventories, inventory];
     }
 
     private bool IsInventoryAttach(Guid inventoryId, Guid variantId)
@@ -166,27 +162,29 @@ public sealed class WarehouseAggregateRoot
         return warehouseId != Id;
     }
 
-    private void DettachInventories(InventoryEntity[] inventories)
+    private void DettachManyInventory(InventoryEntity[] inventories)
     {
-        foreach (var inventory in inventories)
+        foreach (var inventory in inventories) DettachOneInventory(inventory);
+    }
+
+    private void DettachOneInventory(InventoryEntity inventory)
+    {
+        if (!inventory.IsDeleted)
         {
-            if (!inventory.IsDeleted)
-            {
-                throw new ConflictException("Inventory not deleted can not be dettached");
-            }
-
-            if (IsInventoryDettached(inventoryId: inventory.Id))
-            {
-                throw new NotFoundException("Inventory not attached for dettach");
-            }
-
-            if (IsNotInventoryBelongToWarehouse(warehouseId: inventory.WarehouseId))
-            {
-                throw new ConflictException("Inventory not belong to this warehouse");
-            }
+            throw new ConflictException("Inventory not deleted can not be dettached");
         }
 
-        Inventories = Inventories.SkipWhile(inventory => inventories.Any(inventoryToDetach => inventory.Id == inventoryToDetach.Id)).ToArray();
+        if (IsInventoryDettached(inventoryId: inventory.Id))
+        {
+            throw new NotFoundException("Inventory not attached for dettach");
+        }
+
+        if (IsNotInventoryBelongToWarehouse(warehouseId: inventory.WarehouseId))
+        {
+            throw new ConflictException("Inventory not belong to this warehouse");
+        }
+
+        Inventories = Inventories.Select(x => inventory.Id == x.Id ? inventory : x).ToArray();
     }
 
     private bool IsInventoryDettached(Guid inventoryId)

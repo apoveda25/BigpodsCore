@@ -51,22 +51,33 @@ public sealed class VariantOnAttributeEntity
         AttributeId = attributeId;
     }
 
-    public static VariantOnAttributeEntity CreateOne(
-        ICreateOneVariantOnAttributeDto variantOnAttribute,
+    public static VariantOnAttributeEntity[] CreateMany(
+        ICreateOneVariantOnAttributeDto[] variantOnAttributes,
         IVariantOnAttributeModel[] variantsOnAttributesFoundById,
         IAttributeModel[] attributesFoundById
     )
     {
-        if (variantsOnAttributesFoundById.Length != 0)
+        return variantOnAttributes.Select(variantOnAttribute =>
+            CreateOne(
+                variantOnAttribute: variantOnAttribute,
+                variantOnAttributeFoundById: variantsOnAttributesFoundById.FirstOrDefault(v => v.Id == variantOnAttribute.Id),
+                attributeFoundById: attributesFoundById.FirstOrDefault(a => a.Id == variantOnAttribute.AttributeId)
+            )
+        ).ToArray();
+    }
+
+    public static VariantOnAttributeEntity CreateOne(
+        ICreateOneVariantOnAttributeDto variantOnAttribute,
+        IVariantOnAttributeModel? variantOnAttributeFoundById,
+        IAttributeModel? attributeFoundById
+    )
+    {
+        if (variantOnAttributeFoundById is not null)
         {
             throw new ConflictException("VariantsOnAttributes exist with this id");
         }
 
-        if (
-            attributesFoundById.FirstOrDefault(
-                attr => attr.Id == variantOnAttribute.AttributeId
-            ) is null
-        )
+        if (attributeFoundById is null)
         {
             throw new NotFoundException("Attributes not found");
         }

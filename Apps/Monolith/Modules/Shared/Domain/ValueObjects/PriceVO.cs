@@ -4,9 +4,9 @@ namespace Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
 
 public record PriceVO
 {
-    public float Value { get; init; }
+    public decimal Value { get; init; }
 
-    public PriceVO(float price)
+    public PriceVO(decimal price)
     {
         if (price <= 0)
         {

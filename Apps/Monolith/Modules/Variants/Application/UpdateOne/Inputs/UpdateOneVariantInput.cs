@@ -11,9 +11,9 @@ public sealed record UpdateOneVariantInput : IUpdateOneVariantInput
 
     public string? Name { get; set; }
 
-    public float? Price { get; set; }
+    public decimal? Price { get; set; }
 
-    public float? Cost { get; set; }
+    public decimal? Cost { get; set; }
 
     public DateTimeZone UpdatedAtTimezone { get; set; } = DateTimeZone.Utc;
 

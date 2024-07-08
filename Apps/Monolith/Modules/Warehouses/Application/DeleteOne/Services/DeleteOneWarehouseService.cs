@@ -23,7 +23,7 @@ public sealed class DeleteOneWarehouseService(
         var inventoryOutputsRepository = _unitOfWork.GetRepository<InventoryOutputModel>();
 
         var warehouseFoundById = await warehousesRepository.FindOneAsync(
-            filter: x => x.Id == command.WarehouseDto.Id && x.IsDeleted == false,
+            filter: x => x.Id == command.WarehouseDto.Id,
             cancellationToken: cancellationToken
         );
         var inventoriesFoundByWarehouseId = warehouseFoundById is null ? null : await inventariesRepository.FindManyAsync(

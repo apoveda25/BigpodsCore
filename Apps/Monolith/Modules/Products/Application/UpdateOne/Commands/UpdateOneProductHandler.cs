@@ -27,7 +27,7 @@ public sealed class UpdateOneProductHandler(
 
         var aggregateRoot = ProductAggregateRoot.UpdateOne(
             product: command.ProductDto,
-            productFoundById: fetchResponse.ProductFoundById
+            data: fetchResponse
         );
 
         var productModel = _mapper.Map<ProductModel>(source: aggregateRoot);

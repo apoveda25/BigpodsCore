@@ -23,10 +23,10 @@ public sealed class UpdateOneWarehouseService(
             filter: x => x.Id == command.WarehouseDto.Id,
             cancellationToken: cancellationToken
         );
-        var warehouseFoundByName = command.WarehouseDto.Name is not null ? await warehousesRepository.FindOneAsync(
-            filter: x => x.Name == command.WarehouseDto.Name && x.IsDeleted == false,
+        var warehouseFoundByName = command.WarehouseDto.Name is null ? null : await warehousesRepository.FindOneAsync(
+            filter: x => x.Name == command.WarehouseDto.Name,
             cancellationToken: cancellationToken
-        ) : null;
+        );
 
         return new UpdateOneWarehouseServiceResponse(
             WarehouseFoundById: warehouseFoundById,

@@ -31,15 +31,9 @@ public sealed class CreateOneAttributeHandler(
 
         var attributesRepository = _unitOfWork.GetRepository<AttributeModel>();
 
-        var attributeTypeEntity = AttributeTypeEntity.Build(
-            attributeType: fetchResponse.AttributeTypeFoundById
-        );
-
         var aggregateRoot = AttributeAggregateRoot.CreateOne(
             attribute: command.AttributeDto,
-            attributeType: attributeTypeEntity,
-            attributeFoundById: fetchResponse.AttributeFoundById,
-            attributeFoundByValueMeasuringUnitAttributeTypeId: fetchResponse.AttributeFoundByValueMeasuringUnitAttributeTypeId
+            data: fetchResponse
         );
 
         var attributeModel = _mapper.Map<AttributeModel>(source: aggregateRoot);

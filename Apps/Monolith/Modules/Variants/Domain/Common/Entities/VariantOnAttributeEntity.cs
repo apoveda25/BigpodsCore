@@ -52,7 +52,14 @@ public sealed class VariantOnAttributeEntity
         AttributeId = attributeId;
     }
 
-    public static VariantOnAttributeEntity Build(
+    public static VariantOnAttributeEntity[] BuildMany(
+        IVariantOnAttributeModel[] variantsOnAttributes
+    )
+    {
+        return variantsOnAttributes.Select(BuildOne).ToArray();
+    }
+
+    public static VariantOnAttributeEntity BuildOne(
         IVariantOnAttributeModel variantOnAttribute
     )
     {
@@ -74,22 +81,37 @@ public sealed class VariantOnAttributeEntity
         );
     }
 
-    public static VariantOnAttributeEntity CreateOne(
-        ICreateOneVariantOnAttributeDto variantOnAttribute,
+    public static VariantOnAttributeEntity[] CreateMany(
+        ICreateOneVariantOnAttributeDto[] variantsOnAttributes,
         IVariantOnAttributeModel[] variantsOnAttributesFoundById,
         IAttributeModel[] attributesFoundById
     )
     {
-        if (variantsOnAttributesFoundById.Length != 0)
+        return variantsOnAttributes.Select(
+            variantOnAttribute => CreateOne(
+                variantOnAttribute: variantOnAttribute,
+                variantOnAttributeFoundById: variantsOnAttributesFoundById.FirstOrDefault(
+                    x => x.Id == variantOnAttribute.Id
+                ),
+                attributeFoundById: attributesFoundById.FirstOrDefault(
+                    x => x.Id == variantOnAttribute.AttributeId
+                )
+            )
+        ).ToArray();
+    }
+
+    public static VariantOnAttributeEntity CreateOne(
+        ICreateOneVariantOnAttributeDto variantOnAttribute,
+        IVariantOnAttributeModel? variantOnAttributeFoundById,
+        IAttributeModel? attributeFoundById
+    )
+    {
+        if (variantOnAttributeFoundById is not null)
         {
             throw new ConflictException("VariantsOnAttributes exist with this id");
         }
 
-        if (
-            attributesFoundById.FirstOrDefault(
-                attr => attr.Id == variantOnAttribute.AttributeId && attr.IsDeleted == false
-            ) is null
-        )
+        if (attributeFoundById is null)
         {
             throw new NotFoundException("Attributes not found");
         }
@@ -111,9 +133,17 @@ public sealed class VariantOnAttributeEntity
         );
     }
 
-    public bool IsEquals(VariantOnAttributeEntity variantOnAttribute)
+    public static VariantOnAttributeEntity[] DeleteMany(
+        IDeleteOneVariantDto variant,
+        IVariantOnAttributeModel[] variantsOnAttributesFoundByVariantId
+    )
     {
-        return Id == variantOnAttribute.Id || (VariantId == variantOnAttribute.VariantId && AttributeId == variantOnAttribute.AttributeId);
+        return variantsOnAttributesFoundByVariantId.Select(
+            variantOnAttribute => DeleteOne(
+                variant: variant,
+                variantOnAttributeFoundByVariantId: variantOnAttribute
+            )
+        ).ToArray();
     }
 
     public static VariantOnAttributeEntity DeleteOne(
@@ -124,11 +154,6 @@ public sealed class VariantOnAttributeEntity
         if (variantOnAttributeFoundByVariantId is null)
         {
             throw new NotFoundException("VariantOnAttribute not found with this variantId");
-        }
-
-        if (variantOnAttributeFoundByVariantId.VariantId != variant.Id)
-        {
-            throw new ConflictException("VariantOnAttribute not match with this variantId");
         }
 
         if (variantOnAttributeFoundByVariantId.IsDeleted)
@@ -152,5 +177,10 @@ public sealed class VariantOnAttributeEntity
             variantId: variantOnAttributeFoundByVariantId.VariantId,
             attributeId: variantOnAttributeFoundByVariantId.AttributeId
         );
+    }
+
+    public bool IsEquals(VariantOnAttributeEntity variantOnAttribute)
+    {
+        return Id == variantOnAttribute.Id || (VariantId == variantOnAttribute.VariantId && AttributeId == variantOnAttribute.AttributeId);
     }
 }

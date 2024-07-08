@@ -21,11 +21,11 @@ public sealed class DeleteOneAttributeService(
         var attributesClasses = _unitOfWork.GetRepository<AttributeTypeModel>();
 
         var attributeFoundById = await attributesRepository.FindOneAsync(
-            filter: x => x.Id == command.AttributeDto.Id && x.IsDeleted == false,
+            filter: x => x.Id == command.AttributeDto.Id,
             cancellationToken: cancellationToken
         );
         var attributeTypeFoundById = attributeFoundById is null ? null : await attributesClasses.FindOneAsync(
-            filter: x => x.Id == attributeFoundById.AttributeTypeId && x.IsDeleted == false,
+            filter: x => x.Id == attributeFoundById.AttributeTypeId,
             cancellationToken: cancellationToken
         );
 

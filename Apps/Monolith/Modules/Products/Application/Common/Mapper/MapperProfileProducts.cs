@@ -27,14 +27,12 @@ public class MapperProfileProducts : Profile
             .ForMember(destinationMember: dest => dest.Description, memberOptions: opt => opt.MapFrom(src => src.Description.Value))
             .ForMember(destinationMember: dest => dest.Brand, memberOptions: opt => opt.MapFrom(src => src.Brand.Value))
             .ForMember(destinationMember: dest => dest.Model, memberOptions: opt => opt.MapFrom(src => src.Model.Value))
-            .ForMember(destinationMember: dest => dest.Stock, memberOptions: opt => opt.MapFrom(src => src.Stock.Value))
             .ForMember(destinationMember: dest => dest.Variants, memberOptions: opt => opt.Ignore());
 
         CreateMap<VariantEntity, VariantModel>()
             .ForMember(destinationMember: dest => dest.Name, memberOptions: opt => opt.MapFrom(src => src.Name.Value))
             .ForMember(destinationMember: dest => dest.Price, memberOptions: opt => opt.MapFrom(src => src.Price.Value))
             .ForMember(destinationMember: dest => dest.Cost, memberOptions: opt => opt.MapFrom(src => src.Cost.Value))
-            .ForMember(destinationMember: dest => dest.Stock, memberOptions: opt => opt.MapFrom(src => src.Stock.Value))
             .ForMember(destinationMember: dest => dest.Product, memberOptions: opt => opt.Ignore())
             .ForMember(destinationMember: dest => dest.VariantsOnAttributes, memberOptions: opt => opt.Ignore());
 

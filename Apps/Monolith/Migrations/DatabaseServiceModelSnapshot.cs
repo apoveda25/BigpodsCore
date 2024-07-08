@@ -535,9 +535,6 @@ namespace Bigpods.Monolith.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("int(11)");
-
                     b.Property<DateTime?>("UpdatedAtDatetime")
                         .HasColumnType("datetime(6)");
 
@@ -612,9 +609,6 @@ namespace Bigpods.Monolith.Migrations
                         .IsRequired()
                         .HasMaxLength(36)
                         .HasColumnType("varchar(36)");
-
-                    b.Property<int>("Stock")
-                        .HasColumnType("int(11)");
 
                     b.Property<DateTime?>("UpdatedAtDatetime")
                         .HasColumnType("datetime(6)");

@@ -38,9 +38,9 @@ public record CreateOneVariantInput : ICreateOneVariantInput<CreateOneVariantOnA
 
     public string Name { get; set; } = string.Empty;
 
-    public float Price { get; set; } = 0;
+    public decimal Price { get; set; } = 0;
 
-    public float Cost { get; set; } = 0;
+    public decimal Cost { get; set; } = 0;
 
     [GraphQLIgnore]
     public DateTimeZone CreatedAtTimezone { get; set; } = DateTimeZone.Utc;

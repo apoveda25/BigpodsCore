@@ -3,5 +3,14 @@
     "csharp.format.enable": true,
     "[csharp]": {
         "editor.defaultFormatter": "ms-dotnettools.csharp"
+    },
+    "workbench.editor.customLabels.enabled": true,
+    "workbench.editor.customLabels.patterns": {
+        "**/Domain/**": "${filename}.${extname} - 🎓 Domain",
+        "**/Application/**": "${filename}.${extname} - 🤖 Application",
+        "**/Infrastructure/**": "${filename}.${extname} - 📡 Infrastructure",
+        "**/Database/**": "${filename}.${extname} - 📚 Database",
+        "**/Migrations/**": "${filename}.${extname} - 📑 Migrations",
+        "**/Tests/**": "${filename}.${extname} - 🧪 Tests"
     }
 }
