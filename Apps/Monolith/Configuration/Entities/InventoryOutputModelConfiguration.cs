@@ -17,6 +17,8 @@ public class InventoryOutputModelConfiguration : IEntityTypeConfiguration<Invent
 
         builder.Property(propertyExpression: x => x.Stock).IsRequired().HasColumnType("int(11)");
 
+        builder.Property(propertyExpression: x => x.Comment).IsRequired().HasColumnType("varchar(255)");
+
         builder.Property(propertyExpression: x => x.IsDeleted).IsRequired().HasDefaultValue(value: false);
 
         builder.Property(propertyExpression: x => x.CreatedAtDatetime).IsRequired();

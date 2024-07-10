@@ -169,6 +169,10 @@ namespace Bigpods.Monolith.Migrations
                         .HasColumnType("char(36)")
                         .UseCollation("utf8mb4_general_ci");
 
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.Property<DateTime>("CreatedAtDatetime")
                         .HasColumnType("datetime(6)");
 
@@ -318,6 +322,10 @@ namespace Bigpods.Monolith.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)")
                         .UseCollation("utf8mb4_general_ci");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("CreatedAtDatetime")
                         .HasColumnType("datetime(6)");

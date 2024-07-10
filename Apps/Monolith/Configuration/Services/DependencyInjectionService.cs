@@ -50,6 +50,16 @@ using Bigpods.Monolith.Modules.Inventories.Infrastructure.DeleteOne.Mutations;
 using Bigpods.Monolith.Modules.Inventories.Infrastructure.FindMany.Queries;
 using Bigpods.Monolith.Modules.Inventories.Infrastructure.FindOne.Queries;
 using Bigpods.Monolith.Modules.Inventories.Application.Common.Services;
+using Bigpods.Monolith.Modules.InventoryInputs.Infrastructure.CreateOne.Mutations;
+using Bigpods.Monolith.Modules.InventoryInputs.Infrastructure.FindMany.Queries;
+using Bigpods.Monolith.Modules.InventoryInputs.Infrastructure.FindOne.Queries;
+using Bigpods.Monolith.Modules.InventoryInputs.Application.Common.Policies;
+using Bigpods.Monolith.Modules.InventoryInputs.Application.Common.Services;
+using Bigpods.Monolith.Modules.InventoryOutputs.Infrastructure.CreateOne.Mutations;
+using Bigpods.Monolith.Modules.InventoryOutputs.Infrastructure.FindMany.Queries;
+using Bigpods.Monolith.Modules.InventoryOutputs.Infrastructure.FindOne.Queries;
+using Bigpods.Monolith.Modules.InventoryOutputs.Application.Common.Policies;
+using Bigpods.Monolith.Modules.InventoryOutputs.Application.Common.Services;
 
 
 namespace Bigpods.Monolith.Config.Services;
@@ -116,33 +126,39 @@ public static class CoreDependencyInjectionService
             .RegisterDbContext<DatabaseService>()
             .AddMaxExecutionDepthRule(maxAllowedExecutionDepth: 11)
             .AddMutationType()
-            .AddTypeExtension<CreateOneAttributeTypesMutation>()
+            .AddTypeExtension<CreateOneAttributeTypeMutation>()
             .AddTypeExtension<UpdateOneAttributeTypeMutation>()
-            .AddTypeExtension<CreateOneAttributesMutation>()
-            .AddTypeExtension<DeleteOneAttributesMutation>()
-            .AddTypeExtension<CreateOneVariantsMutation>()
-            .AddTypeExtension<UpdateOneVariantsMutation>()
-            .AddTypeExtension<DeleteOneVariantsMutation>()
-            .AddTypeExtension<CreateOneProductsMutation>()
-            .AddTypeExtension<UpdateOneProductsMutation>()
+            .AddTypeExtension<CreateOneAttributeMutation>()
+            .AddTypeExtension<DeleteOneAttributeMutation>()
+            .AddTypeExtension<CreateOneVariantMutation>()
+            .AddTypeExtension<UpdateOneVariantMutation>()
+            .AddTypeExtension<DeleteOneVariantMutation>()
+            .AddTypeExtension<CreateOneProductMutation>()
+            .AddTypeExtension<UpdateOneProductMutation>()
+            .AddTypeExtension<CreateOneInventoryInputMutation>()
+            .AddTypeExtension<CreateOneInventoryOutputMutation>()
             .AddTypeExtension<CreateOneInventoryMutation>()
             .AddTypeExtension<DeleteOneInventoryMutation>()
-            .AddTypeExtension<CreateOneWarehousesMutation>()
-            .AddTypeExtension<UpdateOneWarehousesMutation>()
-            .AddTypeExtension<DeleteOneWarehousesMutation>()
+            .AddTypeExtension<CreateOneWarehouseMutation>()
+            .AddTypeExtension<UpdateOneWarehouseMutation>()
+            .AddTypeExtension<DeleteOneWarehouseMutation>()
             .AddQueryType()
             .AddTypeExtension<FindManyAttributeTypesQuery>()
-            .AddTypeExtension<FindOneAttributeTypesQuery>()
+            .AddTypeExtension<FindOneAttributeTypeQuery>()
             .AddTypeExtension<FindManyAttributesQuery>()
-            .AddTypeExtension<FindOneAttributesQuery>()
+            .AddTypeExtension<FindOneAttributeQuery>()
             .AddTypeExtension<FinaManyVariantsQuery>()
-            .AddTypeExtension<FindOneVariantsQuery>()
+            .AddTypeExtension<FindOneVariantQuery>()
             .AddTypeExtension<FindManyProductsQuery>()
-            .AddTypeExtension<FindOneProductsQuery>()
+            .AddTypeExtension<FindOneProductQuery>()
+            .AddTypeExtension<FindManyInventoryInputsQuery>()
+            .AddTypeExtension<FindOneInventoryInputQuery>()
+            .AddTypeExtension<FindManyInventoryOutputsQuery>()
+            .AddTypeExtension<FindOneInventoryOutputQuery>()
             .AddTypeExtension<FindManyInventoriesQuery>()
             .AddTypeExtension<FindOneInventoryQuery>()
             .AddTypeExtension<FindManyWarehousesQuery>()
-            .AddTypeExtension<FindOneWarehousesQuery>()
+            .AddTypeExtension<FindOneWarehouseQuery>()
             .AddType<DateTimeZoneType>()
             .AddProjections()
             .AddFiltering()
@@ -185,6 +201,8 @@ public static class CoreDependencyInjectionService
             .AddAuthorization(configure: AttributesPolicies.ConfigurePolicies)
             .AddAuthorization(configure: VariantsPolicies.ConfigurePolicies)
             .AddAuthorization(configure: ProductsPolicies.ConfigurePolicies)
+            .AddAuthorization(configure: InventoryInputsPolicies.ConfigurePolicies)
+            .AddAuthorization(configure: InventoryOutputsPolicies.ConfigurePolicies)
             .AddAuthorization(configure: InventoriesPolicies.ConfigurePolicies)
             .AddAuthorization(configure: WarehousesPolicies.ConfigurePolicies)
             .AddKeycloakAuthorization();
@@ -204,6 +222,8 @@ public static class CoreDependencyInjectionService
             .AddAttributesDependenciesConfiguration()
             .AddVariantsDependenciesConfiguration()
             .AddProductsDependenciesConfiguration()
+            .AddInventoryInputsDependenciesConfiguration()
+            .AddInventoryOutputsDependenciesConfiguration()
             .AddInventoriesDependenciesConfiguration()
             .AddWarehousesDependenciesConfiguration();
     }

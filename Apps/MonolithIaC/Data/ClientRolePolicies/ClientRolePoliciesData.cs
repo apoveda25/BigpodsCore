@@ -15,6 +15,8 @@ public partial class ClientRolePoliciesData
     {
         return GetClientRolePoliciesForWarehouses(realms, clients, roles)
             .Concat(GetClientRolePoliciesForInventories(realms, clients, roles))
+            .Concat(GetClientRolePoliciesForInventoryInputs(realms, clients, roles))
+            .Concat(GetClientRolePoliciesForInventoryOutputs(realms, clients, roles))
             .Concat(GetClientRolePoliciesForProducts(realms, clients, roles))
             .Concat(GetClientRolePoliciesForVariants(realms, clients, roles))
             .Concat(GetClientRolePoliciesForAttributes(realms, clients, roles))
