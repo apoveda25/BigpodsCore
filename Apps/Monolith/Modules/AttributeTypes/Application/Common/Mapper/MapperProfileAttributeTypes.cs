@@ -1,7 +1,5 @@
 using AutoMapper;
-
 using Bigpods.Monolith.Modules.AttributeTypes.Application.CreateOne.Dtos;
-
 using Bigpods.Monolith.Modules.AttributeTypes.Application.CreateOne.Inputs;
 using Bigpods.Monolith.Modules.AttributeTypes.Application.UpdateOne.Dtos;
 using Bigpods.Monolith.Modules.AttributeTypes.Application.UpdateOne.Inputs;
@@ -19,8 +17,17 @@ public class MapperProfileAttributeTypes : Profile
         CreateMap<UpdateOneAttributeTypeInput, UpdateOneAttributeTypeDto>().ReverseMap();
 
         CreateMap<AttributeTypeAggregateRoot, AttributeTypeModel>()
-            .ForMember(destinationMember: dest => dest.Name, memberOptions: opt => opt.MapFrom(src => src.Name.Value))
-            .ForMember(destinationMember: dest => dest.Description, memberOptions: opt => opt.MapFrom(src => src.Description.Value))
-            .ForMember(destinationMember: dest => dest.Attributes, memberOptions: opt => opt.Ignore());
+            .ForMember(
+                destinationMember: dest => dest.Name,
+                memberOptions: opt => opt.MapFrom(src => src.Name.Value)
+            )
+            .ForMember(
+                destinationMember: dest => dest.Description,
+                memberOptions: opt => opt.MapFrom(src => src.Description.Value)
+            )
+            .ForMember(
+                destinationMember: dest => dest.Attributes,
+                memberOptions: opt => opt.Ignore()
+            );
     }
 }

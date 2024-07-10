@@ -6,9 +6,8 @@ using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
 namespace Bigpods.Monolith.Modules.AttributeTypes.Application.UpdateOne.Services;
 
-public sealed class UpdateOneAttributeTypeService(
-    [Service] IUnitOfWork unitOfWork
-) : IUpdateOneAttributeTypeService
+public sealed class UpdateOneAttributeTypeService([Service] IUnitOfWork unitOfWork)
+    : IUpdateOneAttributeTypeService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 

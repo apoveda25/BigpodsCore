@@ -1,10 +1,8 @@
 using AutoMapper;
-
 using Bigpods.Monolith.Modules.Shared.Domain.Database;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Warehouses.Domain.Common.Aggregates;
 using Bigpods.Monolith.Modules.Warehouses.Domain.UpdateOne.Services;
-
 using MediatR;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Application.UpdateOne.Commands;
@@ -17,21 +15,22 @@ public sealed class UpdateOneWarehouseHandler(
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IMapper _mapper = mapper;
-    private readonly IUpdateOneWarehouseService _updateOneWarehouseService = updateOneWarehouseService;
+    private readonly IUpdateOneWarehouseService _updateOneWarehouseService =
+        updateOneWarehouseService;
 
     public async Task<WarehouseModel> Handle(
-        UpdateOneWarehouseCommand request,
+        UpdateOneWarehouseCommand command,
         CancellationToken cancellationToken
     )
     {
-        var fetchResponse = await _updateOneWarehouseService.ExecuteAsync(command: request, cancellationToken: cancellationToken);
+        var fetchResponse = await _updateOneWarehouseService.ExecuteAsync(
+            command: command,
+            cancellationToken: cancellationToken
+        );
 
         var warehousesRepository = _unitOfWork.GetRepository<WarehouseModel>();
 
-        var aggregateRoot = WarehouseAggregateRoot.UpdateOne(
-            warehouse: request.WarehouseDto,
-            data: fetchResponse
-        );
+        var aggregateRoot = WarehouseAggregateRoot.UpdateOne(command: command, data: fetchResponse);
 
         var warehouseModel = _mapper.Map<WarehouseModel>(source: aggregateRoot);
 

@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Bigpods.Monolith.Modules.Shared.Domain.Database;
 
-public interface IGenericRepository<T> where T : class
+public interface IGenericRepository<T>
+    where T : class
 {
     DbSet<T> Model { get; }
 
@@ -23,7 +23,10 @@ public interface IGenericRepository<T> where T : class
 
     Task<T> CreateOneAsync(T entity, CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<T>> CreateManyAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+    Task<IEnumerable<T>> CreateManyAsync(
+        IEnumerable<T> entities,
+        CancellationToken cancellationToken = default
+    );
 
     T DeleteOne(T entity);
 

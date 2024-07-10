@@ -3,7 +3,10 @@ using System.Linq;
 
 namespace Bigpods.MonolithIaC.Data.ClientRolePolicies;
 
-public sealed record ClientRolePolicy(string Name, Pulumi.Keycloak.OpenId.ClientRolePolicyArgs Config);
+public sealed record ClientRolePolicy(
+    string Name,
+    Pulumi.Keycloak.OpenId.ClientRolePolicyArgs Config
+);
 
 public partial class ClientRolePoliciesData
 {
@@ -19,6 +22,7 @@ public partial class ClientRolePoliciesData
             .Concat(GetClientRolePoliciesForInventoryOutputs(realms, clients, roles))
             .Concat(GetClientRolePoliciesForProducts(realms, clients, roles))
             .Concat(GetClientRolePoliciesForVariants(realms, clients, roles))
+            .Concat(GetClientRolePoliciesForVariantsOnAttributes(realms, clients, roles))
             .Concat(GetClientRolePoliciesForAttributes(realms, clients, roles))
             .Concat(GetClientRolePoliciesForAttributeTypes(realms, clients, roles))
             .AsParallel()

@@ -1,10 +1,8 @@
 using AutoMapper;
-
 using Bigpods.Monolith.Modules.Inventories.Domain.Common.Aggregates;
 using Bigpods.Monolith.Modules.Inventories.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.Shared.Domain.Database;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
-
 using MediatR;
 
 namespace Bigpods.Monolith.Modules.Inventories.Application.CreateOne.Commands;
@@ -15,7 +13,8 @@ public sealed class CreateOneInventoryHandler(
     [Service] IMapper mapper
 ) : IRequestHandler<CreateOneInventoryCommand, InventoryModel>
 {
-    private readonly ICreateOneInventoryService _createOneInventoryService = createOneInventoryService;
+    private readonly ICreateOneInventoryService _createOneInventoryService =
+        createOneInventoryService;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IMapper _mapper = mapper;
 
@@ -24,12 +23,15 @@ public sealed class CreateOneInventoryHandler(
         CancellationToken token = default
     )
     {
-        var fetchResponse = await _createOneInventoryService.ExecuteAsync(command: command, cancellationToken: token);
+        var fetchResponse = await _createOneInventoryService.ExecuteAsync(
+            command: command,
+            cancellationToken: token
+        );
 
         var inventoriesRepository = _unitOfWork.GetRepository<InventoryModel>();
 
-        var aggregateRoot = WarehouseAggregateRoot.CreateOneVariant(
-            inventory: command.InventoryDto,
+        var aggregateRoot = WarehouseAggregateRoot.CreateOneInventory(
+            command: command,
             data: fetchResponse
         );
 

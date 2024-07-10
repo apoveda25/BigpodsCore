@@ -1,18 +1,20 @@
 using System.Linq.Expressions;
-
 using Bigpods.Monolith.Modules.Shared.Domain.Database;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Bigpods.Monolith.Modules.Shared.Infrastructure.Database;
 
-public class GenericRepository<T>(DatabaseService context, ILogger logger) : IGenericRepository<T> where T : class
+public class GenericRepository<T>(DatabaseService context, ILogger logger) : IGenericRepository<T>
+    where T : class
 {
     protected readonly DatabaseService _context = context;
     protected readonly ILogger _logger = logger;
     protected readonly DbSet<T> _model = context.Set<T>();
 
-    public DbSet<T> Model { get => _model; }
+    public DbSet<T> Model
+    {
+        get => _model;
+    }
 
     public async Task<T?> FindOneAsync(
         Expression<Func<T, bool>>? filter = null,
@@ -98,11 +100,13 @@ public class GenericRepository<T>(DatabaseService context, ILogger logger) : IGe
         }
     }
 
-    public async Task<IEnumerable<T>> CreateManyAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<T>> CreateManyAsync(
+        IEnumerable<T> entities,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
-
             await _model.AddRangeAsync(entities, cancellationToken);
 
             return entities;

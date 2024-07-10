@@ -1,7 +1,6 @@
 using Bigpods.Monolith.Modules.Shared.Domain.Database;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Variants.Application.Common.Policies;
-
 using HotChocolate.Authorization;
 
 namespace Bigpods.Monolith.Modules.Variants.Infrastructure.FindMany.Queries;

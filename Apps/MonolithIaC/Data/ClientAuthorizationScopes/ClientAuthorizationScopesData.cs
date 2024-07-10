@@ -1,14 +1,14 @@
 using System.Collections.Generic;
-
 using Bigpods.MonolithIaC.Data.Clients;
-
 using Bigpods.MonolithIaC.Data.Realms;
-
 using Bigpods.MonolithIaC.Utils;
 
 namespace Bigpods.MonolithIaC.Data.ClientAuthorizationScopes;
 
-public sealed record ClientAuthorizationScope(string Name, Pulumi.Keycloak.OpenId.ClientAuthorizationScopeArgs Config);
+public sealed record ClientAuthorizationScope(
+    string Name,
+    Pulumi.Keycloak.OpenId.ClientAuthorizationScopeArgs Config
+);
 
 public static class ClientAuthorizationScopesData
 {
@@ -20,6 +20,10 @@ public static class ClientAuthorizationScopesData
     public static string UpdateManyName { get; } = "Update many";
     public static string DeleteOneName { get; } = "Delete one";
     public static string DeleteManyName { get; } = "Delete many";
+    public static string AttachOneName { get; } = "Attach one";
+    public static string AttachManyName { get; } = "Attach many";
+    public static string DettachOneName { get; } = "Dettach one";
+    public static string DettachManyName { get; } = "Dettach many";
 
     public static Dictionary<string, ClientAuthorizationScope> GetClientAuthorizationScopes(
         Dictionary<string, Pulumi.Keycloak.Realm> realms,
@@ -37,6 +41,10 @@ public static class ClientAuthorizationScopesData
         string updateManyNameKebabCase = StringUtils.ToKebabCase(UpdateManyName);
         string deleteOneNameKebabCase = StringUtils.ToKebabCase(DeleteOneName);
         string deleteManyNameKebabCase = StringUtils.ToKebabCase(DeleteManyName);
+        string attachOneNameKebabCase = StringUtils.ToKebabCase(AttachOneName);
+        string attachManyNameKebabCase = StringUtils.ToKebabCase(AttachManyName);
+        string dettachOneNameKebabCase = StringUtils.ToKebabCase(DettachOneName);
+        string dettachManyNameKebabCase = StringUtils.ToKebabCase(DettachManyName);
 
         return new Dictionary<string, ClientAuthorizationScope>()
         {
@@ -110,6 +118,42 @@ public static class ClientAuthorizationScopesData
                     RealmId = bigpodsRealm.Id.Apply(id => id),
                     ResourceServerId = bigpodsMonolithAPIClient.Id.Apply(id => id),
                     DisplayName = DeleteManyName,
+                }
+            ),
+            [AttachOneName] = new ClientAuthorizationScope(
+                Name: $"scopes:{attachOneNameKebabCase}",
+                Config: new Pulumi.Keycloak.OpenId.ClientAuthorizationScopeArgs
+                {
+                    RealmId = bigpodsRealm.Id.Apply(id => id),
+                    ResourceServerId = bigpodsMonolithAPIClient.Id.Apply(id => id),
+                    DisplayName = AttachOneName,
+                }
+            ),
+            [AttachManyName] = new ClientAuthorizationScope(
+                Name: $"scopes:{attachManyNameKebabCase}",
+                Config: new Pulumi.Keycloak.OpenId.ClientAuthorizationScopeArgs
+                {
+                    RealmId = bigpodsRealm.Id.Apply(id => id),
+                    ResourceServerId = bigpodsMonolithAPIClient.Id.Apply(id => id),
+                    DisplayName = AttachManyName,
+                }
+            ),
+            [DettachOneName] = new ClientAuthorizationScope(
+                Name: $"scopes:{dettachOneNameKebabCase}",
+                Config: new Pulumi.Keycloak.OpenId.ClientAuthorizationScopeArgs
+                {
+                    RealmId = bigpodsRealm.Id.Apply(id => id),
+                    ResourceServerId = bigpodsMonolithAPIClient.Id.Apply(id => id),
+                    DisplayName = DettachOneName,
+                }
+            ),
+            [DettachManyName] = new ClientAuthorizationScope(
+                Name: $"scopes:{dettachManyNameKebabCase}",
+                Config: new Pulumi.Keycloak.OpenId.ClientAuthorizationScopeArgs
+                {
+                    RealmId = bigpodsRealm.Id.Apply(id => id),
+                    ResourceServerId = bigpodsMonolithAPIClient.Id.Apply(id => id),
+                    DisplayName = DettachManyName,
                 }
             ),
         };

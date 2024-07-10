@@ -1,9 +1,6 @@
 using System.Collections.Generic;
-
 using Bigpods.MonolithIaC.Data.Clients;
-
 using Bigpods.MonolithIaC.Data.Realms;
-
 using Bigpods.MonolithIaC.Utils;
 
 namespace Bigpods.MonolithIaC.Data.Roles;
@@ -32,22 +29,28 @@ public static class RolesData
 
         return new Dictionary<string, Role>
         {
-            [AdminName] = new Role(Name: $"roles:{adminNameKebabCase}", Config: new()
-            {
-                RealmId = bigpodsRealm.Id.Apply(id => id),
-                // ClientId = bigpodsMonolithAPIClient.Id.Apply(id => id),
-                Name = $"{AdminName} Role",
-                Description = $"{AdminName} Role",
-                // CompositeRoles = new[] { defaultRole.Apply(role => role.Id) },
-            }),
-            [ProductTeamName] = new Role(Name: $"roles:{productTeamNameKebabCase}", Config: new()
-            {
-                RealmId = bigpodsRealm.Id.Apply(id => id),
-                // ClientId = bigpodsMonolithAPIClient.Id.Apply(id => id),
-                Name = $"{ProductTeamName} Role",
-                Description = $"{ProductTeamName} Role",
-                // CompositeRoles = new[] { defaultRole.Apply(role => role.Id) },
-            }),
+            [AdminName] = new Role(
+                Name: $"roles:{adminNameKebabCase}",
+                Config: new()
+                {
+                    RealmId = bigpodsRealm.Id.Apply(id => id),
+                    // ClientId = bigpodsMonolithAPIClient.Id.Apply(id => id),
+                    Name = $"{AdminName} Role",
+                    Description = $"{AdminName} Role",
+                    // CompositeRoles = new[] { defaultRole.Apply(role => role.Id) },
+                }
+            ),
+            [ProductTeamName] = new Role(
+                Name: $"roles:{productTeamNameKebabCase}",
+                Config: new()
+                {
+                    RealmId = bigpodsRealm.Id.Apply(id => id),
+                    // ClientId = bigpodsMonolithAPIClient.Id.Apply(id => id),
+                    Name = $"{ProductTeamName} Role",
+                    Description = $"{ProductTeamName} Role",
+                    // CompositeRoles = new[] { defaultRole.Apply(role => role.Id) },
+                }
+            ),
         };
     }
 
@@ -61,11 +64,9 @@ public static class RolesData
 
         return new Dictionary<string, Pulumi.Output<Pulumi.Keycloak.GetRoleResult>>()
         {
-            [DefaultName] = Pulumi.Keycloak.GetRole.Invoke(new()
-            {
-                RealmId = bigpodsRealm.Id.Apply(id => id),
-                Name = defaultNameKebabCase,
-            }),
+            [DefaultName] = Pulumi.Keycloak.GetRole.Invoke(
+                new() { RealmId = bigpodsRealm.Id.Apply(id => id), Name = defaultNameKebabCase, }
+            ),
         };
     }
 }

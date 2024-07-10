@@ -1,10 +1,8 @@
 using AutoMapper;
-
 using Bigpods.Monolith.Modules.Shared.Domain.Database;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Warehouses.Domain.Common.Aggregates;
 using Bigpods.Monolith.Modules.Warehouses.Domain.DeleteOne.Services;
-
 using MediatR;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Application.DeleteOne.Commands;
@@ -17,21 +15,22 @@ public sealed class DeleteOneWarehouseHandler(
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IMapper _mapper = mapper;
-    private readonly IDeleteOneWarehouseService _deleteOneWarehouseService = deleteOneWarehouseService;
+    private readonly IDeleteOneWarehouseService _deleteOneWarehouseService =
+        deleteOneWarehouseService;
 
     public async Task<WarehouseModel> Handle(
         DeleteOneWarehouseCommand command,
         CancellationToken cancellationToken = default
     )
     {
-        var fetchResponse = await _deleteOneWarehouseService.ExecuteAsync(command: command, cancellationToken: cancellationToken);
+        var fetchResponse = await _deleteOneWarehouseService.ExecuteAsync(
+            command: command,
+            cancellationToken: cancellationToken
+        );
 
         var warehousesRepository = _unitOfWork.GetRepository<WarehouseModel>();
 
-        var aggregateRoot = WarehouseAggregateRoot.DeleteOne(
-            warehouse: command.WarehouseDto,
-            data: fetchResponse
-        );
+        var aggregateRoot = WarehouseAggregateRoot.DeleteOne(command: command, data: fetchResponse);
 
         var warehouseModel = _mapper.Map<WarehouseModel>(source: aggregateRoot);
 

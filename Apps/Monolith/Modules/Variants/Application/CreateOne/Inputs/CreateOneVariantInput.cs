@@ -1,16 +1,20 @@
 using Bigpods.Monolith.Modules.Variants.Domain.CreateOne.Inputs;
-
 using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Variants.Application.CreateOne.Inputs;
 
 [GraphQLName(name: "VariantCreateOneVariantInput")]
-public sealed record CreateOneVariantInput : ICreateOneVariantInput<CreateOneVariantOnAttributeInput>
+public sealed record CreateOneVariantInput
+    : ICreateOneVariantInput<CreateOneVariantOnAttributeInput>
 {
     private Guid _id;
 
     [DefaultValue("00000000-0000-0000-0000-000000000000")]
-    public Optional<Guid> Id { get => _id; set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value; }
+    public Optional<Guid> Id
+    {
+        get => _id;
+        set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value;
+    }
 
     public string Name { get; set; } = string.Empty;
 
@@ -34,7 +38,11 @@ public sealed record CreateOneVariantOnAttributeInput : ICreateOneVariantOnAttri
     private Guid _id;
 
     [DefaultValue("00000000-0000-0000-0000-000000000000")]
-    public Optional<Guid> Id { get => _id; set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value; }
+    public Optional<Guid> Id
+    {
+        get => _id;
+        set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value;
+    }
 
     [GraphQLIgnore]
     public DateTimeZone CreatedAtTimezone { get; set; } = DateTimeZone.Utc;

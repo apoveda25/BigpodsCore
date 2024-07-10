@@ -7,7 +7,9 @@ namespace Bigpods.Monolith.Modules.AttributeTypes.Application.Common.Services;
 
 public static class AttributeTypesDependencyInjectionService
 {
-    public static IServiceCollection AddAttributeTypesDependenciesConfiguration(this IServiceCollection services)
+    public static IServiceCollection AddAttributeTypesDependenciesConfiguration(
+        this IServiceCollection services
+    )
     {
         services.AddScoped<ICreateOneAttributeTypeService, CreateOneAttributeTypeService>();
         services.AddScoped<IUpdateOneAttributeTypeService, UpdateOneAttributeTypeService>();

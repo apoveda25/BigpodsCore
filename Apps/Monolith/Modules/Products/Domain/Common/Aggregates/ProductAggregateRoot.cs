@@ -1,113 +1,90 @@
 using Bigpods.Monolith.Modules.Products.Domain.Common.Entities;
-using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Dtos;
+using Bigpods.Monolith.Modules.Products.Domain.Common.Factories;
+using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Commands;
 using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Services;
-using Bigpods.Monolith.Modules.Products.Domain.UpdateOne.Dtos;
+using Bigpods.Monolith.Modules.Products.Domain.UpdateOne.Commands;
 using Bigpods.Monolith.Modules.Products.Domain.UpdateOne.Services;
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
-using Bigpods.Monolith.Modules.Shared.Domain.Models;
 using Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
 
 namespace Bigpods.Monolith.Modules.Products.Domain.Common.Aggregates;
 
-public sealed class ProductAggregateRoot
+public sealed class ProductAggregateRoot(
+    Guid? id = null,
+    string? name = null,
+    string? description = null,
+    string? brand = null,
+    string? model = null,
+    bool? isCompleted = null,
+    bool? isPublished = null,
+    bool? isDeleted = null,
+    DateTime? createdAtDatetime = null,
+    DateTime? updatedAtDatetime = null,
+    DateTime? deletedAtDatetime = null,
+    string? createdAtTimezone = null,
+    string? updatedAtTimezone = null,
+    string? deletedAtTimezone = null,
+    Guid? createdBy = null,
+    Guid? updatedBy = null,
+    Guid? deletedBy = null
+)
 {
-    public Guid Id { get; private set; }
-    public NameVO Name { get; private set; }
-    public SentenceVO Description { get; private set; }
-    public BrandVO Brand { get; private set; }
-    public ModelVO Model { get; private set; }
-    public bool IsCompleted { get; private set; }
-    public bool IsPublished { get; private set; }
-    public bool IsDeleted { get; private set; }
-    public DateTime CreatedAtDatetime { get; private set; }
-    public DateTime? UpdatedAtDatetime { get; private set; }
-    public DateTime? DeletedAtDatetime { get; private set; }
-    public string CreatedAtTimezone { get; private set; }
-    public string? UpdatedAtTimezone { get; private set; }
-    public string? DeletedAtTimezone { get; private set; }
-    public Guid CreatedBy { get; private set; }
-    public Guid? UpdatedBy { get; private set; }
-    public Guid? DeletedBy { get; private set; }
-    public VariantEntity[] Variants { get; private set; }
-
-    private ProductAggregateRoot(
-        Guid id,
-        string name,
-        string description,
-        string brand,
-        string model,
-        bool isCompleted,
-        bool isPublished,
-        bool isDeleted,
-        DateTime createdAtDatetime,
-        DateTime? updatedAtDatetime,
-        DateTime? deletedAtDatetime,
-        string createdAtTimezone,
-        string? updatedAtTimezone,
-        string? deletedAtTimezone,
-        Guid createdBy,
-        Guid? updatedBy,
-        Guid? deletedBy
-    )
-    {
-        Id = id;
-        Name = new NameVO(name);
-        Description = new SentenceVO(description);
-        Brand = new BrandVO(brand);
-        Model = new ModelVO(model);
-        IsCompleted = isCompleted;
-        IsPublished = isPublished;
-        IsDeleted = isDeleted;
-        CreatedAtDatetime = createdAtDatetime;
-        UpdatedAtDatetime = updatedAtDatetime;
-        DeletedAtDatetime = deletedAtDatetime;
-        CreatedAtTimezone = createdAtTimezone;
-        UpdatedAtTimezone = updatedAtTimezone;
-        DeletedAtTimezone = deletedAtTimezone;
-        CreatedBy = createdBy;
-        UpdatedBy = updatedBy;
-        DeletedBy = deletedBy;
-        Variants = [];
-    }
+    public Guid Id { get; private set; } = id ?? Guid.NewGuid();
+    public NameVO Name { get; private set; } = new NameVO(name ?? string.Empty);
+    public SentenceVO Description { get; private set; } =
+        new SentenceVO(description ?? string.Empty);
+    public BrandVO Brand { get; private set; } = new BrandVO(brand ?? string.Empty);
+    public ModelVO Model { get; private set; } = new ModelVO(model ?? string.Empty);
+    public bool IsCompleted { get; private set; } = isCompleted ?? false;
+    public bool IsPublished { get; private set; } = isPublished ?? false;
+    public bool IsDeleted { get; private set; } = isDeleted ?? false;
+    public DateTime CreatedAtDatetime { get; private set; } = createdAtDatetime ?? DateTime.Now;
+    public DateTime? UpdatedAtDatetime { get; private set; } = updatedAtDatetime;
+    public DateTime? DeletedAtDatetime { get; private set; } = deletedAtDatetime;
+    public string CreatedAtTimezone { get; private set; } = createdAtTimezone ?? string.Empty;
+    public string? UpdatedAtTimezone { get; private set; } = updatedAtTimezone;
+    public string? DeletedAtTimezone { get; private set; } = deletedAtTimezone;
+    public Guid CreatedBy { get; private set; } = createdBy ?? Guid.Empty;
+    public Guid? UpdatedBy { get; private set; } = updatedBy;
+    public Guid? DeletedBy { get; private set; } = deletedBy;
+    public VariantEntity[] Variants { get; private set; } = [];
 
     public static ProductAggregateRoot CreateOne(
-        ICreateOneProductDto product,
-        ICreateOneVariantDto[] variants,
-        ICreateOneVariantOnAttributeDto[] variantsOnAttributes,
+        ICreateOneProductCommand command,
         ICreateOneProductServiceResponse data
     )
     {
-        if (data.ProductFoundById is not null)
-        {
-            throw new ConflictException("Product exist with this id");
-        }
-
-        var productAggregateRoot = new ProductAggregateRoot(
-            id: product.Id,
-            name: product.Name,
-            description: product.Description,
-            brand: product.Brand,
-            model: product.Model,
-            isCompleted: false,
-            isPublished: false,
-            isDeleted: false,
-            createdAtDatetime: DateTime.Now,
-            updatedAtDatetime: null,
-            deletedAtDatetime: null,
-            createdAtTimezone: product.CreatedAtTimezone,
-            updatedAtTimezone: null,
-            deletedAtTimezone: null,
-            createdBy: product.CreatedBy,
-            updatedBy: null,
-            deletedBy: null
-        );
-
-        var variantEntities = VariantEntity.CreateMany(
-            variants: variants,
-            variantsOnAttributes: variantsOnAttributes,
-            variantsFoundById: data.VariantsFoundById,
+        var variantOnAttributeEntities = VariantOnAttributeEntityFactory.CreateMany(
+            variantsOnAttributes: command.VariantOnAttributeDtos,
             variantsOnAttributesFoundById: data.VariantsOnAttributesFoundById,
             attributesFoundById: data.AttributesFoundById
+        );
+
+        var variantEntities = VariantEntityFactory.CreateMany(
+            variants: command.VariantDtos,
+            variantsFoundById: data.VariantsFoundById
+        );
+
+        var variantOnAttributeEntitiesGroupByVariantId = variantOnAttributeEntities
+            .AsParallel()
+            .GroupBy(variantOnAttribute => variantOnAttribute.VariantId)
+            .ToDictionary(g => g.Key, g => g.ToArray());
+
+        if (variantOnAttributeEntitiesGroupByVariantId.Count != variantEntities.Length)
+        {
+            throw new ConflictException("VariantOnAttribute not belong to this variant");
+        }
+
+        foreach (var variant in variantEntities)
+        {
+            variant.AttachManyVariantOnAttribute(
+                variantOnAttributeEntitiesGroupByVariantId[variant.Id]
+            );
+        }
+
+        var productAggregateRoot = ProductAggregateRootFactory.CreateOne(
+            product: command.ProductDto,
+            data: data
         );
 
         productAggregateRoot.AttachManyVariants(variantEntities);
@@ -116,7 +93,7 @@ public sealed class ProductAggregateRoot
     }
 
     public static ProductAggregateRoot UpdateOne(
-        IUpdateOneProductDto product,
+        IUpdateOneProductCommand command,
         IUpdateOneProductServiceResponse data
     )
     {
@@ -130,17 +107,17 @@ public sealed class ProductAggregateRoot
             throw new ConflictException("Product is deleted");
         }
 
-        if (data.ProductFoundById.Id != product.Id)
+        if (data.ProductFoundById.Id != command.ProductDto.Id)
         {
             throw new ConflictException("Product id does not match");
         }
 
         return new ProductAggregateRoot(
             id: data.ProductFoundById.Id,
-            name: product.Name ?? data.ProductFoundById.Name,
-            description: product.Description ?? data.ProductFoundById.Description,
-            brand: product.Brand ?? data.ProductFoundById.Brand,
-            model: product.Model ?? data.ProductFoundById.Model,
+            name: command.ProductDto.Name ?? data.ProductFoundById.Name,
+            description: command.ProductDto.Description ?? data.ProductFoundById.Description,
+            brand: command.ProductDto.Brand ?? data.ProductFoundById.Brand,
+            model: command.ProductDto.Model ?? data.ProductFoundById.Model,
             isCompleted: data.ProductFoundById.IsCompleted,
             isPublished: data.ProductFoundById.IsPublished,
             isDeleted: data.ProductFoundById.IsDeleted,
@@ -148,41 +125,47 @@ public sealed class ProductAggregateRoot
             updatedAtDatetime: DateTime.Now,
             deletedAtDatetime: data.ProductFoundById.DeletedAtDatetime,
             createdAtTimezone: data.ProductFoundById.CreatedAtTimezone,
-            updatedAtTimezone: product.UpdatedAtTimezone,
+            updatedAtTimezone: command.ProductDto.UpdatedAtTimezone,
             deletedAtTimezone: data.ProductFoundById.DeletedAtTimezone,
             createdBy: data.ProductFoundById.CreatedBy,
-            updatedBy: product.UpdatedBy,
+            updatedBy: command.ProductDto.UpdatedBy,
             deletedBy: data.ProductFoundById.DeletedBy
         );
     }
 
     private void AttachManyVariants(VariantEntity[] variants)
     {
-        foreach (var variant in variants) AttachOneVariant(variant);
+        foreach (var variant in variants)
+            AttachOneVariant(variant);
     }
 
     private void AttachOneVariant(VariantEntity variant)
     {
-        if (IsVariantExist(variant.Id))
+        if (IsVariantExist(variant))
         {
             throw new ConflictException("Variant exist with this id");
         }
 
-        if (!VariantBelongToProduct(variant.ProductId))
+        if (!VariantBelongToProduct(variant))
         {
             throw new ConflictException("Variant not belong to this product");
+        }
+
+        if (variant.IsDeleted)
+        {
+            throw new ConflictException("Variant deleted cannot be attached");
         }
 
         Variants = [.. Variants, variant];
     }
 
-    private bool IsVariantExist(Guid variantId)
+    private bool IsVariantExist(VariantEntity variant)
     {
-        return Variants.Any(variant => variant.Id == variantId);
+        return Variants.Any(variant.IsEqual);
     }
 
-    private bool VariantBelongToProduct(Guid productId)
+    private bool VariantBelongToProduct(VariantEntity variant)
     {
-        return productId == Id;
+        return variant.ProductId == Id;
     }
 }

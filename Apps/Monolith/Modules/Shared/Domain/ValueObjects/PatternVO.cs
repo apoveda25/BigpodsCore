@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 
 namespace Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;

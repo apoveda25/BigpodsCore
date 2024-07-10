@@ -1,10 +1,8 @@
 using AutoMapper;
-
-using Bigpods.Monolith.Modules.Shared.Domain.Database;
-using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Products.Domain.Common.Aggregates;
 using Bigpods.Monolith.Modules.Products.Domain.UpdateOne.Services;
-
+using Bigpods.Monolith.Modules.Shared.Domain.Database;
+using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using MediatR;
 
 namespace Bigpods.Monolith.Modules.Products.Application.UpdateOne.Commands;
@@ -21,14 +19,14 @@ public sealed class UpdateOneProductHandler(
 
     public async Task<ProductModel> Handle(UpdateOneProductCommand command, CancellationToken token)
     {
-        var fetchResponse = await _updateOneProductService.ExecuteAsync(command: command, cancellationToken: token);
+        var fetchResponse = await _updateOneProductService.ExecuteAsync(
+            command: command,
+            cancellationToken: token
+        );
 
         var productsRepository = _unitOfWork.GetRepository<ProductModel>();
 
-        var aggregateRoot = ProductAggregateRoot.UpdateOne(
-            product: command.ProductDto,
-            data: fetchResponse
-        );
+        var aggregateRoot = ProductAggregateRoot.UpdateOne(command: command, data: fetchResponse);
 
         var productModel = _mapper.Map<ProductModel>(source: aggregateRoot);
 

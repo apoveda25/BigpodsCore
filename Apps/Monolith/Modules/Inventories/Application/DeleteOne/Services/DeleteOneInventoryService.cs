@@ -6,9 +6,8 @@ using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
 namespace Bigpods.Monolith.Modules.Inventories.Application.DeleteOne.Services;
 
-public sealed class DeleteOneInventoryService(
-    [Service] IUnitOfWork unitOfWork
-) : IDeleteOneInventoryService
+public sealed class DeleteOneInventoryService([Service] IUnitOfWork unitOfWork)
+    : IDeleteOneInventoryService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
@@ -26,14 +25,20 @@ public sealed class DeleteOneInventoryService(
             filter: x => x.Id == command.InventoryDto.Id,
             cancellationToken: cancellationToken
         );
-        var warehouseFoundById = inventoryFoundById is null ? null : await warehousesRepository.FindOneAsync(
-            filter: x => x.Id == inventoryFoundById.WarehouseId,
-            cancellationToken: cancellationToken
-        );
-        var inventoriesFoundByProductIdWarehouseId = inventoryFoundById is null ? [] : await inventoriesRepository.FindManyAsync(
-            filter: x => x.ProductId == inventoryFoundById.ProductId && x.WarehouseId == inventoryFoundById.WarehouseId,
-            cancellationToken: cancellationToken
-        );
+        var warehouseFoundById = inventoryFoundById is null
+            ? null
+            : await warehousesRepository.FindOneAsync(
+                filter: x => x.Id == inventoryFoundById.WarehouseId,
+                cancellationToken: cancellationToken
+            );
+        var inventoriesFoundByProductIdWarehouseId = inventoryFoundById is null
+            ? []
+            : await inventoriesRepository.FindManyAsync(
+                filter: x =>
+                    x.ProductId == inventoryFoundById.ProductId
+                    && x.WarehouseId == inventoryFoundById.WarehouseId,
+                cancellationToken: cancellationToken
+            );
         var inventoryInputsFoundByInventoryId = await inventoriesInputsRepository.FindManyAsync(
             filter: x => x.InventoryId == command.InventoryDto.Id,
             cancellationToken: cancellationToken

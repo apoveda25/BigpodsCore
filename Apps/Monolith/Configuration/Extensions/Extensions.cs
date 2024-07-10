@@ -1,5 +1,4 @@
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Database;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Bigpods.Monolith.Config.Extensions;
@@ -20,7 +19,10 @@ public static class Extensions
         catch (Exception ex)
         {
             var logger = loggerFactory.CreateLogger<Program>();
-            logger.LogError(exception: ex, message: "An error occurred while migrating the database.");
+            logger.LogError(
+                exception: ex,
+                message: "An error occurred while migrating the database."
+            );
         }
     }
 }

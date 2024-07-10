@@ -1,15 +1,11 @@
 using System.Security.Claims;
-
 using AutoMapper;
-
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Warehouses.Application.Common.Policies;
 using Bigpods.Monolith.Modules.Warehouses.Application.DeleteOne.Commands;
 using Bigpods.Monolith.Modules.Warehouses.Application.DeleteOne.Dtos;
 using Bigpods.Monolith.Modules.Warehouses.Application.DeleteOne.Inputs;
-
 using HotChocolate.Authorization;
-
 using MediatR;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Infrastructure.DeleteOne.Mutations;
@@ -19,15 +15,22 @@ public sealed class DeleteOneWarehouseMutation
 {
     [Authorize(Policy = WarehousesPolicies.DeleteOneWarehousesPolicy)]
     public async Task<WarehouseModel> DeleteOneWarehouse(
-            [Service] IMediator mediator,
-            [Service] IMapper mapper,
-            ClaimsPrincipal claimsPrincipal,
-            DeleteOneWarehouseInput input
-        )
+        [Service] IMediator mediator,
+        [Service] IMapper mapper,
+        ClaimsPrincipal claimsPrincipal,
+        DeleteOneWarehouseInput input
+    )
     {
-        var userId = Guid.Parse(claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString());
+        var userId = Guid.Parse(
+            claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString()
+        );
 
-        var warehouseDto = mapper.Map<DeleteOneWarehouseDto>(source: input with { DeletedBy = userId });
+        var warehouseDto = mapper.Map<DeleteOneWarehouseDto>(
+            source: input with
+            {
+                DeletedBy = userId
+            }
+        );
 
         return await mediator.Send(new DeleteOneWarehouseCommand(WarehouseDto: warehouseDto));
     }

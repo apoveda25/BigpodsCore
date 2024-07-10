@@ -15,7 +15,6 @@ public interface IDeleteOneInventoryServiceResponse
 {
     public IInventoryModel? InventoryFoundById { get; init; }
     public IWarehouseModel? WarehouseFoundById { get; init; }
-    public IInventoryModel[] InventoriesFoundByProductIdWarehouseId { get; init; }
     public IInventoryInputModel[] InventoryInputsFoundByInventoryId { get; init; }
     public IInventoryOutputModel[] InventoryOutputsFoundByInventoryId { get; init; }
 }

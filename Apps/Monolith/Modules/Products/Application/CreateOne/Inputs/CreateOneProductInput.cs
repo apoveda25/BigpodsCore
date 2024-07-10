@@ -1,5 +1,4 @@
 using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Inputs;
-
 using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Products.Application.CreateOne.Inputs;
@@ -10,7 +9,11 @@ public sealed record CreateOneProductInput : ICreateOneProductInput<CreateOneVar
     private Guid _id;
 
     [DefaultValue("00000000-0000-0000-0000-000000000000")]
-    public Optional<Guid> Id { get => _id; set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value; }
+    public Optional<Guid> Id
+    {
+        get => _id;
+        set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value;
+    }
 
     public string Name { get; set; } = string.Empty;
 
@@ -34,7 +37,11 @@ public record CreateOneVariantInput : ICreateOneVariantInput<CreateOneVariantOnA
     private Guid _id;
 
     [DefaultValue("00000000-0000-0000-0000-000000000000")]
-    public Optional<Guid> Id { get => _id; set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value; }
+    public Optional<Guid> Id
+    {
+        get => _id;
+        set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value;
+    }
 
     public string Name { get; set; } = string.Empty;
 
@@ -60,7 +67,11 @@ public record CreateOneVariantOnAttributeInput : ICreateOneVariantOnAttributeInp
     private Guid _id;
 
     [DefaultValue("00000000-0000-0000-0000-000000000000")]
-    public Optional<Guid> Id { get => _id; set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value; }
+    public Optional<Guid> Id
+    {
+        get => _id;
+        set => _id = Guid.Empty.CompareTo(value.Value) == 0 ? Guid.NewGuid() : value;
+    }
 
     [GraphQLIgnore]
     public DateTimeZone CreatedAtTimezone { get; set; } = DateTimeZone.Utc;

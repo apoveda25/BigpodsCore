@@ -33,5 +33,4 @@ public interface ICreateOneVariantOnAttributeInput
     public Guid CreatedBy { get; set; }
     public Guid AttributeId { get; set; }
     public Guid VariantId { get; set; }
-
 }

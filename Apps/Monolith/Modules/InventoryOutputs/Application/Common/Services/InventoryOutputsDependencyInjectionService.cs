@@ -5,7 +5,9 @@ namespace Bigpods.Monolith.Modules.InventoryOutputs.Application.Common.Services;
 
 public static class InventoryOutputsDependencyInjectionService
 {
-    public static IServiceCollection AddInventoryOutputsDependenciesConfiguration(this IServiceCollection services)
+    public static IServiceCollection AddInventoryOutputsDependenciesConfiguration(
+        this IServiceCollection services
+    )
     {
         services.AddScoped<ICreateOneInventoryOutputService, CreateOneInventoryOutputService>();
 

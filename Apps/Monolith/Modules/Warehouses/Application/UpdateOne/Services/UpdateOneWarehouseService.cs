@@ -6,9 +6,8 @@ using Bigpods.Monolith.Modules.Warehouses.Domain.UpdateOne.Services;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Application.UpdateOne.Services;
 
-public sealed class UpdateOneWarehouseService(
-    [Service] IUnitOfWork unitOfWork
-) : IUpdateOneWarehouseService
+public sealed class UpdateOneWarehouseService([Service] IUnitOfWork unitOfWork)
+    : IUpdateOneWarehouseService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
@@ -23,10 +22,12 @@ public sealed class UpdateOneWarehouseService(
             filter: x => x.Id == command.WarehouseDto.Id,
             cancellationToken: cancellationToken
         );
-        var warehouseFoundByName = command.WarehouseDto.Name is null ? null : await warehousesRepository.FindOneAsync(
-            filter: x => x.Name == command.WarehouseDto.Name,
-            cancellationToken: cancellationToken
-        );
+        var warehouseFoundByName = command.WarehouseDto.Name is null
+            ? null
+            : await warehousesRepository.FindOneAsync(
+                filter: x => x.Name == command.WarehouseDto.Name,
+                cancellationToken: cancellationToken
+            );
 
         return new UpdateOneWarehouseServiceResponse(
             WarehouseFoundById: warehouseFoundById,

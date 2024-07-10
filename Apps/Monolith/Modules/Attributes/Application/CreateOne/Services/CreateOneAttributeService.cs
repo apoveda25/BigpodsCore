@@ -6,9 +6,8 @@ using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
 namespace Bigpods.Monolith.Modules.Attributes.Application.CreateOne.Services;
 
-public sealed class CreateOneAttributeService(
-    [Service] IUnitOfWork unitOfWork
-) : ICreateOneAttributeService
+public sealed class CreateOneAttributeService([Service] IUnitOfWork unitOfWork)
+    : ICreateOneAttributeService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
@@ -24,10 +23,14 @@ public sealed class CreateOneAttributeService(
             filter: x => x.Id == command.AttributeDto.Id,
             cancellationToken: cancellationToken
         );
-        var attributeFoundByValueMeasuringUnitAttributeTypeId = await attributesRepository.FindOneAsync(
-            filter: x => x.Value == command.AttributeDto.Value && x.MeasuringUnit == command.AttributeDto.MeasuringUnit && x.AttributeTypeId == command.AttributeDto.AttributeTypeId,
-            cancellationToken: cancellationToken
-        );
+        var attributeFoundByValueMeasuringUnitAttributeTypeId =
+            await attributesRepository.FindOneAsync(
+                filter: x =>
+                    x.Value == command.AttributeDto.Value
+                    && x.MeasuringUnit == command.AttributeDto.MeasuringUnit
+                    && x.AttributeTypeId == command.AttributeDto.AttributeTypeId,
+                cancellationToken: cancellationToken
+            );
         var attributeTypeFoundById = await attributesClassesRepository.FindOneAsync(
             filter: x => x.Id == command.AttributeDto.AttributeTypeId,
             cancellationToken: cancellationToken

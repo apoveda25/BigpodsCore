@@ -3,11 +3,17 @@ using System.Linq;
 
 namespace Bigpods.MonolithIaC.Data.ClientAuthorizationPermissions;
 
-public sealed record ClientAuthorizationPermission(string Name, Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs Config);
+public sealed record ClientAuthorizationPermission(
+    string Name,
+    Pulumi.Keycloak.OpenId.ClientAuthorizationPermissionArgs Config
+);
 
 public partial class ClientAuthorizationPermissionsData
 {
-    public static Dictionary<string, ClientAuthorizationPermission> GetClientAuthorizationPermissions(
+    public static Dictionary<
+        string,
+        ClientAuthorizationPermission
+    > GetClientAuthorizationPermissions(
         Dictionary<string, Pulumi.Keycloak.Realm> realms,
         Dictionary<string, Pulumi.Keycloak.OpenId.Client> clients,
         Dictionary<string, Pulumi.Keycloak.OpenId.ClientRolePolicy> policies,

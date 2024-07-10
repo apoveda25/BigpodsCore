@@ -1,5 +1,4 @@
 using Bigpods.Monolith.Modules.Warehouses.Domain.UpdateOne.Inputs;
-
 using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Application.UpdateOne.Inputs;

@@ -1,7 +1,6 @@
 using Bigpods.Monolith.Modules.AttributeTypes.Application.Common.Policies;
 using Bigpods.Monolith.Modules.Shared.Domain.Database;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
-
 using HotChocolate.Authorization;
 
 namespace Bigpods.Monolith.Modules.AttributeTypes.Infrastructure.FindOne.Queries;
@@ -12,8 +11,13 @@ public sealed class FindOneAttributeTypeQuery
     [Authorize(Policy = AttributeTypesPolicies.ReadOneAttributeTypesPolicy)]
     [UseFirstOrDefault]
     [UseProjection]
-    public IQueryable<AttributeTypeModel> FindOneAttributeType([Service] IUnitOfWork unitOfWork, Guid id)
+    public IQueryable<AttributeTypeModel> FindOneAttributeType(
+        [Service] IUnitOfWork unitOfWork,
+        Guid id
+    )
     {
-        return unitOfWork.GetRepository<AttributeTypeModel>().Model.Where(predicate: p => p.Id == id);
+        return unitOfWork
+            .GetRepository<AttributeTypeModel>()
+            .Model.Where(predicate: p => p.Id == id);
     }
 }

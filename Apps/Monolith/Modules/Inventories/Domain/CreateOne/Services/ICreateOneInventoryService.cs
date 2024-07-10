@@ -14,8 +14,8 @@ public interface ICreateOneInventoryService
 public interface ICreateOneInventoryServiceResponse
 {
     public IInventoryModel? InventoryFoundById { get; init; }
+    public IInventoryModel? InventoryFoundByWarehouseIdVariantId { get; init; }
     public IProductModel? ProductFoundById { get; init; }
     public IVariantModel? VariantFoundById { get; init; }
     public IWarehouseModel? WarehouseFoundById { get; init; }
-    public IInventoryModel[] InventoriesFoundByProductIdWarehouseId { get; init; }
 }

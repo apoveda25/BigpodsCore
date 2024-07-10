@@ -1,5 +1,4 @@
 using AutoMapper;
-
 using Bigpods.Monolith.Modules.Inventories.Application.CreateOne.Dtos;
 using Bigpods.Monolith.Modules.Inventories.Application.CreateOne.Inputs;
 using Bigpods.Monolith.Modules.Inventories.Application.DeleteOne.Dtos;
@@ -18,6 +17,9 @@ public class MapperProfileInventories : Profile
         CreateMap<DeleteOneInventoryInput, DeleteOneInventoryDto>().ReverseMap();
 
         CreateMap<InventoryEntity, InventoryModel>()
-            .ForMember(destinationMember: dest => dest.Stock, memberOptions: opt => opt.MapFrom(src => src.Stock.Value));
+            .ForMember(
+                destinationMember: dest => dest.Stock,
+                memberOptions: opt => opt.MapFrom(src => src.Stock.Value)
+            );
     }
 }

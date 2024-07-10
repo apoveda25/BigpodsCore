@@ -7,7 +7,9 @@ namespace Bigpods.Monolith.Modules.Inventories.Application.Common.Services;
 
 public static class InventoriesDependencyInjectionService
 {
-    public static IServiceCollection AddInventoriesDependenciesConfiguration(this IServiceCollection services)
+    public static IServiceCollection AddInventoriesDependenciesConfiguration(
+        this IServiceCollection services
+    )
     {
         services.AddScoped<ICreateOneInventoryService, CreateOneInventoryService>();
         services.AddScoped<IDeleteOneInventoryService, DeleteOneInventoryService>();

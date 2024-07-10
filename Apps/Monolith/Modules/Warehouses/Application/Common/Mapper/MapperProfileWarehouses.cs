@@ -1,9 +1,6 @@
 using AutoMapper;
-
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
-
 using Bigpods.Monolith.Modules.Warehouses.Application.CreateOne.Dtos;
-
 using Bigpods.Monolith.Modules.Warehouses.Application.CreateOne.Inputs;
 using Bigpods.Monolith.Modules.Warehouses.Application.DeleteOne.Dtos;
 using Bigpods.Monolith.Modules.Warehouses.Application.DeleteOne.Inputs;
@@ -24,7 +21,13 @@ public class MapperProfileWarehouses : Profile
         CreateMap<DeleteOneWarehouseInput, DeleteOneWarehouseDto>().ReverseMap();
 
         CreateMap<WarehouseAggregateRoot, WarehouseModel>()
-            .ForMember(destinationMember: dest => dest.Name, memberOptions: opt => opt.MapFrom(src => src.Name.Value))
-            .ForMember(destinationMember: dest => dest.Description, memberOptions: opt => opt.MapFrom(src => src.Description.Value));
+            .ForMember(
+                destinationMember: dest => dest.Name,
+                memberOptions: opt => opt.MapFrom(src => src.Name.Value)
+            )
+            .ForMember(
+                destinationMember: dest => dest.Description,
+                memberOptions: opt => opt.MapFrom(src => src.Description.Value)
+            );
     }
 }

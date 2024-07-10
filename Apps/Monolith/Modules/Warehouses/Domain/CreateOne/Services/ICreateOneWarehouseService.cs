@@ -9,7 +9,6 @@ public interface ICreateOneWarehouseService
         ICreateOneWarehouseCommand command,
         CancellationToken cancellationToken = default
     );
-
 }
 
 public interface ICreateOneWarehouseServiceResponse

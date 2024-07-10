@@ -1,137 +1,46 @@
-using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Dtos;
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
-using Bigpods.Monolith.Modules.Shared.Domain.Models;
 using Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
 
 namespace Bigpods.Monolith.Modules.Products.Domain.Common.Entities;
 
-public sealed class VariantEntity
+public sealed class VariantEntity(
+    Guid? id = null,
+    string? name = null,
+    string? sku = null,
+    decimal? price = null,
+    decimal? cost = null,
+    bool? isDeleted = null,
+    DateTime? createdAtDatetime = null,
+    DateTime? updatedAtDatetime = null,
+    DateTime? deletedAtDatetime = null,
+    string? createdAtTimezone = null,
+    string? updatedAtTimezone = null,
+    string? deletedAtTimezone = null,
+    Guid? createdBy = null,
+    Guid? updatedBy = null,
+    Guid? deletedBy = null,
+    Guid? productId = null
+)
 {
-    public Guid Id { get; private set; }
-    public NameVO Name { get; private set; }
-    public string Sku { get; private set; }
-    public PriceVO Price { get; private set; }
-    public CostVO Cost { get; private set; }
-    public bool IsDeleted { get; private set; }
-    public DateTime CreatedAtDatetime { get; private set; }
-    public DateTime? UpdatedAtDatetime { get; private set; }
-    public DateTime? DeletedAtDatetime { get; private set; }
-    public string CreatedAtTimezone { get; private set; }
-    public string? UpdatedAtTimezone { get; private set; }
-    public string? DeletedAtTimezone { get; private set; }
-    public Guid CreatedBy { get; private set; }
-    public Guid? UpdatedBy { get; private set; }
-    public Guid? DeletedBy { get; private set; }
-    public Guid ProductId { get; private set; }
-    public VariantOnAttributeEntity[] VariantsOnAttributes { get; private set; }
+    public Guid Id { get; private set; } = id ?? Guid.NewGuid();
+    public NameVO Name { get; private set; } = new NameVO(name ?? string.Empty);
+    public string Sku { get; private set; } = sku ?? string.Empty;
+    public PriceVO Price { get; private set; } = new PriceVO(price ?? 0);
+    public CostVO Cost { get; private set; } = new CostVO(cost ?? 0);
+    public bool IsDeleted { get; private set; } = isDeleted ?? false;
+    public DateTime CreatedAtDatetime { get; private set; } = createdAtDatetime ?? DateTime.Now;
+    public DateTime? UpdatedAtDatetime { get; private set; } = updatedAtDatetime;
+    public DateTime? DeletedAtDatetime { get; private set; } = deletedAtDatetime;
+    public string CreatedAtTimezone { get; private set; } = createdAtTimezone ?? string.Empty;
+    public string? UpdatedAtTimezone { get; private set; } = updatedAtTimezone;
+    public string? DeletedAtTimezone { get; private set; } = deletedAtTimezone;
+    public Guid CreatedBy { get; private set; } = createdBy ?? Guid.Empty;
+    public Guid? UpdatedBy { get; private set; } = updatedBy;
+    public Guid? DeletedBy { get; private set; } = deletedBy;
+    public Guid ProductId { get; private set; } = productId ?? Guid.Empty;
+    public VariantOnAttributeEntity[] VariantsOnAttributes { get; private set; } = [];
 
-    private VariantEntity(
-        Guid id,
-        string name,
-        string sku,
-        decimal price,
-        decimal cost,
-        bool isDeleted,
-        DateTime createdAtDatetime,
-        DateTime? updatedAtDatetime,
-        DateTime? deletedAtDatetime,
-        string createdAtTimezone,
-        string? updatedAtTimezone,
-        string? deletedAtTimezone,
-        Guid createdBy,
-        Guid? updatedBy,
-        Guid? deletedBy,
-        Guid productId
-    )
-    {
-        Id = id;
-        Name = new NameVO(name);
-        Sku = sku;
-        Price = new PriceVO(price);
-        Cost = new CostVO(cost);
-        IsDeleted = isDeleted;
-        CreatedAtDatetime = createdAtDatetime;
-        UpdatedAtDatetime = updatedAtDatetime;
-        DeletedAtDatetime = deletedAtDatetime;
-        CreatedAtTimezone = createdAtTimezone;
-        UpdatedAtTimezone = updatedAtTimezone;
-        DeletedAtTimezone = deletedAtTimezone;
-        CreatedBy = createdBy;
-        UpdatedBy = updatedBy;
-        DeletedBy = deletedBy;
-        ProductId = productId;
-        VariantsOnAttributes = [];
-    }
-
-    public static VariantEntity[] CreateMany(
-        ICreateOneVariantDto[] variants,
-        ICreateOneVariantOnAttributeDto[] variantsOnAttributes,
-        IVariantModel[] variantsFoundById,
-        IVariantOnAttributeModel[] variantsOnAttributesFoundById,
-        IAttributeModel[] attributesFoundById
-    )
-    {
-        return variants.Select(variant =>
-            CreateOne(
-                variant: variant,
-                variantsOnAttributes: variantsOnAttributes,
-                variantFoundById: variantsFoundById.FirstOrDefault(v => v.Id == variant.Id),
-                variantsOnAttributesFoundById: variantsOnAttributesFoundById,
-                attributesFoundById: attributesFoundById
-            )
-        ).ToArray();
-    }
-
-    public static VariantEntity CreateOne(
-        ICreateOneVariantDto variant,
-        ICreateOneVariantOnAttributeDto[] variantsOnAttributes,
-        IVariantModel? variantFoundById,
-        IVariantOnAttributeModel[] variantsOnAttributesFoundById,
-        IAttributeModel[] attributesFoundById
-    )
-    {
-        if (variantFoundById is not null)
-        {
-            throw new ConflictException("Variants exist with this id");
-        }
-
-        var entity = new VariantEntity
-        (
-            id: variant.Id,
-            name: variant.Name,
-            sku: string.Empty,
-            price: variant.Price,
-            cost: variant.Cost,
-            isDeleted: false,
-            createdAtDatetime: DateTime.Now,
-            updatedAtDatetime: null,
-            deletedAtDatetime: null,
-            createdAtTimezone: variant.CreatedAtTimezone,
-            updatedAtTimezone: null,
-            deletedAtTimezone: null,
-            createdBy: variant.CreatedBy,
-            updatedBy: null,
-            deletedBy: null,
-            productId: variant.ProductId
-        );
-
-        if (entity.Price.Value <= entity.Cost.Value)
-        {
-            throw new ConflictException("Price must be greater than cost");
-        }
-
-        var variantOnAttributeEntities = VariantOnAttributeEntity.CreateMany(
-            variantOnAttributes: variantsOnAttributes,
-            variantsOnAttributesFoundById: variantsOnAttributesFoundById,
-            attributesFoundById: attributesFoundById
-        );
-
-        entity.AttachManyVariantOnAttribute(variantOnAttributeEntities);
-
-        return entity;
-    }
-
-    private void AttachManyVariantOnAttribute(VariantOnAttributeEntity[] variantsOnAttributes)
+    public void AttachManyVariantOnAttribute(VariantOnAttributeEntity[] variantsOnAttributes)
     {
         foreach (var variantOnAttribute in variantsOnAttributes)
         {
@@ -139,28 +48,38 @@ public sealed class VariantEntity
         }
     }
 
-    private void AttachOneVariantOnAttribute(VariantOnAttributeEntity variantOnAttribute)
+    public void AttachOneVariantOnAttribute(VariantOnAttributeEntity variantOnAttribute)
     {
         if (IsVariantOnAttributeExist(variantOnAttribute))
         {
             throw new ConflictException("VariantOnAttribute exist with this id or attributeId");
         }
 
-        if (!VariantOnAttributeBelongToVariant(variantOnAttribute.VariantId))
+        if (VariantOnAttributeNotBelongToVariant(variantOnAttribute))
         {
             throw new ConflictException("VariantOnAttribute not belong to this variant");
+        }
+
+        if (variantOnAttribute.IsDeleted)
+        {
+            throw new ConflictException("VariantOnAttribute deleted cannot be attached");
         }
 
         VariantsOnAttributes = [.. VariantsOnAttributes, variantOnAttribute];
     }
 
-    private bool IsVariantOnAttributeExist(VariantOnAttributeEntity entity)
+    public bool IsEqual(VariantEntity variantEntity)
     {
-        return VariantsOnAttributes.Any(entity.IsEquals);
+        return Id == variantEntity.Id;
     }
 
-    private bool VariantOnAttributeBelongToVariant(Guid variantId)
+    private bool IsVariantOnAttributeExist(VariantOnAttributeEntity entity)
     {
-        return variantId == Id;
+        return VariantsOnAttributes.Any(entity.IsIsEqual);
+    }
+
+    private bool VariantOnAttributeNotBelongToVariant(VariantOnAttributeEntity variantOnAttribute)
+    {
+        return variantOnAttribute.VariantId != Id;
     }
 }

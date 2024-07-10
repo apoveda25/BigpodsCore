@@ -1,14 +1,13 @@
 using Bigpods.Monolith.Modules.Shared.Domain.Database;
-using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Shared.Domain.Models;
+using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Variants.Domain.CreateOne.Commands;
 using Bigpods.Monolith.Modules.Variants.Domain.CreateOne.Services;
 
 namespace Bigpods.Monolith.Modules.Variants.Application.CreateOne.Services;
 
-public sealed class CreateOneVariantService(
-    [Service] IUnitOfWork unitOfWork
-) : ICreateOneVariantService
+public sealed class CreateOneVariantService([Service] IUnitOfWork unitOfWork)
+    : ICreateOneVariantService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
@@ -31,17 +30,24 @@ public sealed class CreateOneVariantService(
             cancellationToken: cancellationToken
         );
         var variantsFoundByProductId = await variantsRepository.FindManyAsync(
-           filter: x => x.ProductId == command.VariantDto.ProductId && x.IsDeleted == false,
-           cancellationToken: cancellationToken
+            filter: x => x.ProductId == command.VariantDto.ProductId,
+            cancellationToken: cancellationToken
         );
         var variantsOnAttributesFoundById = await variantsOnAttributesRepository.FindManyAsync(
             filter: x => command.VariantOnAttributeDtos.Select(dto => dto.Id).Contains(x.Id),
             cancellationToken: cancellationToken
         );
-        var variantsOnAttributesFoundByVariantId = await variantsOnAttributesRepository.FindManyAsync(
-            filter: x => variantsFoundByProductId.Select(model => model.Id).Contains(x.VariantId) && x.IsDeleted == false,
-            cancellationToken: cancellationToken
-        );
+        var variantsOnAttributesFoundByVariantIdAttributeId =
+            await variantsOnAttributesRepository.FindManyAsync(
+                filter: x =>
+                    command
+                        .VariantOnAttributeDtos.Select(dto => dto.VariantId)
+                        .Contains(x.VariantId)
+                    && command
+                        .VariantOnAttributeDtos.Select(dto => dto.AttributeId)
+                        .Contains(x.AttributeId),
+                cancellationToken: cancellationToken
+            );
         var attributesFoundById = await attributesRepository.FindManyAsync(
             filter: x =>
                 command.VariantOnAttributeDtos.Select(dto => dto.AttributeId).Contains(x.Id),
@@ -53,7 +59,7 @@ public sealed class CreateOneVariantService(
             VariantFoundById: variantFoundById,
             VariantsOnAttributesFoundById: variantsOnAttributesFoundById.ToArray(),
             VariantsFoundByProductId: variantsFoundByProductId.ToArray(),
-            VariantsOnAttributesFoundByVariantId: variantsOnAttributesFoundByVariantId.ToArray(),
+            VariantsOnAttributesFoundByVariantIdAttributeId: variantsOnAttributesFoundByVariantIdAttributeId.ToArray(),
             AttributesFoundById: attributesFoundById.ToArray()
         );
     }
@@ -64,6 +70,6 @@ public record CreateOneVariantServiceResponse(
     IVariantModel? VariantFoundById,
     IVariantModel[] VariantsFoundByProductId,
     IVariantOnAttributeModel[] VariantsOnAttributesFoundById,
-    IVariantOnAttributeModel[] VariantsOnAttributesFoundByVariantId,
+    IVariantOnAttributeModel[] VariantsOnAttributesFoundByVariantIdAttributeId,
     IAttributeModel[] AttributesFoundById
 ) : ICreateOneVariantServiceResponse;

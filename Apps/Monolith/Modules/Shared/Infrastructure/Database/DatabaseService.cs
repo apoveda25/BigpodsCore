@@ -1,12 +1,11 @@
 using System.Reflection;
-
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Bigpods.Monolith.Modules.Shared.Infrastructure.Database;
 
-public class DatabaseService(DbContextOptions dbContextOptions) : DbContext(options: dbContextOptions)
+public class DatabaseService(DbContextOptions dbContextOptions)
+    : DbContext(options: dbContextOptions)
 {
     public DbSet<ProductModel> Products { get; set; }
     public DbSet<VariantModel> Variants { get; set; }

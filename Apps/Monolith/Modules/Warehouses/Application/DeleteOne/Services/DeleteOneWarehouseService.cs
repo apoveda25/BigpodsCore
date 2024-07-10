@@ -6,9 +6,8 @@ using Bigpods.Monolith.Modules.Warehouses.Domain.DeleteOne.Services;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Application.DeleteOne.Services;
 
-public sealed class DeleteOneWarehouseService(
-    [Service] IUnitOfWork unitOfWork
-) : IDeleteOneWarehouseService
+public sealed class DeleteOneWarehouseService([Service] IUnitOfWork unitOfWork)
+    : IDeleteOneWarehouseService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
@@ -26,18 +25,24 @@ public sealed class DeleteOneWarehouseService(
             filter: x => x.Id == command.WarehouseDto.Id,
             cancellationToken: cancellationToken
         );
-        var inventoriesFoundByWarehouseId = warehouseFoundById is null ? null : await inventariesRepository.FindManyAsync(
-            filter: x => x.WarehouseId == warehouseFoundById.Id,
-            cancellationToken: cancellationToken
-        );
-        var inventoryInputsFoundByWarehouseId = warehouseFoundById is null ? null : await inventoryInputsRepository.FindManyAsync(
-            filter: x => x.WarehouseId == warehouseFoundById.Id,
-            cancellationToken: cancellationToken
-        );
-        var inventoryOutputsFoundByWarehouseId = warehouseFoundById is null ? null : await inventoryOutputsRepository.FindManyAsync(
-            filter: x => x.WarehouseId == warehouseFoundById.Id,
-            cancellationToken: cancellationToken
-        );
+        var inventoriesFoundByWarehouseId = warehouseFoundById is null
+            ? null
+            : await inventariesRepository.FindManyAsync(
+                filter: x => x.WarehouseId == warehouseFoundById.Id,
+                cancellationToken: cancellationToken
+            );
+        var inventoryInputsFoundByWarehouseId = warehouseFoundById is null
+            ? null
+            : await inventoryInputsRepository.FindManyAsync(
+                filter: x => x.WarehouseId == warehouseFoundById.Id,
+                cancellationToken: cancellationToken
+            );
+        var inventoryOutputsFoundByWarehouseId = warehouseFoundById is null
+            ? null
+            : await inventoryOutputsRepository.FindManyAsync(
+                filter: x => x.WarehouseId == warehouseFoundById.Id,
+                cancellationToken: cancellationToken
+            );
 
         return new DeleteOneWarehouseServiceResponse(
             WarehouseFoundById: warehouseFoundById,

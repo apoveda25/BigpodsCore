@@ -1,74 +1,60 @@
 using Bigpods.Monolith.Modules.InventoryInputs.Domain.Common.Entities;
+using Bigpods.Monolith.Modules.InventoryInputs.Domain.Common.Factories;
+using Bigpods.Monolith.Modules.InventoryInputs.Domain.CreateOne.Commands;
 using Bigpods.Monolith.Modules.InventoryInputs.Domain.CreateOne.Dtos;
 using Bigpods.Monolith.Modules.InventoryInputs.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
-using Bigpods.Monolith.Modules.Shared.Domain.Models;
 using Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
+using Humanizer;
 
 namespace Bigpods.Monolith.Modules.InventoryInputs.Domain.Common.Aggregates;
 
-public sealed class WarehouseAggregateRoot
+public sealed class WarehouseAggregateRoot(
+    Guid? id = null,
+    string? name = null,
+    string? description = null,
+    bool? isDeleted = null,
+    DateTime? createdAtDatetime = null,
+    DateTime? updatedAtDatetime = null,
+    DateTime? deletedAtDatetime = null,
+    string? createdAtTimezone = null,
+    string? updatedAtTimezone = null,
+    string? deletedAtTimezone = null,
+    Guid? createdBy = null,
+    Guid? updatedBy = null,
+    Guid? deletedBy = null
+)
 {
-    public Guid Id { get; private set; }
-    public NameVO Name { get; private set; }
-    public SentenceVO Description { get; private set; }
-    public bool IsDeleted { get; private set; }
-    public DateTime CreatedAtDatetime { get; private set; }
-    public DateTime? UpdatedAtDatetime { get; private set; }
-    public DateTime? DeletedAtDatetime { get; private set; }
-    public string CreatedAtTimezone { get; private set; }
-    public string? UpdatedAtTimezone { get; private set; }
-    public string? DeletedAtTimezone { get; private set; }
-    public Guid CreatedBy { get; private set; }
-    public Guid? UpdatedBy { get; private set; }
-    public Guid? DeletedBy { get; private set; }
-    public InventoryEntity[] Inventories { get; private set; }
-    public InventoryInputEntity[] InventoryInputs { get; private set; }
-
-    private WarehouseAggregateRoot(
-        Guid id,
-        string name,
-        string description,
-        bool isDeleted,
-        DateTime createdAtDatetime,
-        DateTime? updatedAtDatetime,
-        DateTime? deletedAtDatetime,
-        string createdAtTimezone,
-        string? updatedAtTimezone,
-        string? deletedAtTimezone,
-        Guid createdBy,
-        Guid? updatedBy,
-        Guid? deletedBy
-    )
-    {
-        Id = id;
-        Name = new NameVO(name);
-        Description = new SentenceVO(description);
-        IsDeleted = isDeleted;
-        CreatedAtDatetime = createdAtDatetime;
-        UpdatedAtDatetime = updatedAtDatetime;
-        DeletedAtDatetime = deletedAtDatetime;
-        CreatedAtTimezone = createdAtTimezone;
-        UpdatedAtTimezone = updatedAtTimezone;
-        DeletedAtTimezone = deletedAtTimezone;
-        CreatedBy = createdBy;
-        UpdatedBy = updatedBy;
-        DeletedBy = deletedBy;
-        Inventories = [];
-        InventoryInputs = [];
-    }
+    public Guid Id { get; private set; } = id ?? Guid.NewGuid();
+    public NameVO Name { get; private set; } = new NameVO(name ?? string.Empty);
+    public SentenceVO Description { get; private set; } =
+        new SentenceVO(description ?? string.Empty);
+    public bool IsDeleted { get; private set; } = isDeleted ?? false;
+    public DateTime CreatedAtDatetime { get; private set; } = createdAtDatetime ?? DateTime.Now;
+    public DateTime? UpdatedAtDatetime { get; private set; } = updatedAtDatetime;
+    public DateTime? DeletedAtDatetime { get; private set; } = deletedAtDatetime;
+    public string CreatedAtTimezone { get; private set; } = createdAtTimezone ?? string.Empty;
+    public string? UpdatedAtTimezone { get; private set; } = updatedAtTimezone;
+    public string? DeletedAtTimezone { get; private set; } = deletedAtTimezone;
+    public Guid CreatedBy { get; private set; } = createdBy ?? Guid.Empty;
+    public Guid? UpdatedBy { get; private set; } = updatedBy;
+    public Guid? DeletedBy { get; private set; } = deletedBy;
+    public InventoryEntity[] Inventories { get; private set; } = [];
+    public InventoryInputEntity[] InventoryInputs { get; private set; } = [];
 
     public static WarehouseAggregateRoot CreateOneInventoryInput(
-        ICreateOneInventoryInputDto inventoryInput,
+        ICreateOneInventoryInputCommand command,
         ICreateOneInventoryInputServiceResponse data
     )
     {
-        var aggregateRoot = BuildOne(data.WarehouseFoundById);
+        var aggregateRoot = WarehouseAggregateRootFactory.BuildOne(data.WarehouseFoundById);
 
-        var inventoryEntity = InventoryEntity.BuildOne(inventoryInput: data.InventoryFoundById);
+        var inventoryEntity = InventoryEntityFactory.BuildOne(
+            inventoryInput: data.InventoryFoundById
+        );
 
-        var inventoryInputEntity = InventoryInputEntity.CreateOne(
-            inventoryInput: inventoryInput,
+        var inventoryInputEntity = InventoryInputEntityFactory.CreateOne(
+            inventoryInput: command.InventoryInputDto,
             inventoryInputFoundById: data.InventoryInputFoundById,
             inventoryFoundById: data.InventoryFoundById,
             productFoundById: data.ProductFoundById,
@@ -85,32 +71,6 @@ public sealed class WarehouseAggregateRoot
         return aggregateRoot;
     }
 
-    private static WarehouseAggregateRoot BuildOne(
-        IWarehouseModel? warehouse
-    )
-    {
-        if (warehouse is null)
-        {
-            throw new NotFoundException("Warehouse not exist with this id");
-        }
-
-        return new WarehouseAggregateRoot(
-            id: warehouse.Id,
-            name: warehouse.Name,
-            description: warehouse.Description,
-            isDeleted: warehouse.IsDeleted,
-            createdAtDatetime: warehouse.CreatedAtDatetime,
-            updatedAtDatetime: warehouse.UpdatedAtDatetime,
-            deletedAtDatetime: warehouse.DeletedAtDatetime,
-            createdAtTimezone: warehouse.CreatedAtTimezone,
-            updatedAtTimezone: warehouse.UpdatedAtTimezone,
-            deletedAtTimezone: warehouse.DeletedAtTimezone,
-            createdBy: warehouse.CreatedBy,
-            updatedBy: warehouse.UpdatedBy,
-            deletedBy: warehouse.DeletedBy
-        );
-    }
-
     private void AttachOneInventory(InventoryEntity inventory)
     {
         if (inventory.IsDeleted)
@@ -118,12 +78,12 @@ public sealed class WarehouseAggregateRoot
             throw new ConflictException("Inventory deleted can not be attached");
         }
 
-        if (IsInventoryAttach(inventoryId: inventory.Id, variantId: inventory.VariantId))
+        if (IsInventoryAttach(inventory))
         {
             throw new ConflictException("Inventory attached with this id or variant id");
         }
 
-        if (IsNotInventoryBelongToWarehouse(warehouseId: inventory.WarehouseId))
+        if (IsNotInventoryBelongToWarehouse(inventory))
         {
             throw new ConflictException("Inventory not belong to this warehouse");
         }
@@ -138,12 +98,12 @@ public sealed class WarehouseAggregateRoot
             throw new ConflictException("Inventory input deleted can not be attached");
         }
 
-        if (IsInventoryInputAttach(inventoryInputId: inventoryInput.Id))
+        if (IsInventoryInputAttach(inventoryInput))
         {
             throw new ConflictException("Inventory input attached with this id or variant id");
         }
 
-        if (IsNotInventoryInputBelongToWarehouse(warehouseId: inventoryInput.WarehouseId))
+        if (IsNotInventoryInputBelongToWarehouse(inventoryInput))
         {
             throw new ConflictException("Inventory input not belong to this warehouse");
         }
@@ -151,23 +111,23 @@ public sealed class WarehouseAggregateRoot
         InventoryInputs = [.. InventoryInputs, inventoryInput];
     }
 
-    private bool IsInventoryAttach(Guid inventoryId, Guid variantId)
+    private bool IsInventoryAttach(InventoryEntity inventory)
     {
-        return Inventories.Any(inventory => inventory.Id == inventoryId || inventory.VariantId == variantId);
+        return Inventories.Any(inventory.IsEqual);
     }
 
-    private bool IsNotInventoryBelongToWarehouse(Guid warehouseId)
+    private bool IsNotInventoryBelongToWarehouse(InventoryEntity inventory)
     {
-        return warehouseId != Id;
+        return inventory.WarehouseId != Id;
     }
 
-    private bool IsInventoryInputAttach(Guid inventoryInputId)
+    private bool IsInventoryInputAttach(InventoryInputEntity inventoryInput)
     {
-        return InventoryInputs.Any(inventoryInput => inventoryInput.Id == inventoryInputId);
+        return InventoryInputs.Any(inventoryInput.IsEqual);
     }
 
-    private bool IsNotInventoryInputBelongToWarehouse(Guid warehouseId)
+    private bool IsNotInventoryInputBelongToWarehouse(InventoryInputEntity inventoryInput)
     {
-        return warehouseId != Id;
+        return inventoryInput.WarehouseId != Id;
     }
 }

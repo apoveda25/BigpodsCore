@@ -10,4 +10,3 @@ public sealed record CreateOneAttributeDto(
     Guid CreatedBy,
     Guid AttributeTypeId
 ) : ICreateOneAttributeDto;
-

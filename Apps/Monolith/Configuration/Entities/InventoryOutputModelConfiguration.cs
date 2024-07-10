@@ -1,5 +1,4 @@
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,13 +12,21 @@ public class InventoryOutputModelConfiguration : IEntityTypeConfiguration<Invent
 
         builder.HasKey(keyExpression: x => x.Id);
 
-        builder.Property(propertyExpression: x => x.Id).UseCollation(collation: "utf8mb4_general_ci");
+        builder
+            .Property(propertyExpression: x => x.Id)
+            .UseCollation(collation: "utf8mb4_general_ci");
 
         builder.Property(propertyExpression: x => x.Stock).IsRequired().HasColumnType("int(11)");
 
-        builder.Property(propertyExpression: x => x.Comment).IsRequired().HasColumnType("varchar(255)");
+        builder
+            .Property(propertyExpression: x => x.Comment)
+            .IsRequired()
+            .HasColumnType("varchar(255)");
 
-        builder.Property(propertyExpression: x => x.IsDeleted).IsRequired().HasDefaultValue(value: false);
+        builder
+            .Property(propertyExpression: x => x.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(value: false);
 
         builder.Property(propertyExpression: x => x.CreatedAtDatetime).IsRequired();
 
@@ -27,24 +34,42 @@ public class InventoryOutputModelConfiguration : IEntityTypeConfiguration<Invent
 
         builder.Property(propertyExpression: x => x.DeletedAtDatetime);
 
-        builder.Property(propertyExpression: x => x.CreatedAtTimezone).IsRequired().HasMaxLength(maxLength: 36);
+        builder
+            .Property(propertyExpression: x => x.CreatedAtTimezone)
+            .IsRequired()
+            .HasMaxLength(maxLength: 36);
 
         builder.Property(propertyExpression: x => x.UpdatedAtTimezone).HasMaxLength(maxLength: 36);
 
         builder.Property(propertyExpression: x => x.DeletedAtTimezone).HasMaxLength(maxLength: 36);
 
-        builder.Property(propertyExpression: x => x.CreatedBy).IsRequired().UseCollation(collation: "utf8mb4_general_ci");
+        builder
+            .Property(propertyExpression: x => x.CreatedBy)
+            .IsRequired()
+            .UseCollation(collation: "utf8mb4_general_ci");
 
-        builder.Property(propertyExpression: x => x.UpdatedBy).UseCollation(collation: "utf8mb4_general_ci");
+        builder
+            .Property(propertyExpression: x => x.UpdatedBy)
+            .UseCollation(collation: "utf8mb4_general_ci");
 
-        builder.Property(propertyExpression: x => x.DeletedBy).UseCollation(collation: "utf8mb4_general_ci");
+        builder
+            .Property(propertyExpression: x => x.DeletedBy)
+            .UseCollation(collation: "utf8mb4_general_ci");
 
-        builder.Property(propertyExpression: x => x.ProductId).UseCollation(collation: "utf8mb4_general_ci");
+        builder
+            .Property(propertyExpression: x => x.ProductId)
+            .UseCollation(collation: "utf8mb4_general_ci");
 
-        builder.Property(propertyExpression: x => x.VariantId).UseCollation(collation: "utf8mb4_general_ci");
+        builder
+            .Property(propertyExpression: x => x.VariantId)
+            .UseCollation(collation: "utf8mb4_general_ci");
 
-        builder.Property(propertyExpression: x => x.WarehouseId).UseCollation(collation: "utf8mb4_general_ci");
+        builder
+            .Property(propertyExpression: x => x.WarehouseId)
+            .UseCollation(collation: "utf8mb4_general_ci");
 
-        builder.Property(propertyExpression: x => x.InventoryId).UseCollation(collation: "utf8mb4_general_ci");
+        builder
+            .Property(propertyExpression: x => x.InventoryId)
+            .UseCollation(collation: "utf8mb4_general_ci");
     }
 }

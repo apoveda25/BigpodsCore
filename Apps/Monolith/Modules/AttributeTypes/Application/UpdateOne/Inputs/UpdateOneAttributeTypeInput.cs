@@ -1,6 +1,4 @@
-
 using Bigpods.Monolith.Modules.AttributeTypes.Domain.UpdateOne.Inputs;
-
 using NodaTime;
 
 namespace Bigpods.Monolith.Modules.AttributeTypes.Application.UpdateOne.Inputs;

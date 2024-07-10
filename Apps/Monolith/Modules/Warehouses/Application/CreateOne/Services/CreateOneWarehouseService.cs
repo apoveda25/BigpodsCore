@@ -6,9 +6,8 @@ using Bigpods.Monolith.Modules.Warehouses.Domain.CreateOne.Services;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Application.CreateOne.Services;
 
-public sealed class CreateOneWarehouseService(
-    [Service] IUnitOfWork unitOfWork
-) : ICreateOneWarehouseService
+public sealed class CreateOneWarehouseService([Service] IUnitOfWork unitOfWork)
+    : ICreateOneWarehouseService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 

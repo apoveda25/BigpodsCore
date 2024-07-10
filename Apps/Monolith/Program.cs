@@ -2,8 +2,8 @@ using Bigpods.Monolith.Config.Services;
 
 var builder = WebApplication.CreateBuilder(args: args);
 
-builder.Services
-    .AddCors()
+builder
+    .Services.AddCors()
     // .AddOpenTelemetryConfiguration()
     // .AddLoggingConfiguration(builder: builder.Logging)
     .AddAuthenticationConfiguration(configuration: builder.Configuration)
@@ -23,10 +23,8 @@ app.UseAuthorization();
 
 app.MapGraphQL();
 
-app.UseCors(configurePolicy: options => options
-    .AllowAnyOrigin()
-    .WithMethods(methods: ["POST"])
-    .AllowAnyHeader()
+app.UseCors(configurePolicy: options =>
+    options.AllowAnyOrigin().WithMethods(methods: ["POST"]).AllowAnyHeader()
 );
 
 app.Run();

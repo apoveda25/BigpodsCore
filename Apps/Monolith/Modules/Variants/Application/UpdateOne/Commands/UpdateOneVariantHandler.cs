@@ -1,11 +1,8 @@
 using AutoMapper;
-
 using Bigpods.Monolith.Modules.Shared.Domain.Database;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Variants.Domain.Common.Aggregates;
-using Bigpods.Monolith.Modules.Variants.Domain.Common.Entities;
 using Bigpods.Monolith.Modules.Variants.Domain.UpdateOne.Services;
-
 using MediatR;
 
 namespace Bigpods.Monolith.Modules.Variants.Application.UpdateOne.Commands;
@@ -25,12 +22,15 @@ public sealed class UpdateOneVariantHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var fetchResponse = await _updateOneVariantService.ExecuteAsync(command: command, cancellationToken: cancellationToken);
+        var fetchResponse = await _updateOneVariantService.ExecuteAsync(
+            command: command,
+            cancellationToken: cancellationToken
+        );
 
         var variantsRepository = _unitOfWork.GetRepository<VariantModel>();
 
         var aggregateRoot = ProductAggregateRoot.UpdateOneVariant(
-            variant: command.VariantDto,
+            command: command,
             data: fetchResponse
         );
 

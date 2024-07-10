@@ -2,7 +2,7 @@
     "editor.formatOnSave": true,
     "csharp.format.enable": true,
     "[csharp]": {
-        "editor.defaultFormatter": "ms-dotnettools.csharp"
+        "editor.defaultFormatter": "csharpier.csharpier-vscode"
     },
     "workbench.editor.customLabels.enabled": true,
     "workbench.editor.customLabels.patterns": {

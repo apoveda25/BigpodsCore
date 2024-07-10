@@ -1,72 +1,78 @@
-using Keycloak.AuthServices.Authentication;
-using Keycloak.AuthServices.Authorization;
-
-using Bigpods.Monolith.Modules.Shared.Infrastructure.Database;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
+using System.Reflection;
 using Bigpods.Monolith.Modules.Attributes.Application.Common.Policies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-using OpenTelemetry.Logs;
-using HotChocolate.Types.NodaTime;
+using Bigpods.Monolith.Modules.Attributes.Application.Common.Services;
 using Bigpods.Monolith.Modules.Attributes.Infrastructure.CreateOne.Mutations;
 using Bigpods.Monolith.Modules.Attributes.Infrastructure.DeleteOne.Mutations;
-using Bigpods.Monolith.Modules.Shared.Domain.Database;
-using Bigpods.Monolith.Modules.Variants.Infrastructure.CreateOne.Mutations;
-using Bigpods.Monolith.Modules.Products.Infrastructure.CreateOne.Mutations;
-using Bigpods.Monolith.Modules.Variants.Application.Common.Policies;
-using Bigpods.Monolith.Modules.Products.Application.Common.Policies;
-using System.Reflection;
-using Bigpods.Monolith.Modules.Products.Infrastructure.UpdateOne.Mutations;
-using Bigpods.Monolith.Modules.Products.Infrastructure.FindMany.Queries;
-using Bigpods.Monolith.Modules.Products.Infrastructure.FindOne.Queries;
-using Bigpods.Monolith.Modules.Variants.Infrastructure.UpdateOne.Mutations;
-using Bigpods.Monolith.Modules.Variants.Infrastructure.FindMany.Queries;
-using Bigpods.Monolith.Modules.Variants.Infrastructure.FindOne.Queries;
-using Bigpods.Monolith.Modules.Variants.Infrastructure.DeleteOne.Mutations;
-using Bigpods.Monolith.Modules.AttributeTypes.Infrastructure.CreateOne.Mutations;
+using Bigpods.Monolith.Modules.Attributes.Infrastructure.FindMany.Queries;
+using Bigpods.Monolith.Modules.Attributes.Infrastructure.FindOne.Queries;
 using Bigpods.Monolith.Modules.AttributeTypes.Application.Common.Policies;
+using Bigpods.Monolith.Modules.AttributeTypes.Application.Common.Services;
+using Bigpods.Monolith.Modules.AttributeTypes.Infrastructure.CreateOne.Mutations;
 using Bigpods.Monolith.Modules.AttributeTypes.Infrastructure.FindMany.Queries;
 using Bigpods.Monolith.Modules.AttributeTypes.Infrastructure.FindOne.Queries;
 using Bigpods.Monolith.Modules.AttributeTypes.Infrastructure.UpdateOne.Mutations;
-using Bigpods.Monolith.Modules.Attributes.Infrastructure.FindMany.Queries;
-using Bigpods.Monolith.Modules.Attributes.Infrastructure.FindOne.Queries;
-using Bigpods.Monolith.Modules.AttributeTypes.Application.Common.Services;
-using Bigpods.Monolith.Modules.Attributes.Application.Common.Services;
-using Bigpods.Monolith.Modules.Variants.Application.Common.Services;
-using Bigpods.Monolith.Modules.Products.Application.Common.Services;
-using Bigpods.Monolith.Modules.Warehouses.Application.Common.Services;
-using Bigpods.Monolith.Modules.Warehouses.Application.Common.Policies;
-using Bigpods.Monolith.Modules.Warehouses.Infrastructure.CreateOne.Mutations;
-using Bigpods.Monolith.Modules.Warehouses.Infrastructure.UpdateOne.Mutations;
-using Bigpods.Monolith.Modules.Warehouses.Infrastructure.DeleteOne.Mutations;
-using Bigpods.Monolith.Modules.Warehouses.Infrastructure.FindMany.Queries;
-using Bigpods.Monolith.Modules.Warehouses.Infrastructure.FindOne.Queries;
 using Bigpods.Monolith.Modules.Inventories.Application.Common.Policies;
+using Bigpods.Monolith.Modules.Inventories.Application.Common.Services;
 using Bigpods.Monolith.Modules.Inventories.Infrastructure.CreateOne.Mutations;
 using Bigpods.Monolith.Modules.Inventories.Infrastructure.DeleteOne.Mutations;
 using Bigpods.Monolith.Modules.Inventories.Infrastructure.FindMany.Queries;
 using Bigpods.Monolith.Modules.Inventories.Infrastructure.FindOne.Queries;
-using Bigpods.Monolith.Modules.Inventories.Application.Common.Services;
+using Bigpods.Monolith.Modules.InventoryInputs.Application.Common.Policies;
+using Bigpods.Monolith.Modules.InventoryInputs.Application.Common.Services;
 using Bigpods.Monolith.Modules.InventoryInputs.Infrastructure.CreateOne.Mutations;
 using Bigpods.Monolith.Modules.InventoryInputs.Infrastructure.FindMany.Queries;
 using Bigpods.Monolith.Modules.InventoryInputs.Infrastructure.FindOne.Queries;
-using Bigpods.Monolith.Modules.InventoryInputs.Application.Common.Policies;
-using Bigpods.Monolith.Modules.InventoryInputs.Application.Common.Services;
+using Bigpods.Monolith.Modules.InventoryOutputs.Application.Common.Policies;
+using Bigpods.Monolith.Modules.InventoryOutputs.Application.Common.Services;
 using Bigpods.Monolith.Modules.InventoryOutputs.Infrastructure.CreateOne.Mutations;
 using Bigpods.Monolith.Modules.InventoryOutputs.Infrastructure.FindMany.Queries;
 using Bigpods.Monolith.Modules.InventoryOutputs.Infrastructure.FindOne.Queries;
-using Bigpods.Monolith.Modules.InventoryOutputs.Application.Common.Policies;
-using Bigpods.Monolith.Modules.InventoryOutputs.Application.Common.Services;
-
+using Bigpods.Monolith.Modules.Products.Application.Common.Policies;
+using Bigpods.Monolith.Modules.Products.Application.Common.Services;
+using Bigpods.Monolith.Modules.Products.Infrastructure.CreateOne.Mutations;
+using Bigpods.Monolith.Modules.Products.Infrastructure.FindMany.Queries;
+using Bigpods.Monolith.Modules.Products.Infrastructure.FindOne.Queries;
+using Bigpods.Monolith.Modules.Products.Infrastructure.UpdateOne.Mutations;
+using Bigpods.Monolith.Modules.Shared.Domain.Database;
+using Bigpods.Monolith.Modules.Shared.Infrastructure.Database;
+using Bigpods.Monolith.Modules.Variants.Application.Common.Policies;
+using Bigpods.Monolith.Modules.Variants.Application.Common.Services;
+using Bigpods.Monolith.Modules.Variants.Infrastructure.CreateOne.Mutations;
+using Bigpods.Monolith.Modules.Variants.Infrastructure.DeleteOne.Mutations;
+using Bigpods.Monolith.Modules.Variants.Infrastructure.FindMany.Queries;
+using Bigpods.Monolith.Modules.Variants.Infrastructure.FindOne.Queries;
+using Bigpods.Monolith.Modules.Variants.Infrastructure.UpdateOne.Mutations;
+using Bigpods.Monolith.Modules.VariantsOnAttributes.Application.Common.Policies;
+using Bigpods.Monolith.Modules.VariantsOnAttributes.Application.Common.Services;
+using Bigpods.Monolith.Modules.VariantsOnAttributes.Infrastructure.AttachMany.Mutations;
+using Bigpods.Monolith.Modules.VariantsOnAttributes.Infrastructure.DettachMany.Mutations;
+using Bigpods.Monolith.Modules.VariantsOnAttributes.Infrastructure.FindMany.Queries;
+using Bigpods.Monolith.Modules.VariantsOnAttributes.Infrastructure.FindOne.Queries;
+using Bigpods.Monolith.Modules.Warehouses.Application.Common.Policies;
+using Bigpods.Monolith.Modules.Warehouses.Application.Common.Services;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.CreateOne.Mutations;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.DeleteOne.Mutations;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.FindMany.Queries;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.FindOne.Queries;
+using Bigpods.Monolith.Modules.Warehouses.Infrastructure.UpdateOne.Mutations;
+using HotChocolate.Types.NodaTime;
+using Keycloak.AuthServices.Authentication;
+using Keycloak.AuthServices.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 namespace Bigpods.Monolith.Config.Services;
 
 public static class CoreDependencyInjectionService
 {
-    public static IServiceCollection AddLoggingConfiguration(this IServiceCollection services, ILoggingBuilder builder)
+    public static IServiceCollection AddLoggingConfiguration(
+        this IServiceCollection services,
+        ILoggingBuilder builder
+    )
     {
         builder.AddOpenTelemetry(logging =>
         {
@@ -98,15 +104,21 @@ public static class CoreDependencyInjectionService
         return services;
     }
 
-    public static IServiceCollection AddPersistenceConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddPersistenceConfiguration(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        var databaseConnectionString = configuration.GetConnectionString(name: "BigpodsConnectionUrl");
+        var databaseConnectionString = configuration.GetConnectionString(
+            name: "BigpodsConnectionUrl"
+        );
 
-        services.AddDbContext<DatabaseService>(
-            optionsAction: options => options.UseMySql(
+        services.AddDbContext<DatabaseService>(optionsAction: options =>
+            options.UseMySql(
                 connectionString: databaseConnectionString,
                 serverVersion: ServerVersion.AutoDetect(connectionString: databaseConnectionString),
-                mySqlOptionsAction: x => x.MigrationsHistoryTable(tableName: HistoryRepository.DefaultTableName)
+                mySqlOptionsAction: x =>
+                    x.MigrationsHistoryTable(tableName: HistoryRepository.DefaultTableName)
             )
         );
 
@@ -130,6 +142,8 @@ public static class CoreDependencyInjectionService
             .AddTypeExtension<UpdateOneAttributeTypeMutation>()
             .AddTypeExtension<CreateOneAttributeMutation>()
             .AddTypeExtension<DeleteOneAttributeMutation>()
+            .AddTypeExtension<AttachManyVariantsOnAttributesMutation>()
+            .AddTypeExtension<DettachManyVariantsOnAttributesMutation>()
             .AddTypeExtension<CreateOneVariantMutation>()
             .AddTypeExtension<UpdateOneVariantMutation>()
             .AddTypeExtension<DeleteOneVariantMutation>()
@@ -147,6 +161,8 @@ public static class CoreDependencyInjectionService
             .AddTypeExtension<FindOneAttributeTypeQuery>()
             .AddTypeExtension<FindManyAttributesQuery>()
             .AddTypeExtension<FindOneAttributeQuery>()
+            .AddTypeExtension<FinaManyVariantsOnAttributesQuery>()
+            .AddTypeExtension<FindOneVariantOnAttributeQuery>()
             .AddTypeExtension<FinaManyVariantsQuery>()
             .AddTypeExtension<FindOneVariantQuery>()
             .AddTypeExtension<FindManyProductsQuery>()
@@ -177,12 +193,17 @@ public static class CoreDependencyInjectionService
 
     public static IServiceCollection AddMediatorConfiguration(this IServiceCollection services)
     {
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly: Assembly.GetExecutingAssembly()));
+        services.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssembly(assembly: Assembly.GetExecutingAssembly())
+        );
 
         return services;
     }
 
-    public static IServiceCollection AddAuthenticationConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAuthenticationConfiguration(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -194,11 +215,15 @@ public static class CoreDependencyInjectionService
         return services;
     }
 
-    public static IServiceCollection AddAuthorizationConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAuthorizationConfiguration(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services
             .AddAuthorization(configure: AttributeTypesPolicies.ConfigurePolicies)
             .AddAuthorization(configure: AttributesPolicies.ConfigurePolicies)
+            .AddAuthorization(configure: VariantsOnAttributesPolicies.ConfigurePolicies)
             .AddAuthorization(configure: VariantsPolicies.ConfigurePolicies)
             .AddAuthorization(configure: ProductsPolicies.ConfigurePolicies)
             .AddAuthorization(configure: InventoryInputsPolicies.ConfigurePolicies)
@@ -220,6 +245,7 @@ public static class CoreDependencyInjectionService
         return services
             .AddAttributeTypesDependenciesConfiguration()
             .AddAttributesDependenciesConfiguration()
+            .AddVariantsOnAttributesDependenciesConfiguration()
             .AddVariantsDependenciesConfiguration()
             .AddProductsDependenciesConfiguration()
             .AddInventoryInputsDependenciesConfiguration()

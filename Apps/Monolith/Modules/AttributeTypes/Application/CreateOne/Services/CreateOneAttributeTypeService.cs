@@ -6,9 +6,8 @@ using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
 namespace Bigpods.Monolith.Modules.AttributeTypes.Application.CreateOne.Services;
 
-public sealed class CreateOneAttributeTypeService(
-    [Service] IUnitOfWork unitOfWork
-) : ICreateOneAttributeTypeService
+public sealed class CreateOneAttributeTypeService([Service] IUnitOfWork unitOfWork)
+    : ICreateOneAttributeTypeService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 

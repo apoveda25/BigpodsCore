@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using Bigpods.MonolithIaC.Data.Realms;
 using Bigpods.MonolithIaC.Utils;
 
@@ -21,13 +20,16 @@ public class ClientScopesData
 
         return new Dictionary<string, ClientScopeData>
         {
-            [AudienceName] = new ClientScopeData(Name: $"client-scopes:{audienceNameKebabCase}", Config: new()
-            {
-                Name = $"client-scopes:{audienceNameKebabCase}",
-                RealmId = bigpodsRealm.Id.Apply(id => id),
-                Description = $"{AudienceName} Client Scope",
-                IncludeInTokenScope = true,
-            }),
+            [AudienceName] = new ClientScopeData(
+                Name: $"client-scopes:{audienceNameKebabCase}",
+                Config: new()
+                {
+                    Name = $"client-scopes:{audienceNameKebabCase}",
+                    RealmId = bigpodsRealm.Id.Apply(id => id),
+                    Description = $"{AudienceName} Client Scope",
+                    IncludeInTokenScope = true,
+                }
+            ),
         };
     }
 }

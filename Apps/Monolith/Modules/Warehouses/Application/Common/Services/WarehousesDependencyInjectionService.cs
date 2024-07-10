@@ -9,7 +9,9 @@ namespace Bigpods.Monolith.Modules.Warehouses.Application.Common.Services;
 
 public static class WarehousesDependencyInjectionService
 {
-    public static IServiceCollection AddWarehousesDependenciesConfiguration(this IServiceCollection services)
+    public static IServiceCollection AddWarehousesDependenciesConfiguration(
+        this IServiceCollection services
+    )
     {
         services.AddScoped<ICreateOneWarehouseService, CreateOneWarehouseService>();
         services.AddScoped<IUpdateOneWarehouseService, UpdateOneWarehouseService>();

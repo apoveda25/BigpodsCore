@@ -1,5 +1,4 @@
 using Bigpods.Monolith.Modules.Warehouses.Domain.DeleteOne.Inputs;
-
 using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Application.DeleteOne.Inputs;

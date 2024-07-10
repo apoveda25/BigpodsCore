@@ -6,9 +6,8 @@ using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
 namespace Bigpods.Monolith.Modules.Attributes.Application.DeleteOne.Services;
 
-public sealed class DeleteOneAttributeService(
-    [Service] IUnitOfWork unitOfWork
-) : IDeleteOneAttributeService
+public sealed class DeleteOneAttributeService([Service] IUnitOfWork unitOfWork)
+    : IDeleteOneAttributeService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
@@ -24,10 +23,12 @@ public sealed class DeleteOneAttributeService(
             filter: x => x.Id == command.AttributeDto.Id,
             cancellationToken: cancellationToken
         );
-        var attributeTypeFoundById = attributeFoundById is null ? null : await attributesClasses.FindOneAsync(
-            filter: x => x.Id == attributeFoundById.AttributeTypeId,
-            cancellationToken: cancellationToken
-        );
+        var attributeTypeFoundById = attributeFoundById is null
+            ? null
+            : await attributesClasses.FindOneAsync(
+                filter: x => x.Id == attributeFoundById.AttributeTypeId,
+                cancellationToken: cancellationToken
+            );
 
         return new DeleteOneAttributeServiceResponse(
             AttributeFoundById: attributeFoundById,

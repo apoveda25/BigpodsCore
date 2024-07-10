@@ -9,7 +9,9 @@ namespace Bigpods.Monolith.Modules.Variants.Application.Common.Services;
 
 public static class VariantsDependencyInjectionService
 {
-    public static IServiceCollection AddVariantsDependenciesConfiguration(this IServiceCollection services)
+    public static IServiceCollection AddVariantsDependenciesConfiguration(
+        this IServiceCollection services
+    )
     {
         services.AddScoped<ICreateOneVariantService, CreateOneVariantService>();
         services.AddScoped<IUpdateOneVariantService, UpdateOneVariantService>();

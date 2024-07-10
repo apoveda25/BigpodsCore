@@ -1,7 +1,6 @@
-using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Commands;
 using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Dtos;
-
+using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using MediatR;
 
 namespace Bigpods.Monolith.Modules.Products.Application.CreateOne.Commands;

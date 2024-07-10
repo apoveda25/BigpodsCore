@@ -7,7 +7,9 @@ namespace Bigpods.Monolith.Modules.Products.Application.Common.Services;
 
 public static class ProductsDependencyInjectionService
 {
-    public static IServiceCollection AddProductsDependenciesConfiguration(this IServiceCollection services)
+    public static IServiceCollection AddProductsDependenciesConfiguration(
+        this IServiceCollection services
+    )
     {
         services.AddScoped<ICreateOneProductService, CreateOneProductService>();
         services.AddScoped<IUpdateOneProductService, UpdateOneProductService>();

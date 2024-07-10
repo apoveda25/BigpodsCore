@@ -1,14 +1,13 @@
-using Bigpods.Monolith.Modules.Shared.Domain.Database;
-using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Commands;
 using Bigpods.Monolith.Modules.Products.Domain.CreateOne.Services;
+using Bigpods.Monolith.Modules.Shared.Domain.Database;
 using Bigpods.Monolith.Modules.Shared.Domain.Models;
+using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
 namespace Bigpods.Monolith.Modules.Products.Application.CreateOne.Services;
 
-public sealed class CreateOneProductService(
-    [Service] IUnitOfWork unitOfWork
-) : ICreateOneProductService
+public sealed class CreateOneProductService([Service] IUnitOfWork unitOfWork)
+    : ICreateOneProductService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
@@ -35,7 +34,8 @@ public sealed class CreateOneProductService(
             cancellationToken: cancellationToken
         );
         var attributesFoundById = await attributesRepository.FindManyAsync(
-            filter: x => command.VariantOnAttributeDtos.Select(dto => dto.AttributeId).Contains(x.Id),
+            filter: x =>
+                command.VariantOnAttributeDtos.Select(dto => dto.AttributeId).Contains(x.Id),
             cancellationToken: cancellationToken
         );
 

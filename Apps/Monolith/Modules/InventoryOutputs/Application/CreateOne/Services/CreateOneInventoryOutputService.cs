@@ -6,9 +6,8 @@ using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
 namespace Bigpods.Monolith.Modules.InventoryOutputs.Application.CreateOne.Services;
 
-public sealed class CreateOneInventoryOutputService(
-    [Service] IUnitOfWork unitOfWork
-) : ICreateOneInventoryOutputService
+public sealed class CreateOneInventoryOutputService([Service] IUnitOfWork unitOfWork)
+    : ICreateOneInventoryOutputService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
