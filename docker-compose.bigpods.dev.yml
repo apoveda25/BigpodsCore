@@ -1,0 +1,62 @@
+version: "3.8"
+services:
+  keycloak_server:
+    image: bigpods/keycloak
+    build:
+      dockerfile: ./docker/keycloak/Dockerfile
+    container_name: bigpods_keycloak_server
+    restart: always
+    depends_on:
+      keycloak_postgres_server:
+        condition: service_healthy
+    env_file: .env.keycloak
+    environment:
+      - INFISICAL_MACHINE_IDENTITY_CLIENT_ID=1eaae199-ffe0-40b3-8754-b6ffcc7aa494
+      - INFISICAL_MACHINE_IDENTITY_CLIENT_SECRET=6596913ec1d427010da95c1033e84139492793853554398bfaf656f89cd00712
+      - INFISICAL_TOKEN=${INFISICAL_TOKEN}
+    # environment:
+    #   KC_DB: postgres
+    #   KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER}
+    #   KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    #   KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+    #   KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    #   KC_DB_URL: jdbc:postgresql://postgres.localhost/bigpods
+    #   KC_HOSTNAME: localhost
+    #   KEYCLOAK_USER: ${KEYCLOAK_DB_USER}
+    ports:
+      - 8081:8080
+      - 8443:8443
+    networks:
+      - keycloak_server_network
+
+  keycloak_postgres_server:
+    image: postgres:14-alpine
+    container_name: bigpods_keycloak_postgres_server
+    restart: always
+    hostname: postgres.localhost
+    env_file: .env.keycloak
+    # environment:
+    #   POSTGRES_USER: ${KEYCLOAK_DB_USER}
+    #   POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    #   POSTGRES_DB: ${KEYCLOAK_DB_NAME}
+    # ports:
+    #   - 5432:5432
+    volumes:
+      - keycloak_postgres_server_data_volume:/var/lib/postgresql/data
+    networks:
+      - keycloak_server_network
+    healthcheck:
+      test: "pg_isready --username=${POSTGRES_USER} && psql --username=${POSTGRES_USER} --list"
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+volumes:
+  keycloak_postgres_server_data_volume:
+    driver: local
+    name: bigpods_keycloak_postgres_server_data_volume
+
+networks:
+  keycloak_server_network:
+    name: bigpods_keycloak_server_network
+    driver: bridge

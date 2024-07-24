@@ -200,12 +200,28 @@ services:
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
       KC_DB_URL: jdbc:postgresql://postgres.localhost/bigpods
       KC_HOSTNAME: localhost
-      KEYCLOAK_USER: ${KEYCLOAK_DB_USER}
+      # KEYCLOAK_USER: ${KEYCLOAK_DB_USER}
     ports:
-      - ${KEYCLOAK_PORT}:8080
+      - 8082:8080
       - 8443:8443
     networks:
       - keycloak-network
+
+  minio:
+    image: quay.io/minio/minio
+    container_name: bigpods-minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: ${DEPOSIT_USER}
+      MINIO_ROOT_PASSWORD: ${DEPOSIT_PASSWORD}
+    command: server /data --console-address ":9001"
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - minio-volume:/data
+    networks:
+      - minio-network
 
 volumes:
   tidb-data-volume:
@@ -223,6 +239,9 @@ volumes:
   cockroachdb-volume:
     driver: local
     name: bigpods-cockroachdb-volume
+  minio-volume:
+    driver: local
+    name: bigpods-minio-volume
 
 networks:
   tidb-network:
@@ -233,4 +252,7 @@ networks:
     driver: bridge
   keycloak-network:
     name: bigpods-keycloak-network
+    driver: bridge
+  minio-network:
+    name: bigpods-minio-network
     driver: bridge
