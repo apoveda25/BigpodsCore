@@ -95,7 +95,7 @@ public class GenericRepository<T>(DatabaseService context, ILogger logger) : IGe
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error adding entity {entity}", entity);
+            _logger.LogError(e, "Error adding entity");
             throw;
         }
     }
@@ -128,7 +128,7 @@ public class GenericRepository<T>(DatabaseService context, ILogger logger) : IGe
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error updating entity {entity}", entity);
+            _logger.LogError(e, "Error updating entity");
             throw;
         }
     }
@@ -158,7 +158,7 @@ public class GenericRepository<T>(DatabaseService context, ILogger logger) : IGe
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error deleting entity {entity}", entity);
+            _logger.LogError(e, "Error deleting entity");
             throw;
         }
     }

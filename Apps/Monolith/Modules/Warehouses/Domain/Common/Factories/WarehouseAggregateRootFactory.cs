@@ -7,7 +7,7 @@ using Bigpods.Monolith.Modules.Warehouses.Domain.UpdateOne.Dtos;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Domain.Common.Factories;
 
-public sealed class WarehouseAggregateRootFactory
+public static class WarehouseAggregateRootFactory
 {
     public static WarehouseAggregateRoot CreateOne(
         ICreateOneWarehouseDto warehouse,
@@ -47,7 +47,7 @@ public sealed class WarehouseAggregateRootFactory
             throw new NotFoundException("Warehouse not found with this id");
         }
 
-        if (warehouseFoundById.IsDeleted == true)
+        if (warehouseFoundById.IsDeleted)
         {
             throw new NotFoundException("Warehouse is deleted");
         }
@@ -64,17 +64,17 @@ public sealed class WarehouseAggregateRootFactory
 
         return new WarehouseAggregateRoot(
             id: warehouseFoundById.Id,
-            name: warehouse?.Name ?? warehouseFoundById.Name,
-            description: warehouse?.Description ?? warehouseFoundById.Description,
+            name: warehouse.Name ?? warehouseFoundById.Name,
+            description: warehouse.Description ?? warehouseFoundById.Description,
             isDeleted: warehouseFoundById.IsDeleted,
             createdAtDatetime: warehouseFoundById.CreatedAtDatetime,
             updatedAtDatetime: DateTime.Now,
             deletedAtDatetime: warehouseFoundById.DeletedAtDatetime,
             createdAtTimezone: warehouseFoundById.CreatedAtTimezone,
-            updatedAtTimezone: warehouse?.UpdatedAtTimezone,
+            updatedAtTimezone: warehouse.UpdatedAtTimezone,
             deletedAtTimezone: warehouseFoundById.DeletedAtTimezone,
             createdBy: warehouseFoundById.CreatedBy,
-            updatedBy: warehouse?.UpdatedBy,
+            updatedBy: warehouse.UpdatedBy,
             deletedBy: warehouseFoundById.DeletedBy
         );
     }
@@ -92,7 +92,7 @@ public sealed class WarehouseAggregateRootFactory
             throw new NotFoundException("Warehouse not found with this id");
         }
 
-        if (warehouseFoundById.IsDeleted == true)
+        if (warehouseFoundById.IsDeleted)
         {
             throw new NotFoundException("Warehouse not found with this id");
         }

@@ -17,11 +17,14 @@ public sealed class UpdateOneProductHandler(
     private readonly IMapper _mapper = mapper;
     private readonly IUpdateOneProductService _updateOneProductService = updateOneProductService;
 
-    public async Task<ProductModel> Handle(UpdateOneProductCommand command, CancellationToken token)
+    public async Task<ProductModel> Handle(
+        UpdateOneProductCommand command,
+        CancellationToken cancellationToken
+    )
     {
         var fetchResponse = await _updateOneProductService.ExecuteAsync(
             command: command,
-            cancellationToken: token
+            cancellationToken: cancellationToken
         );
 
         var productsRepository = _unitOfWork.GetRepository<ProductModel>();
@@ -32,7 +35,7 @@ public sealed class UpdateOneProductHandler(
 
         productsRepository.UpdateOne(entity: productModel);
 
-        await _unitOfWork.CompleteAsync(cancellationToken: token);
+        await _unitOfWork.CompleteAsync(cancellationToken: cancellationToken);
 
         return productModel;
     }

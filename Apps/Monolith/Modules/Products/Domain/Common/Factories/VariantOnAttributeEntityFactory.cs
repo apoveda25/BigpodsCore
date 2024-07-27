@@ -5,7 +5,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Products.Domain.Common.Factories;
 
-public sealed class VariantOnAttributeEntityFactory
+public static class VariantOnAttributeEntityFactory
 {
     public static VariantOnAttributeEntity[] CreateMany(
         ICreateOneVariantOnAttributeDto[] variantsOnAttributes,

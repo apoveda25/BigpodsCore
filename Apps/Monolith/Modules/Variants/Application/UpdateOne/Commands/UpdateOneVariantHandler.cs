@@ -19,7 +19,7 @@ public sealed class UpdateOneVariantHandler(
 
     public async Task<VariantModel> Handle(
         UpdateOneVariantCommand command,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _updateOneVariantService.ExecuteAsync(
@@ -35,7 +35,7 @@ public sealed class UpdateOneVariantHandler(
         );
 
         var variantModel = _mapper.Map<VariantModel>(
-            source: aggregateRoot.Variants.FirstOrDefault(x => x.Id == command.VariantDto.Id)
+            Array.Find(aggregateRoot.Variants, x => x.Id == command.VariantDto.Id)
         );
 
         variantsRepository.UpdateOne(entity: variantModel);

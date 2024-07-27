@@ -7,7 +7,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 
 namespace Bigpods.Monolith.Modules.Products.Domain.Common.Factories;
 
-public sealed class ProductAggregateRootFactory
+public static class ProductAggregateRootFactory
 {
     public static ProductAggregateRoot CreateOne(
         ICreateOneProductDto product,

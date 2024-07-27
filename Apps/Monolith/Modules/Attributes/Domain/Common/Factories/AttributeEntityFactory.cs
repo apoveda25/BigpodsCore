@@ -6,7 +6,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Attributes.Domain.Common.Factories;
 
-public sealed class AttributeEntityFactory
+public static class AttributeEntityFactory
 {
     public static AttributeEntity CreateOne(
         ICreateOneAttributeDto attribute,
@@ -67,7 +67,7 @@ public sealed class AttributeEntityFactory
             throw new NotFoundException("Attribute not exist with this id");
         }
 
-        if (attributeFoundById.IsDeleted == true)
+        if (attributeFoundById.IsDeleted)
         {
             throw new ConflictException("Attribute is deleted");
         }

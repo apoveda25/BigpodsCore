@@ -7,7 +7,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 
 namespace Bigpods.Monolith.Modules.AttributeTypes.Domain.Common.Factories;
 
-public sealed class AttributeTypeAggregateRootFactory
+public static class AttributeTypeAggregateRootFactory
 {
     public static AttributeTypeAggregateRoot CreateOne(
         ICreateOneAttributeTypeDto attributeType,

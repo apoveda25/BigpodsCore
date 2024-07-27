@@ -21,9 +21,8 @@ public sealed class UpdateOneVariantMutation
         UpdateOneVariantInput input
     )
     {
-        var userId = Guid.Parse(
-            claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString()
-        );
+        var sub = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = sub is not null ? Guid.Parse(sub) : Guid.Empty;
 
         var variantDto = mapper.Map<UpdateOneVariantDto>(source: input with { UpdatedBy = userId });
 

@@ -1,7 +1,7 @@
 config:
   keycloak:clientId:
-    secure: AAABAIBY1lDngCQnpLwsBcOpVNWhSl+dezQkzCqHXIEpoN6/UAkb9h4=
+    secure: AAABAOb8o3hub8kZiEt7EGg2IrR64onTYlz5IPGp0OEMpGpfV6ayA6s=
   keycloak:password:
-    secure: AAABADYGUKZoddLyztDzORRMjUwa1nxn1ksJo/n/5unNK4vjlg==
-  keycloak:url: http://localhost:8082
+    secure: AAABANQREVZ8fl+5Ntmc3VnD4xOY1ibuSbxVOYHvbWhkXkhzBG4YYdI=
+  keycloak:url: http://localhost:8080
   keycloak:username: admin

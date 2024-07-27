@@ -6,7 +6,7 @@ using Bigpods.Monolith.Modules.Variants.Domain.DeleteOne.Dtos;
 
 namespace Bigpods.Monolith.Modules.Variants.Domain.Common.Factories;
 
-public sealed class VariantOnAttributeEntityFactory
+public static class VariantOnAttributeEntityFactory
 {
     public static VariantOnAttributeEntity[] CreateMany(
         ICreateOneVariantOnAttributeDto[] variantsOnAttributes,

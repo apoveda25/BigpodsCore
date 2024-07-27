@@ -128,7 +128,7 @@ public sealed class AttributeTypeAggregateRoot(
 
     private bool IsAttributeAttached(AttributeEntity attribute)
     {
-        return Attributes.Any(attribute.IsEqual);
+        return Array.Exists(Attributes, attribute.IsEqual);
     }
 
     private bool IsNotAttributeBelongToAttributeType(AttributeEntity attribute)

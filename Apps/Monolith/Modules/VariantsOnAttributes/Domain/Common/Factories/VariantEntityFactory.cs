@@ -4,7 +4,7 @@ using Bigpods.Monolith.Modules.VariantsOnAttributes.Domain.Common.Entities;
 
 namespace Bigpods.Monolith.Modules.VariantsOnAttributes.Domain.Common.Factories;
 
-public sealed class VariantEntityFactory
+public static class VariantEntityFactory
 {
     public static VariantEntity[] BuildMany(IVariantModel[] variants)
     {

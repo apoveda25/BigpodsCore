@@ -20,7 +20,7 @@ public sealed class CreateOneInventoryInputHandler(
 
     public async Task<InventoryInputModel> Handle(
         CreateOneInventoryInputCommand command,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _createOneInventoryInputService.ExecuteAsync(
@@ -37,11 +37,12 @@ public sealed class CreateOneInventoryInputHandler(
         );
 
         var inventoryInputModel = _mapper.Map<InventoryInputModel>(
-            aggregateRoot.InventoryInputs.FirstOrDefault(x => x.Id == command.InventoryInputDto.Id)
+            Array.Find(aggregateRoot.InventoryInputs, x => x.Id == command.InventoryInputDto.Id)
         );
         var inventoryModel = _mapper.Map<InventoryModel>(
-            aggregateRoot.Inventories.FirstOrDefault(x =>
-                x.Id == command.InventoryInputDto.InventoryId
+            Array.Find(
+                aggregateRoot.Inventories,
+                x => x.Id == command.InventoryInputDto.InventoryId
             )
         );
 

@@ -5,8 +5,8 @@ namespace Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 [GraphQLName(name: "VariantOnAttributeType")]
 public sealed class VariantOnAttributeModel : BaseModel, IVariantOnAttributeModel
 {
-    public Guid VariantId { get; set; } = default!;
-    public Guid AttributeId { get; set; } = default!;
+    public Guid VariantId { get; set; } = Guid.NewGuid();
+    public Guid AttributeId { get; set; } = Guid.NewGuid();
 
     public VariantModel Variant { get; set; } = default!;
     public AttributeModel Attribute { get; set; } = default!;

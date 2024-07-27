@@ -68,7 +68,7 @@ public static class ClientsData
                     ImplicitFlowEnabled = false,
                     LoginTheme = "keycloak",
                     Oauth2DeviceAuthorizationGrantEnabled = false,
-                    RootUrl = "http://localhost:8082",
+                    RootUrl = "http://localhost:8080",
                     WebOrigins = new[] { "*", },
                     StandardFlowEnabled = false,
                     ServiceAccountsEnabled = true,

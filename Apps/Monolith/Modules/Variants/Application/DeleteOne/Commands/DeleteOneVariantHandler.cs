@@ -19,7 +19,7 @@ public sealed class DeleteOneVariantHandler(
 
     public async Task<VariantModel> Handle(
         DeleteOneVariantCommand command,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _deleteOneVariantService.ExecuteAsync(
@@ -35,9 +35,7 @@ public sealed class DeleteOneVariantHandler(
             data: fetchResponse
         );
 
-        var variantEntity = aggregateRoot.Variants.FirstOrDefault(x =>
-            x.Id == command.VariantDto.Id
-        );
+        var variantEntity = Array.Find(aggregateRoot.Variants, x => x.Id == command.VariantDto.Id);
 
         var variantModel = _mapper.Map<VariantModel>(source: variantEntity);
         var variantOnAttributeModels = _mapper.Map<VariantOnAttributeModel[]>(

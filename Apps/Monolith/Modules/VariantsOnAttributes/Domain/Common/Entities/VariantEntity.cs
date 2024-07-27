@@ -95,15 +95,16 @@ public sealed class VariantEntity(
         VariantsOnAttributes = [.. VariantsOnAttributes, variantOnAttributeEntity];
     }
 
-    public bool IsIsEqual(VariantEntity entity)
+    public bool IsEqual(VariantEntity entity)
     {
         return Id == entity.Id;
     }
 
     private bool IsVariantOnAttributeAlreadyAttached(VariantOnAttributeEntity entity)
     {
-        return VariantsOnAttributes.Any(variantOnAttributeEntity =>
-            variantOnAttributeEntity.IsIsEqual(entity)
+        return Array.Exists(
+            VariantsOnAttributes,
+            variantOnAttributeEntity => variantOnAttributeEntity.IsEqual(entity)
         );
     }
 

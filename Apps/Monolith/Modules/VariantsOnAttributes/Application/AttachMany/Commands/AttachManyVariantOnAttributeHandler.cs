@@ -20,12 +20,12 @@ public sealed class AttachManyVariantOnAttributeHandler(
 
     public async Task<VariantOnAttributeModel[]> Handle(
         AttachManyVariantOnAttributeCommand command,
-        CancellationToken token
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _attachManyVariantOnAttributeService.ExecuteAsync(
             command: command,
-            cancellationToken: token
+            cancellationToken: cancellationToken
         );
 
         var variantsOnAttributesRepository = _unitOfWork.GetRepository<VariantOnAttributeModel>();
@@ -41,10 +41,10 @@ public sealed class AttachManyVariantOnAttributeHandler(
 
         await variantsOnAttributesRepository.CreateManyAsync(
             entities: variantOnAttributeModels,
-            cancellationToken: token
+            cancellationToken: cancellationToken
         );
 
-        await _unitOfWork.CompleteAsync(cancellationToken: token);
+        await _unitOfWork.CompleteAsync(cancellationToken: cancellationToken);
 
         return variantOnAttributeModels;
     }

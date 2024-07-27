@@ -75,7 +75,7 @@ public sealed class VariantEntity(
 
     private bool IsVariantOnAttributeExist(VariantOnAttributeEntity entity)
     {
-        return VariantsOnAttributes.Any(entity.IsIsEqual);
+        return Array.Exists(VariantsOnAttributes, entity.IsIsEqual);
     }
 
     private bool VariantOnAttributeNotBelongToVariant(VariantOnAttributeEntity variantOnAttribute)

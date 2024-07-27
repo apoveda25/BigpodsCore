@@ -21,9 +21,8 @@ public sealed class CreateOneInventoryInputMutation
         CreateOneInventoryInputInput input
     )
     {
-        var userId = Guid.Parse(
-            claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString()
-        );
+        var sub = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = sub is not null ? Guid.Parse(sub) : Guid.Empty;
 
         var inventoryInputDto = mapper.Map<CreateOneInventoryInputDto>(
             source: input with

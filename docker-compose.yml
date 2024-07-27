@@ -1,0 +1,259 @@
+services:
+  keycloak_server:
+    image: bigpods/keycloak_server
+    build:
+      dockerfile: ./docker/keycloak/Dockerfile
+    container_name: bigpods_keycloak_server
+    restart: always
+    depends_on:
+      keycloak_postgres_server:
+        condition: service_healthy
+    environment:
+      - KC_DB_URL=${KC_DB_URL}
+      - KC_DB_USERNAME=${KC_DB_USERNAME}
+      - KC_DB_PASSWORD=${KC_DB_PASSWORD}
+      - KC_HOSTNAME=${KC_HOSTNAME}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - 8080:8080
+      - 8443:8443
+    networks:
+      - keycloak_server_network
+
+  keycloak_postgres_server:
+    image: postgres:16.3-alpine3.20
+    container_name: bigpods_keycloak_postgres_server
+    restart: always
+    hostname: postgres.localhost
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    # ports:
+    #   - 5432:5432
+    volumes:
+      - keycloak_postgres_server_data_volume:/var/lib/postgresql/data
+    networks:
+      - keycloak_server_network
+    healthcheck:
+      test: "pg_isready --username=${POSTGRES_USER} && psql --username=${POSTGRES_USER} --list"
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  api_pd0_server:
+    image: pingcap/pd:latest
+    container_name: bigpods_api_pd0_server
+    ports:
+      - '2379'
+    volumes:
+      - ./docker/tidb/pd.toml:/pd.toml:ro
+      - api_tidb_server_data_volume:/data
+      - api_tidb_server_logs_volume:/logs
+    command:
+      - --name=api_pd0_server
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://api_pd0_server:2379
+      - --advertise-peer-urls=http://api_pd0_server:2380
+      - --initial-cluster=api_pd0_server=http://api_pd0_server:2380,api_pd1_server=http://api_pd1_server:2380
+      - --data-dir=/data/api_pd0_server
+      - --config=/pd.toml
+      - --log-file=/logs/api_pd0_server.log
+    restart: on-failure
+    networks:
+      - api_server_network
+
+  api_pd1_server:
+    image: pingcap/pd:latest
+    container_name: bigpods_api_pd1_server
+    ports:
+      - '2379'
+    volumes:
+      - ./docker/tidb/pd.toml:/pd.toml:ro
+      - api_tidb_server_data_volume:/data
+      - api_tidb_server_logs_volume:/logs
+    command:
+      - --name=api_pd1_server
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://api_pd1_server:2379
+      - --advertise-peer-urls=http://api_pd1_server:2380
+      - --initial-cluster=api_pd0_server=http://api_pd0_server:2380,api_pd1_server=http://api_pd1_server:2380
+      - --data-dir=/data/api_pd1_server
+      - --config=/pd.toml
+      - --log-file=/logs/api_pd1_server.log
+    restart: on-failure
+    networks:
+      - api_server_network
+
+  api_tikv0_server:
+    image: pingcap/tikv:latest
+    container_name: bigpods_api_tikv0_server
+    volumes:
+      - ./docker/tidb/tikv.toml:/tikv.toml:ro
+      - api_tidb_server_data_volume:/data
+      - api_tidb_server_logs_volume:/logs
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=api_tikv0_server:20160
+      - --data-dir=/data/api_tikv0_server
+      - --pd=api_pd0_server:2379,api_pd1_server:2379
+      - --config=/tikv.toml
+      - --log-file=/logs/api_tikv0_server.log
+    depends_on:
+      - 'api_pd0_server'
+      - 'api_pd1_server'
+    restart: on-failure
+    networks:
+      - api_server_network
+
+  api_tikv1_server:
+    image: pingcap/tikv:latest
+    container_name: bigpods_api_tikv1_server
+    volumes:
+      - ./docker/tidb/tikv.toml:/tikv.toml:ro
+      - api_tidb_server_data_volume:/data
+      - api_tidb_server_logs_volume:/logs
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=api_tikv1_server:20160
+      - --data-dir=/data/api_tikv1_server
+      - --pd=api_pd0_server:2379,api_pd1_server:2379
+      - --config=/tikv.toml
+      - --log-file=/logs/api_tikv1_server.log
+    depends_on:
+      - 'api_pd0_server'
+      - 'api_pd1_server'
+    restart: on-failure
+    networks:
+      - api_server_network
+
+  api_tidb_server:
+    image: pingcap/tidb:latest
+    container_name: bigpods_api_tidb_server
+    ports:
+      - '4000:4000'
+      - '10080:10080'
+    volumes:
+      - ./docker/tidb/tidb.toml:/tidb.toml:ro
+      - api_tidb_server_data_volume:/data
+    command:
+      - --store=tikv
+      - --path=api_pd0_server:2379,api_pd1_server:2379
+      - --config=/tidb.toml
+      - --log-file=/logs/tidb.log
+      - --advertise-address=api_tidb_server
+    depends_on:
+      - 'api_tikv0_server'
+      - 'api_tikv1_server'
+    restart: on-failure
+    networks:
+      - api_server_network
+
+  api_minio_server:
+    image: quay.io/minio/minio:RELEASE.2024-07-16T23-46-41Z
+    container_name: bigpods_api_minio_server
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+    command: server /data --console-address ":9001"
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - api_minio_server_data_volume:/data
+    networks:
+      - api_server_network
+
+  api_redpanda_server:
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      # Address the broker advertises to clients that connect to the Kafka API.
+      # Use the internal addresses to connect to the Redpanda brokers'
+      # from inside the same Docker network.
+      # Use the external addresses to connect to the Redpanda brokers'
+      # from outside the Docker network.
+      - --advertise-kafka-addr internal://api_redpanda_server:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      # Address the broker advertises to clients that connect to the HTTP Proxy.
+      - --advertise-pandaproxy-addr internal://api_redpanda_server:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      # Redpanda brokers use the RPC API to communicate with each other internally.
+      - --rpc-addr api_redpanda_server:33145
+      - --advertise-rpc-addr api_redpanda_server:33145
+      # Mode dev-container uses well-known configuration properties for development in containers.
+      - --mode dev-container
+      # Tells Seastar (the framework Redpanda uses under the hood) to use 1 core on the system.
+      - --smp 1
+      - --default-log-level=info
+    image: docker.redpanda.com/redpandadata/redpanda:v24.1.12
+    container_name: bigpods_api_redpanda_server
+    volumes:
+      - api_redpanda_server_data_volume:/var/lib/redpanda/data
+    networks:
+      - api_server_network
+    ports:
+      - 18081:18081
+      - 18082:18082
+      - 19092:19092
+      - 19644:9644
+
+  api_console_server:
+    container_name: bigpods_api_console_server
+    image: docker.redpanda.com/redpandadata/console:v2.6.1
+    networks:
+      - api_server_network
+    entrypoint: /bin/sh
+    command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["api_redpanda_server:9092"]
+          schemaRegistry:
+            enabled: true
+            urls: ["http://api_redpanda_server:8081"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://api_redpanda_server:9644"]
+    ports:
+      - 8081:8080
+    depends_on:
+      - api_redpanda_server
+
+volumes:
+  keycloak_postgres_server_data_volume:
+    driver: local
+    name: bigpods_keycloak_postgres_server_data_volume
+  api_oceanbase_server_root_volume:
+    driver: local
+    name: bigpods_api_oceanbase_server_root_volume
+  api_tidb_server_data_volume:
+    driver: local
+    name: bigpods_api_tidb_server_data_volume
+  api_tidb_server_logs_volume:
+    driver: local
+    name: bigpods_api_tidb_server_logs_volume
+  api_minio_server_data_volume:
+    driver: local
+    name: bigpods_api_minio_server_data_volume
+  api_minio_server_config_volume:
+    driver: local
+    name: bigpods_api_minio_server_config_volume
+  api_redpanda_server_data_volume:
+    driver: local
+    name: bigpods_api_redpanda_server_data_volume
+
+networks:
+  keycloak_server_network:
+    name: bigpods_keycloak_server_network
+    driver: bridge
+  api_server_network:
+    name: bigpods_api_server_network
+    driver: bridge

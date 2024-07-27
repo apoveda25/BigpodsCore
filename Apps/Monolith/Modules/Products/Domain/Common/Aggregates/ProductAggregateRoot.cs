@@ -161,7 +161,7 @@ public sealed class ProductAggregateRoot(
 
     private bool IsVariantExist(VariantEntity variant)
     {
-        return Variants.Any(variant.IsEqual);
+        return Array.Exists(Variants, variant.IsEqual);
     }
 
     private bool VariantBelongToProduct(VariantEntity variant)

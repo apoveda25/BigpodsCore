@@ -111,7 +111,7 @@ public sealed class WarehouseAggregateRoot(
 
     private bool IsInventoryAttach(InventoryEntity inventory)
     {
-        return Inventories.Any(inventory.IsEqual);
+        return Array.Exists(Inventories, inventory.IsEqual);
     }
 
     private bool IsNotInventoryBelongToWarehouse(InventoryEntity inventory)
@@ -121,7 +121,7 @@ public sealed class WarehouseAggregateRoot(
 
     private bool IsInventoryOutputAttach(InventoryOutputEntity inventoryOutput)
     {
-        return InventoryOutputs.Any(inventoryOutput.IsEqual);
+        return Array.Exists(InventoryOutputs, inventoryOutput.IsEqual);
     }
 
     private bool IsNotInventoryOutputBelongToWarehouse(InventoryOutputEntity inventoryOutput)

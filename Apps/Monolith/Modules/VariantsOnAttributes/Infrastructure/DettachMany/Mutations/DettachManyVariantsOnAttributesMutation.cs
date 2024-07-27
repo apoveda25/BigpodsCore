@@ -21,9 +21,8 @@ public sealed class DettachManyVariantsOnAttributesMutation
         DettachManyVariantOnAttributeInput input
     )
     {
-        var userId = Guid.Parse(
-            claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString()
-        );
+        var sub = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = sub is not null ? Guid.Parse(sub) : Guid.Empty;
 
         input.VariantsOnAttributes = input
             .VariantsOnAttributes.Select(x => x with { DeletedBy = userId })
