@@ -36,7 +36,7 @@ public sealed class CreateOneAttributeHandler(
         );
 
         var attributeModel = _mapper.Map<AttributeModel>(
-            source: aggregateRoot.Attributes.Find(x => x.Id == command.AttributeDto.Id)
+            Array.Find(aggregateRoot.Attributes, x => x.Id == command.AttributeDto.Id)
         );
 
         await attributesRepository.CreateOneAsync(
