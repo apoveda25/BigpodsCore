@@ -21,9 +21,8 @@ public sealed class CreateOneAttributeMutation
         CreateOneAttributeInput input
     )
     {
-        var userId = Guid.Parse(
-            claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString()
-        );
+        var sub = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = sub is not null ? Guid.Parse(sub) : Guid.Empty;
 
         var dto = mapper.Map<CreateOneAttributeDto>(source: input with { CreatedBy = userId });
 

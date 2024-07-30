@@ -4,7 +4,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.InventoryOutputs.Domain.Common.Factories;
 
-public sealed class InventoryEntityFactory
+public static class InventoryEntityFactory
 {
     public static InventoryEntity BuildOne(IInventoryModel? inventoryOutput)
     {

@@ -1,14 +1,18 @@
-using Bigpods.Monolith.Config.Services;
+using Bigpods.Monolith.Configuration.Services;
+using DotNetEnv;
+using DotNetEnv.Configuration;
 
 var builder = WebApplication.CreateBuilder(args: args);
+
+builder.Configuration.AddDotNetEnv(".env", LoadOptions.TraversePath());
 
 builder
     .Services.AddCors()
     // .AddOpenTelemetryConfiguration()
     // .AddLoggingConfiguration(builder: builder.Logging)
-    .AddAuthenticationConfiguration(configuration: builder.Configuration)
-    .AddAuthorizationConfiguration(configuration: builder.Configuration)
-    .AddPersistenceConfiguration(configuration: builder.Configuration)
+    .AddAuthenticationConfiguration()
+    .AddAuthorizationConfiguration()
+    .AddPersistenceConfiguration()
     .AddMappersConfiguration()
     .AddMediatorConfiguration()
     .AddGraphQLConfiguration()
@@ -24,7 +28,7 @@ app.UseAuthorization();
 app.MapGraphQL();
 
 app.UseCors(configurePolicy: options =>
-    options.AllowAnyOrigin().WithMethods(methods: ["POST"]).AllowAnyHeader()
+    options.AllowAnyOrigin().WithMethods("GET", "POST").AllowAnyHeader()
 );
 
-app.Run();
+await app.RunAsync();

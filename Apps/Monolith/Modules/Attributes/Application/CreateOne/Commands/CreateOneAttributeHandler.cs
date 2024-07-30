@@ -20,7 +20,7 @@ public sealed class CreateOneAttributeHandler(
 
     public async Task<AttributeModel> Handle(
         CreateOneAttributeCommand command,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _createOneAttributeService.ExecuteAsync(
@@ -36,7 +36,7 @@ public sealed class CreateOneAttributeHandler(
         );
 
         var attributeModel = _mapper.Map<AttributeModel>(
-            source: aggregateRoot.Attributes.FirstOrDefault(x => x.Id == command.AttributeDto.Id)
+            source: aggregateRoot.Attributes.Find(x => x.Id == command.AttributeDto.Id)
         );
 
         await attributesRepository.CreateOneAsync(

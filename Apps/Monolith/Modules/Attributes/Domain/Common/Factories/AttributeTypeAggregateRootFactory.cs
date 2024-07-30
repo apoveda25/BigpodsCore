@@ -4,7 +4,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Attributes.Domain.Common.Factories;
 
-public sealed class AttributeTypeAggregateRootFactory
+public static class AttributeTypeAggregateRootFactory
 {
     public static AttributeTypeAggregateRoot BuildOne(IAttributeTypeModel? attributeType)
     {

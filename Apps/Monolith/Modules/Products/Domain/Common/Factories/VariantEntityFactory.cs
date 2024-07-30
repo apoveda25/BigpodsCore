@@ -5,7 +5,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Products.Domain.Common.Factories;
 
-public sealed class VariantEntityFactory
+public static class VariantEntityFactory
 {
     public static VariantEntity[] CreateMany(
         ICreateOneVariantDto[] variants,

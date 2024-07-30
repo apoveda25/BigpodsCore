@@ -4,7 +4,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Inventories.Domain.Common.Factories;
 
-public sealed class WarehouseAggregateRootFactory
+public static class WarehouseAggregateRootFactory
 {
     public static WarehouseAggregateRoot BuildOne(IWarehouseModel? warehouse)
     {

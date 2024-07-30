@@ -6,9 +6,9 @@ namespace Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 public sealed class InventoryModel : BaseModel, IInventoryModel
 {
     public int Stock { get; set; } = default!;
-    public Guid ProductId { get; set; } = default!;
-    public Guid VariantId { get; set; } = default!;
-    public Guid WarehouseId { get; set; } = default!;
+    public Guid ProductId { get; set; } = Guid.NewGuid();
+    public Guid VariantId { get; set; } = Guid.NewGuid();
+    public Guid WarehouseId { get; set; } = Guid.NewGuid();
 
     public ProductModel Product { get; set; } = default!;
     public VariantModel Variant { get; set; } = default!;

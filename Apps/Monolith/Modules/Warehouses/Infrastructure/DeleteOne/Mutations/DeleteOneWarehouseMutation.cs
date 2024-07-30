@@ -21,9 +21,8 @@ public sealed class DeleteOneWarehouseMutation
         DeleteOneWarehouseInput input
     )
     {
-        var userId = Guid.Parse(
-            claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier) ?? Guid.Empty.ToString()
-        );
+        var sub = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = sub is not null ? Guid.Parse(sub) : Guid.Empty;
 
         var warehouseDto = mapper.Map<DeleteOneWarehouseDto>(
             source: input with

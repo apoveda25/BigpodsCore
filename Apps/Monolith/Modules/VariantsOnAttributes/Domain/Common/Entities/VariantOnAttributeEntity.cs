@@ -30,7 +30,7 @@ public sealed class VariantOnAttributeEntity(
     public Guid VariantId { get; private set; } = variantId ?? Guid.Empty;
     public Guid AttributeId { get; private set; } = attributeId ?? Guid.Empty;
 
-    public bool IsIsEqual(VariantOnAttributeEntity variantOnAttribute)
+    public bool IsEqual(VariantOnAttributeEntity variantOnAttribute)
     {
         return Id == variantOnAttribute.Id
             || (

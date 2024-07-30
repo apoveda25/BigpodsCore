@@ -1,0 +1,58 @@
+meta {
+  name: createOneAttributeType
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{API_URL}}
+  body: graphql
+  auth: oauth2
+}
+
+auth:oauth2 {
+  grant_type: authorization_code
+  callback_url: {{CALLBACK_URL}}
+  authorization_url: {{AUTHORIZATION_URL}}
+  access_token_url: {{ACCESS_TOKEN_URL}}
+  client_id: {{CLIENT_ID}}
+  client_secret: {{CLIENT_SECRET}}
+  scope: {{SCOPE}}
+  state: 
+  pkce: true
+}
+
+body:graphql {
+  mutation ($input: AttributeTypeCreateOneAttributeTypeInput!) {
+    createOneAttributeType(input: $input) {
+      id
+      name
+      valuePattern
+      measuringUnitPattern
+      isDeleted
+      createdAtDatetime
+      createdAtTimezone
+      createdBy
+      updatedAtDatetime
+      updatedAtTimezone
+      updatedBy
+      deletedAtDatetime
+      deletedAtTimezone
+      deletedBy
+    }
+  }
+  
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "id": "06ef638d-ee7a-4b74-b295-14179b582902",
+      "name": "COLOR",
+      "description": "",
+      "valuePattern": "XigocmdiWyhdKCgoMjVbMC01XSl8KDJbMC00XVswLTldKXwoMVswLTldezJ9KXwoWzAtOV17Mn0pfChbMC05XSkpKFssXSgoMjVbMC01XSl8KDJbMC00XVswLTldKXwoMVswLTldezJ9KXwoWzAtOV17Mn0pfChbMC05XSkpKXsyfSlbKV0pfHJnYmFbKF0oKCgyNVswLTVdKXwoMlswLTRdWzAtOV0pfCgxWzAtOV17Mn0pfChbMC05XXsyfSl8KFswLTldKSkoWyxdKCgyNVswLTVdKXwoMlswLTRdWzAtOV0pfCgxWzAtOV17Mn0pfChbMC05XXsyfSl8KFswLTldKSkpezJ9KVssXSgoMChbLl1cZHsxLDJ9KSopfDEpWyldKSQ=",
+      "measuringUnitPattern": "XlJHQkEk",
+      "createdAtTimezone": "America/Bogota"
+    }
+  }
+}

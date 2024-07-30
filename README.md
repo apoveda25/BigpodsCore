@@ -41,10 +41,10 @@ pulumi stack init dev
 
 ```bash
 # Set environment variables for the keycloak provider with the following syntax:
-pulumi config set keycloak:url http://localhost:8082 && \
+pulumi config set keycloak:url http://localhost:8080 && \
 pulumi config set keycloak:clientId admin-cli --secret && \
 pulumi config set keycloak:username admin && \
-pulumi config set keycloak:password admin --secret
+pulumi config set keycloak:password Secret123 --secret
 ```
 
 ```bash

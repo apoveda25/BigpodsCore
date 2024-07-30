@@ -4,8 +4,6 @@ using Bigpods.MonolithIaC.Data.Clients;
 using Bigpods.MonolithIaC.Data.ClientScopes;
 using Bigpods.MonolithIaC.Data.Realms;
 using Bigpods.MonolithIaC.Utils;
-using Pulumi;
-using Pulumi.Keycloak.OpenId;
 
 namespace Bigpods.MonolithIaC.Data.DefaultClientScopes;
 
@@ -14,14 +12,14 @@ public sealed record ClientDefaultScope(
     Pulumi.Keycloak.OpenId.ClientDefaultScopesArgs Config
 );
 
-public class ClientDefaultScopesData
+public static class ClientDefaultScopesData
 {
     public static string ClientDefaultScopesName
     {
         get => string.Join(":", Scopes);
     }
     private static string[] Scopes { get; } =
-        new[] { "profile", "email", "roles", "web-origins", "acr" };
+        new[] { "profile", "email", "roles", "web-origins", "acr", "basic" };
 
     public static Dictionary<string, ClientDefaultScope> GetClientDefaultScopes(
         Dictionary<string, Pulumi.Keycloak.Realm> realms,

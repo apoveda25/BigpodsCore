@@ -58,6 +58,7 @@ using Bigpods.Monolith.Modules.Warehouses.Infrastructure.UpdateOne.Mutations;
 using HotChocolate.Types.NodaTime;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
+using Keycloak.AuthServices.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -65,7 +66,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
-namespace Bigpods.Monolith.Config.Services;
+namespace Bigpods.Monolith.Configuration.Services;
 
 public static class CoreDependencyInjectionService
 {
@@ -104,14 +105,9 @@ public static class CoreDependencyInjectionService
         return services;
     }
 
-    public static IServiceCollection AddPersistenceConfiguration(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static IServiceCollection AddPersistenceConfiguration(this IServiceCollection services)
     {
-        var databaseConnectionString = configuration.GetConnectionString(
-            name: "BigpodsConnectionUrl"
-        );
+        string databaseConnectionString = DotNetEnv.Env.GetString("DATABASE_CONNECTION_URL");
 
         services.AddDbContext<DatabaseService>(optionsAction: options =>
             options.UseMySql(
@@ -201,24 +197,28 @@ public static class CoreDependencyInjectionService
     }
 
     public static IServiceCollection AddAuthenticationConfiguration(
-        this IServiceCollection services,
-        IConfiguration configuration
+        this IServiceCollection services
     )
     {
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddKeycloakWebApi(
-                configuration: configuration,
-                configSectionName: KeycloakAuthenticationOptions.Section
-            );
+            .AddKeycloakWebApi(options =>
+            {
+                options.Realm = DotNetEnv.Env.GetString("OIDC_REALM");
+                options.AuthServerUrl = DotNetEnv.Env.GetString("OIDC_URL");
+                options.SslRequired = DotNetEnv.Env.GetString("OIDC_SSL");
+                options.Resource = DotNetEnv.Env.GetString("OIDC_CLIENT_ID");
+                options.VerifyTokenAudience = true;
+                options.Credentials = new KeycloakClientInstallationCredentials
+                {
+                    Secret = DotNetEnv.Env.GetString("OIDC_SECRET")
+                };
+            });
 
         return services;
     }
 
-    public static IServiceCollection AddAuthorizationConfiguration(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static IServiceCollection AddAuthorizationConfiguration(this IServiceCollection services)
     {
         services
             .AddAuthorization(configure: AttributeTypesPolicies.ConfigurePolicies)
@@ -233,8 +233,18 @@ public static class CoreDependencyInjectionService
             .AddKeycloakAuthorization();
 
         services.AddAuthorizationServer(
-            configuration: configuration,
-            configSectionName: KeycloakAuthenticationOptions.Section
+            (options) =>
+            {
+                options.Realm = DotNetEnv.Env.GetString("OIDC_REALM");
+                options.AuthServerUrl = DotNetEnv.Env.GetString("OIDC_URL");
+                options.SslRequired = DotNetEnv.Env.GetString("OIDC_SSL");
+                options.Resource = DotNetEnv.Env.GetString("OIDC_CLIENT_ID");
+                options.VerifyTokenAudience = true;
+                options.Credentials = new KeycloakClientInstallationCredentials
+                {
+                    Secret = DotNetEnv.Env.GetString("OIDC_SECRET")
+                };
+            }
         );
 
         return services;

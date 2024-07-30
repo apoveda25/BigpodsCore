@@ -20,7 +20,7 @@ public sealed class CreateOneWarehouseHandler(
 
     public async Task<WarehouseModel> Handle(
         CreateOneWarehouseCommand command,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _createOneWarehouseService.ExecuteAsync(

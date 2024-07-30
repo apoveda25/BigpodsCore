@@ -19,19 +19,19 @@ public sealed class CreateOneAttributeTypeHandler(
         createOneAttributeTypeService;
 
     public async Task<AttributeTypeModel> Handle(
-        CreateOneAttributeTypeCommand command,
-        CancellationToken token = default
+        CreateOneAttributeTypeCommand request,
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _createOneAttributeTypeService.ExecuteAsync(
-            command: command,
-            cancellationToken: token
+            command: request,
+            cancellationToken: cancellationToken
         );
 
         var attributeTypesRepository = _unitOfWork.GetRepository<AttributeTypeModel>();
 
         var aggregateRoot = AttributeTypeAggregateRoot.CreateOne(
-            command: command,
+            command: request,
             data: fetchResponse
         );
 
@@ -39,10 +39,10 @@ public sealed class CreateOneAttributeTypeHandler(
 
         await attributeTypesRepository.CreateOneAsync(
             entity: attributeTypeModel,
-            cancellationToken: token
+            cancellationToken: cancellationToken
         );
 
-        await _unitOfWork.CompleteAsync(cancellationToken: token);
+        await _unitOfWork.CompleteAsync(cancellationToken: cancellationToken);
 
         return attributeTypeModel;
     }

@@ -5,7 +5,6 @@ using Bigpods.Monolith.Modules.Variants.Domain.Common.Factories;
 using Bigpods.Monolith.Modules.Variants.Domain.CreateOne.Commands;
 using Bigpods.Monolith.Modules.Variants.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.Variants.Domain.DeleteOne.Commands;
-using Bigpods.Monolith.Modules.Variants.Domain.DeleteOne.Dtos;
 using Bigpods.Monolith.Modules.Variants.Domain.DeleteOne.Services;
 using Bigpods.Monolith.Modules.Variants.Domain.UpdateOne.Commands;
 using Bigpods.Monolith.Modules.Variants.Domain.UpdateOne.Services;
@@ -168,7 +167,7 @@ public sealed partial class ProductAggregateRoot(
 
     private bool IsVariantExist(VariantEntity variantEntity)
     {
-        return Variants.Any(variantEntity.IsIsEqual);
+        return Array.Exists(Variants, variantEntity.IsIsEqual);
     }
 
     private bool IsVariantBelongToProduct(VariantEntity variantEntity)

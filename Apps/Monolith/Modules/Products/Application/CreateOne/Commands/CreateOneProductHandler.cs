@@ -17,11 +17,14 @@ public sealed class CreateOneProductHandler(
     private readonly IMapper _mapper = mapper;
     private readonly ICreateOneProductService _createOneProductService = createOneProductService;
 
-    public async Task<ProductModel> Handle(CreateOneProductCommand command, CancellationToken token)
+    public async Task<ProductModel> Handle(
+        CreateOneProductCommand command,
+        CancellationToken cancellationToken
+    )
     {
         var fetchResponse = await _createOneProductService.ExecuteAsync(
             command: command,
-            cancellationToken: token
+            cancellationToken: cancellationToken
         );
 
         var productsRepository = _unitOfWork.GetRepository<ProductModel>();
@@ -36,14 +39,20 @@ public sealed class CreateOneProductHandler(
             source: aggregateRoot.Variants.SelectMany(v => v.VariantsOnAttributes)
         );
 
-        await productsRepository.CreateOneAsync(entity: productModel, cancellationToken: token);
-        await variantsRepository.CreateManyAsync(entities: variantModels, cancellationToken: token);
+        await productsRepository.CreateOneAsync(
+            entity: productModel,
+            cancellationToken: cancellationToken
+        );
+        await variantsRepository.CreateManyAsync(
+            entities: variantModels,
+            cancellationToken: cancellationToken
+        );
         await variantsOnAttributesRepository.CreateManyAsync(
             entities: variantOnAttributeModels,
-            cancellationToken: token
+            cancellationToken: cancellationToken
         );
 
-        await _unitOfWork.CompleteAsync(cancellationToken: token);
+        await _unitOfWork.CompleteAsync(cancellationToken: cancellationToken);
 
         return productModel;
     }

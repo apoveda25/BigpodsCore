@@ -17,11 +17,14 @@ public sealed class CreateOneVariantHandler(
     private readonly IMapper _mapper = mapper;
     private readonly ICreateOneVariantService _createOneVariantService = createOneVariantService;
 
-    public async Task<VariantModel> Handle(CreateOneVariantCommand command, CancellationToken token)
+    public async Task<VariantModel> Handle(
+        CreateOneVariantCommand command,
+        CancellationToken cancellationToken
+    )
     {
         var fetchResponse = await _createOneVariantService.ExecuteAsync(
             command: command,
-            cancellationToken: token
+            cancellationToken: cancellationToken
         );
 
         var variantsRepository = _unitOfWork.GetRepository<VariantModel>();
@@ -33,21 +36,24 @@ public sealed class CreateOneVariantHandler(
         );
 
         var variantModel = _mapper.Map<VariantModel>(
-            source: aggregateRoot.Variants.FirstOrDefault(x => x.Id == command.VariantDto.Id)
+            Array.Find(aggregateRoot.Variants, x => x.Id == command.VariantDto.Id)
         );
         var variantOnAttributeModels = _mapper.Map<VariantOnAttributeModel[]>(
             source: aggregateRoot
                 .Variants.SelectMany(x => x.VariantsOnAttributes)
-                .Where(x => command.VariantOnAttributeDtos.Any(dto => dto.Id == x.Id))
+                .Where(x => Array.Exists(command.VariantOnAttributeDtos, dto => dto.Id == x.Id))
         );
 
-        await variantsRepository.CreateOneAsync(entity: variantModel, cancellationToken: token);
+        await variantsRepository.CreateOneAsync(
+            entity: variantModel,
+            cancellationToken: cancellationToken
+        );
         await variantsOnAttributesRepository.CreateManyAsync(
             entities: variantOnAttributeModels,
-            cancellationToken: token
+            cancellationToken: cancellationToken
         );
 
-        await _unitOfWork.CompleteAsync(cancellationToken: token);
+        await _unitOfWork.CompleteAsync(cancellationToken: cancellationToken);
 
         return variantModel;
     }

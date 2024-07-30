@@ -4,7 +4,7 @@ using Bigpods.Monolith.Modules.VariantsOnAttributes.Domain.Common.Aggregates;
 
 namespace Bigpods.Monolith.Modules.VariantsOnAttributes.Domain.Common.Factories;
 
-public sealed class ProductAggregateRootFactory
+public static class ProductAggregateRootFactory
 {
     public static ProductAggregateRoot BuildOne(IProductModel? product)
     {

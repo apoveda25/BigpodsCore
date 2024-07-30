@@ -20,7 +20,7 @@ public sealed class DeleteOneWarehouseHandler(
 
     public async Task<WarehouseModel> Handle(
         DeleteOneWarehouseCommand command,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _deleteOneWarehouseService.ExecuteAsync(

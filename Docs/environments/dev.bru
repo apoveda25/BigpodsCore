@@ -1,0 +1,11 @@
+vars {
+  API_URL: http://localhost:3000/graphql
+  CALLBACK_URL: http://localhost
+  AUTHORIZATION_URL: http://localhost:8080/realms/bigpods/protocol/openid-connect/auth
+  ACCESS_TOKEN_URL: http://localhost:8080/realms/bigpods/protocol/openid-connect/token
+  CLIENT_ID: bigpods-gui-api-client
+  SCOPE: openid profile email phone address offline_access acr basic
+}
+vars:secret [
+  CLIENT_SECRET
+]

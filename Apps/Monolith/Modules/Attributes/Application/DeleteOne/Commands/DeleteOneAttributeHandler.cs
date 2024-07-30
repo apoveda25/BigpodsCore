@@ -20,7 +20,7 @@ public sealed class DeleteOneAttributeHandler(
 
     public async Task<AttributeModel> Handle(
         DeleteOneAttributeCommand command,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _deleteOneAttributeService.ExecuteAsync(
@@ -36,7 +36,7 @@ public sealed class DeleteOneAttributeHandler(
         );
 
         var attributeModel = _mapper.Map<AttributeModel>(
-            source: aggregateRoot.Attributes.FirstOrDefault(x => x.Id == command.AttributeDto.Id)
+            source: aggregateRoot.Attributes.Find(x => x.Id == command.AttributeDto.Id)
         );
 
         attributesRepository.DeleteOne(entity: attributeModel);

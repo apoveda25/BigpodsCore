@@ -7,7 +7,7 @@ using Bigpods.Monolith.Modules.Variants.Domain.UpdateOne.Dtos;
 
 namespace Bigpods.Monolith.Modules.Variants.Domain.Common.Factories;
 
-public sealed class VariantEntityFactory
+public static class VariantEntityFactory
 {
     public static VariantEntity CreateOne(
         ICreateOneVariantDto variant,

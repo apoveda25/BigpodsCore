@@ -9,7 +9,7 @@ public sealed class VariantModel : BaseModel, IVariantModel
     public string Sku { get; set; } = default!;
     public decimal Price { get; set; } = default!;
     public decimal Cost { get; set; } = default!;
-    public Guid ProductId { get; set; } = default!;
+    public Guid ProductId { get; set; } = Guid.NewGuid();
 
     public ProductModel Product { get; set; } = default!;
     public ICollection<VariantOnAttributeModel> VariantsOnAttributes { get; set; } = default!;

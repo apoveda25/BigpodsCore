@@ -20,12 +20,12 @@ public sealed class DettachManyVariantOnAttributeHandler(
 
     public async Task<VariantOnAttributeModel[]> Handle(
         DettachManyVariantOnAttributeCommand command,
-        CancellationToken token
+        CancellationToken cancellationToken
     )
     {
         var fetchResponse = await _attachManyVariantOnAttributeService.ExecuteAsync(
             command: command,
-            cancellationToken: token
+            cancellationToken: cancellationToken
         );
 
         var variantsOnAttributesRepository = _unitOfWork.GetRepository<VariantOnAttributeModel>();
@@ -41,7 +41,7 @@ public sealed class DettachManyVariantOnAttributeHandler(
 
         variantsOnAttributesRepository.DeleteMany(entities: variantOnAttributeModels);
 
-        await _unitOfWork.CompleteAsync(cancellationToken: token);
+        await _unitOfWork.CompleteAsync(cancellationToken: cancellationToken);
 
         return variantOnAttributeModels;
     }

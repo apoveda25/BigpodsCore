@@ -99,7 +99,7 @@ public sealed partial class VariantEntity(
 
     private bool IsVariantOnAttributeExist(VariantOnAttributeEntity entity)
     {
-        return VariantsOnAttributes.Any(entity.IsIsEqual);
+        return Array.Exists(VariantsOnAttributes, entity.IsIsEqual);
     }
 
     private bool VariantOnAttributeBelongToVariant(

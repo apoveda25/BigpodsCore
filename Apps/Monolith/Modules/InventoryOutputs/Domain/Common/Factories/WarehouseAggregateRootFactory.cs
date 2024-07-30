@@ -1,12 +1,10 @@
 using Bigpods.Monolith.Modules.InventoryOutputs.Domain.Common.Aggregates;
-using Bigpods.Monolith.Modules.InventoryOutputs.Domain.CreateOne.Dtos;
-using Bigpods.Monolith.Modules.InventoryOutputs.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.InventoryOutputs.Domain.Common.Factories;
 
-public sealed class WarehouseAggregateRootFactory
+public static class WarehouseAggregateRootFactory
 {
     public static WarehouseAggregateRoot BuildOne(IWarehouseModel? warehouse)
     {

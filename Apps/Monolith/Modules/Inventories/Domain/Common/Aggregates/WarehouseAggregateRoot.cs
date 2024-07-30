@@ -1,10 +1,8 @@
 using Bigpods.Monolith.Modules.Inventories.Domain.Common.Entities;
 using Bigpods.Monolith.Modules.Inventories.Domain.Common.Factories;
 using Bigpods.Monolith.Modules.Inventories.Domain.CreateOne.Commands;
-using Bigpods.Monolith.Modules.Inventories.Domain.CreateOne.Dtos;
 using Bigpods.Monolith.Modules.Inventories.Domain.CreateOne.Services;
 using Bigpods.Monolith.Modules.Inventories.Domain.DeleteOne.Commands;
-using Bigpods.Monolith.Modules.Inventories.Domain.DeleteOne.Dtos;
 using Bigpods.Monolith.Modules.Inventories.Domain.DeleteOne.Services;
 using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Domain.ValueObjects;
@@ -105,7 +103,7 @@ public sealed class WarehouseAggregateRoot(
 
     private bool IsInventoryExist(InventoryEntity inventory)
     {
-        return Inventories.Any(inventory.IsEqual);
+        return Array.Exists(Inventories, inventory.IsEqual);
     }
 
     private bool IsNotInventoryBelongToWarehouse(InventoryEntity inventory)
