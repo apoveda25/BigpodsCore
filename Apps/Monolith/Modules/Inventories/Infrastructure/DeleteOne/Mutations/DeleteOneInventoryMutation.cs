@@ -4,6 +4,7 @@ using Bigpods.Monolith.Modules.Inventories.Application.Common.Policies;
 using Bigpods.Monolith.Modules.Inventories.Application.DeleteOne.Commands;
 using Bigpods.Monolith.Modules.Inventories.Application.DeleteOne.Dtos;
 using Bigpods.Monolith.Modules.Inventories.Application.DeleteOne.Inputs;
+using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using HotChocolate.Authorization;
 using MediatR;
@@ -13,6 +14,8 @@ namespace Bigpods.Monolith.Modules.Inventories.Infrastructure.DeleteOne.Mutation
 [ExtendObjectType(name: OperationTypeNames.Mutation)]
 public sealed class DeleteOneInventoryMutation
 {
+    [Error(typeof(NotFoundException))]
+    [Error(typeof(ConflictException))]
     [Authorize(Policy = InventoriesPolicies.DeleteOneInventoriesPolicy)]
     public async Task<InventoryModel> DeleteOneInventory(
         [Service] IMediator mediator,

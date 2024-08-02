@@ -2,7 +2,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
-[GraphQLName(name: "ProductType")]
+[GraphQLName(name: "Product")]
 public sealed class ProductModel : BaseModel, IProductModel
 {
     public string Name { get; set; } = default!;

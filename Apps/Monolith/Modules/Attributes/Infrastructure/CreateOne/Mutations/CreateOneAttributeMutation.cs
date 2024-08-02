@@ -4,6 +4,7 @@ using Bigpods.Monolith.Modules.Attributes.Application.Common.Policies;
 using Bigpods.Monolith.Modules.Attributes.Application.CreateOne.Commands;
 using Bigpods.Monolith.Modules.Attributes.Application.CreateOne.Dtos;
 using Bigpods.Monolith.Modules.Attributes.Application.CreateOne.Inputs;
+using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using HotChocolate.Authorization;
 using MediatR;
@@ -13,6 +14,8 @@ namespace Bigpods.Monolith.Modules.Attributes.Infrastructure.CreateOne.Mutations
 [ExtendObjectType(name: OperationTypeNames.Mutation)]
 public sealed class CreateOneAttributeMutation
 {
+    [Error(typeof(ConflictException))]
+    [Error(typeof(NotFoundException))]
     [Authorize(Policy = AttributesPolicies.CreateOneAttributesPolicy)]
     public async Task<AttributeModel> CreateOneAttribute(
         [Service] IMediator mediator,

@@ -2,7 +2,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
-[GraphQLName(name: "VariantOnMediaType")]
+[GraphQLName(name: "VariantOnMedia")]
 public sealed class VariantOnMediaModel : BaseModel, IVariantOnMediaModel
 {
     public Guid MediaId { get; set; } = Guid.NewGuid();

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
+using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Variants.Application.Common.Policies;
 using Bigpods.Monolith.Modules.Variants.Application.DeleteOne.Commands;
@@ -13,6 +14,8 @@ namespace Bigpods.Monolith.Modules.Variants.Infrastructure.DeleteOne.Mutations;
 [ExtendObjectType(name: OperationTypeNames.Mutation)]
 public sealed class DeleteOneVariantMutation
 {
+    [Error(typeof(NotFoundException))]
+    [Error(typeof(ConflictException))]
     [Authorize(Policy = VariantsPolicies.DeleteOneVariantsPolicy)]
     public async Task<VariantModel> DeleteOneVariant(
         [Service] IMediator mediator,

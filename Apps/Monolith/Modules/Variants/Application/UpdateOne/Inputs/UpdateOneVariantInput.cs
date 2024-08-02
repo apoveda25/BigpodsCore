@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Variants.Application.UpdateOne.Inputs;
 
-[GraphQLName(name: "VariantUpdateOneVariantInput")]
 public sealed record UpdateOneVariantInput : IUpdateOneVariantInput
 {
     public Guid Id { get; set; } = Guid.Empty;

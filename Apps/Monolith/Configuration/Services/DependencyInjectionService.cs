@@ -138,8 +138,8 @@ public static class CoreDependencyInjectionService
             .AddTypeExtension<UpdateOneAttributeTypeMutation>()
             .AddTypeExtension<CreateOneAttributeMutation>()
             .AddTypeExtension<DeleteOneAttributeMutation>()
-            .AddTypeExtension<AttachManyVariantsOnAttributesMutation>()
-            .AddTypeExtension<DettachManyVariantsOnAttributesMutation>()
+            .AddTypeExtension<AttachManyVariantOnAttributeMutation>()
+            .AddTypeExtension<DettachManyVariantOnAttributeMutation>()
             .AddTypeExtension<CreateOneVariantMutation>()
             .AddTypeExtension<UpdateOneVariantMutation>()
             .AddTypeExtension<DeleteOneVariantMutation>()
@@ -175,6 +175,17 @@ public static class CoreDependencyInjectionService
             .AddProjections()
             .AddFiltering()
             .AddSorting()
+            .AddMutationConventions(
+                new MutationConventionOptions
+                {
+                    InputArgumentName = "input",
+                    InputTypeNamePattern = "{MutationName}Input",
+                    PayloadTypeNamePattern = "{MutationName}Payload",
+                    PayloadErrorTypeNamePattern = "{MutationName}Error",
+                    PayloadErrorsFieldName = "errors",
+                    ApplyToAllMutations = true,
+                }
+            )
             .InitializeOnStartup();
 
         return services;

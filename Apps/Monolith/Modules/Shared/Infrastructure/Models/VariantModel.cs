@@ -2,7 +2,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
-[GraphQLName(name: "VariantType")]
+[GraphQLName(name: "Variant")]
 public sealed class VariantModel : BaseModel, IVariantModel
 {
     public string Name { get; set; } = default!;

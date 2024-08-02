@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.AttributeTypes.Application.UpdateOne.Inputs;
 
-[GraphQLName(name: "AttributeTypeUpdateOneAttributeTypeInput")]
 public sealed record UpdateOneAttributeTypeInput : IUpdateOneAttributeTypeInput
 {
     public Guid Id { get; set; } = Guid.Empty;

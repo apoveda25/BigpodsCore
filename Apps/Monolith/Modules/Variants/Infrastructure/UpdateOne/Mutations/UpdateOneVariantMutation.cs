@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
+using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Variants.Application.Common.Policies;
 using Bigpods.Monolith.Modules.Variants.Application.UpdateOne.Commands;
@@ -13,6 +14,8 @@ namespace Bigpods.Monolith.Modules.Variants.Infrastructure.UpdateOne.Mutations;
 [ExtendObjectType(name: OperationTypeNames.Mutation)]
 public sealed class UpdateOneVariantMutation
 {
+    [Error(typeof(NotFoundException))]
+    [Error(typeof(ConflictException))]
     [Authorize(Policy = VariantsPolicies.UpdateOneVariantsPolicy)]
     public async Task<VariantModel> UpdateOneVariant(
         [Service] IMediator mediator,

@@ -2,7 +2,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
-[GraphQLName(name: "AttributeTypeType")]
+[GraphQLName(name: "AttributeType")]
 public sealed class AttributeTypeModel : BaseModel, IAttributeTypeModel
 {
     public string Name { get; set; } = default!;

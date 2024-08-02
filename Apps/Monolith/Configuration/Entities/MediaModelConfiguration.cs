@@ -20,7 +20,7 @@ public class MediaModelConfiguration : IEntityTypeConfiguration<MediaModel>
 
         builder.Property(propertyExpression: x => x.Url).IsRequired().HasMaxLength(maxLength: 255);
 
-        builder.Property(propertyExpression: x => x.Position).IsRequired().HasColumnType("int(2)");
+        builder.Property(propertyExpression: x => x.Order).IsRequired().HasColumnType("int(2)");
 
         builder
             .Property(propertyExpression: x => x.ContentType)

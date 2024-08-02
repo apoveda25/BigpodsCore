@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Application.DeleteOne.Inputs;
 
-[GraphQLName(name: "WarehouseDeleteOneWarehouseInput")]
 public sealed record DeleteOneWarehouseInput : IDeleteOneWarehouseInput
 {
     public Guid Id { get; set; } = Guid.Empty;

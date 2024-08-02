@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Products.Application.UpdateOne.Inputs;
 
-[GraphQLName(name: "ProductUpdateOneProductInput")]
 public record UpdateOneProductInput : IUpdateOneProductInput
 {
     public Guid Id { get; set; }

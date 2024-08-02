@@ -4,6 +4,7 @@ using Bigpods.Monolith.Modules.Products.Application.Common.Policies;
 using Bigpods.Monolith.Modules.Products.Application.CreateOne.Commands;
 using Bigpods.Monolith.Modules.Products.Application.CreateOne.Dtos;
 using Bigpods.Monolith.Modules.Products.Application.CreateOne.Inputs;
+using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using HotChocolate.Authorization;
 using MediatR;
@@ -13,6 +14,8 @@ namespace Bigpods.Monolith.Modules.Products.Infrastructure.CreateOne.Mutations;
 [ExtendObjectType(name: OperationTypeNames.Mutation)]
 public sealed class CreateOneProductMutation
 {
+    [Error(typeof(NotFoundException))]
+    [Error(typeof(ConflictException))]
     [Authorize(Policy = ProductsPolicies.CreateOneProductsPolicy)]
     public async Task<ProductModel> CreateOneProduct(
         [Service] IMediator mediator,

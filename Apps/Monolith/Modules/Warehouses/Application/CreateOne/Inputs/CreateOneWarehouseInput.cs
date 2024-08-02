@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Warehouses.Application.CreateOne.Inputs;
 
-[GraphQLName(name: "WarehouseCreateOneWarehouseInput")]
 public sealed record CreateOneWarehouseInput : ICreateOneWarehouseInput
 {
     private Guid _id;

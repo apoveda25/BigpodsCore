@@ -2,7 +2,7 @@ using Bigpods.Monolith.Modules.Shared.Domain.Models;
 
 namespace Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 
-[GraphQLName(name: "InventoryType")]
+[GraphQLName(name: "Inventory")]
 public sealed class InventoryModel : BaseModel, IInventoryModel
 {
     public int Stock { get; set; } = default!;

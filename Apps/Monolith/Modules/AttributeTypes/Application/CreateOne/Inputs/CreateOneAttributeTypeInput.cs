@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.AttributeTypes.Application.CreateOne.Inputs;
 
-[GraphQLName(name: "AttributeTypeCreateOneAttributeTypeInput")]
 public sealed record CreateOneAttributeTypeInput : ICreateOneAttributeTypeInput
 {
     private Guid _id;

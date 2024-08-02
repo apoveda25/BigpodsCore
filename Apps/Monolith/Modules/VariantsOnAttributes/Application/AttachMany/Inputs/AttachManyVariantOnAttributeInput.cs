@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.VariantsOnAttributes.Application.AttachMany.Inputs;
 
-[GraphQLName(name: "VariantOnAttributeAttachManyVariantOnAttributeInput")]
 public sealed record AttachManyVariantOnAttributeInput
     : IAttachManyVariantOnAttributeInput<CreateOneVariantOnAttributeInput>
 {

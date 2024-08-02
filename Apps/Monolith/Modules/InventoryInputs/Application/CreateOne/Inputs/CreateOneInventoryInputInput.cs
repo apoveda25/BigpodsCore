@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.InventoryInputs.Application.CreateOne.Inputs;
 
-[GraphQLName(name: "InventoryInputCreateOneInventoryInputInput")]
 public sealed record CreateOneInventoryInputInput : ICreateOneInventoryInputInput
 {
     private Guid _id;

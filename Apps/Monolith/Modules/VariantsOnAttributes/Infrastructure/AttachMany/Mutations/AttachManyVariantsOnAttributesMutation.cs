@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
+using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.VariantsOnAttributes.Application.AttachMany.Commands;
 using Bigpods.Monolith.Modules.VariantsOnAttributes.Application.AttachMany.Dtos;
@@ -11,10 +12,12 @@ using MediatR;
 namespace Bigpods.Monolith.Modules.VariantsOnAttributes.Infrastructure.AttachMany.Mutations;
 
 [ExtendObjectType(name: OperationTypeNames.Mutation)]
-public sealed class AttachManyVariantsOnAttributesMutation
+public sealed class AttachManyVariantOnAttributeMutation
 {
+    [Error(typeof(NotFoundException))]
+    [Error(typeof(ConflictException))]
     [Authorize(Policy = VariantsOnAttributesPolicies.AttachManyVariantsOnAttributesPolicy)]
-    public async Task<VariantOnAttributeModel[]> AttachManyVariantsOnAttributes(
+    public async Task<VariantOnAttributeModel[]> AttachManyVariantOnAttribute(
         [Service] IMediator mediator,
         [Service] IMapper mapper,
         ClaimsPrincipal claimsPrincipal,

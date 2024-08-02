@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
+using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using Bigpods.Monolith.Modules.Warehouses.Application.Common.Policies;
 using Bigpods.Monolith.Modules.Warehouses.Application.UpdateOne.Commands;
@@ -13,6 +14,8 @@ namespace Bigpods.Monolith.Modules.Warehouses.Infrastructure.UpdateOne.Mutations
 [ExtendObjectType(name: OperationTypeNames.Mutation)]
 public sealed class UpdateOneWarehouseMutation
 {
+    [Error(typeof(NotFoundException))]
+    [Error(typeof(ConflictException))]
     [Authorize(Policy = WarehousesPolicies.UpdateOneWarehousesPolicy)]
     public async Task<WarehouseModel> UpdateOneWarehouse(
         [Service] IMediator mediator,

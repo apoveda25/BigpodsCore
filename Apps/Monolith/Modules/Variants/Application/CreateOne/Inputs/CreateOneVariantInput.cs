@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Variants.Application.CreateOne.Inputs;
 
-[GraphQLName(name: "VariantCreateOneVariantInput")]
 public sealed record CreateOneVariantInput
     : ICreateOneVariantInput<CreateOneVariantOnAttributeInput>
 {

@@ -4,6 +4,7 @@ using Bigpods.Monolith.Modules.InventoryOutputs.Application.Common.Policies;
 using Bigpods.Monolith.Modules.InventoryOutputs.Application.CreateOne.Commands;
 using Bigpods.Monolith.Modules.InventoryOutputs.Application.CreateOne.Dtos;
 using Bigpods.Monolith.Modules.InventoryOutputs.Application.CreateOne.Inputs;
+using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using HotChocolate.Authorization;
 using MediatR;
@@ -13,6 +14,8 @@ namespace Bigpods.Monolith.Modules.InventoryOutputs.Infrastructure.CreateOne.Mut
 [ExtendObjectType(name: OperationTypeNames.Mutation)]
 public sealed class CreateOneInventoryOutputMutation
 {
+    [Error(typeof(NotFoundException))]
+    [Error(typeof(ConflictException))]
     [Authorize(Policy = InventoryOutputsPolicies.CreateOneInventoryOutputsPolicy)]
     public async Task<InventoryOutputModel> CreateOneInventoryOutput(
         [Service] IMediator mediator,

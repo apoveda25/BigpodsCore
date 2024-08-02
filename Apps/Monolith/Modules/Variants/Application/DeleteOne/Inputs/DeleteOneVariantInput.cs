@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.Variants.Application.DeleteOne.Inputs;
 
-[GraphQLName(name: "VariantDeleteOneVariantInput")]
 public sealed record DeleteOneVariantInput : IDeleteOneVariantInput
 {
     public Guid Id { get; set; } = Guid.Empty;

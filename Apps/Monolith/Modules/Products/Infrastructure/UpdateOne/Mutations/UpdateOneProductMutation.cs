@@ -4,6 +4,7 @@ using Bigpods.Monolith.Modules.Products.Application.Common.Policies;
 using Bigpods.Monolith.Modules.Products.Application.UpdateOne.Commands;
 using Bigpods.Monolith.Modules.Products.Application.UpdateOne.Dtos;
 using Bigpods.Monolith.Modules.Products.Application.UpdateOne.Inputs;
+using Bigpods.Monolith.Modules.Shared.Domain.Exceptions;
 using Bigpods.Monolith.Modules.Shared.Infrastructure.Models;
 using HotChocolate.Authorization;
 using MediatR;
@@ -13,6 +14,8 @@ namespace Bigpods.Monolith.Modules.Products.Infrastructure.UpdateOne.Mutations;
 [ExtendObjectType(name: OperationTypeNames.Mutation)]
 public sealed class UpdateOneProductMutation
 {
+    [Error(typeof(NotFoundException))]
+    [Error(typeof(ConflictException))]
     [Authorize(Policy = ProductsPolicies.UpdateOneProductsPolicy)]
     public async Task<ProductModel> UpdateOneProduct(
         [Service] IMediator mediator,

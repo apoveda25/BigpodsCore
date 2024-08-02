@@ -3,7 +3,6 @@ using NodaTime;
 
 namespace Bigpods.Monolith.Modules.VariantsOnAttributes.Application.DettachMany.Inputs;
 
-[GraphQLName(name: "VariantOnAttributeDettachManyVariantOnAttributeInput")]
 public sealed record DettachManyVariantOnAttributeInput
     : IDettachManyVariantOnAttributeInput<DeleteOneVariantOnAttributeInput>
 {
