@@ -1,0 +1,7 @@
+name: MinioIaC
+runtime: dotnet
+description: MinIO IaC
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: csharp

@@ -1,6 +1,6 @@
 namespace Bigpods.MonolithIaC.Factories;
 
-public class UserRolesFactory
+public static class UserRolesFactory
 {
     public static Pulumi.Keycloak.UserRoles Build(string name, Pulumi.Keycloak.UserRolesArgs args)
     {

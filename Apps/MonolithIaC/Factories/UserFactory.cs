@@ -1,6 +1,6 @@
 namespace Bigpods.MonolithIaC.Factories;
 
-public class UserFactory
+public static class UserFactory
 {
     public static Pulumi.Keycloak.User Build(string name, Pulumi.Keycloak.UserArgs args)
     {

@@ -1,6 +1,6 @@
 namespace Bigpods.MonolithIaC.Factories;
 
-public class RealmFactory
+public static class RealmFactory
 {
     public static Pulumi.Keycloak.Realm Build(string name, Pulumi.Keycloak.RealmArgs? args)
     {

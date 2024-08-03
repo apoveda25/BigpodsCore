@@ -1,6 +1,6 @@
 namespace Bigpods.MonolithIaC.Factories;
 
-public class ClientRolePolicyFactory
+public static class ClientRolePolicyFactory
 {
     public static Pulumi.Keycloak.OpenId.ClientRolePolicy Build(
         string name,

@@ -1,6 +1,6 @@
 namespace Bigpods.MonolithIaC.Factories;
 
-public class ClientAuthorizationScopeFactory
+public static class ClientAuthorizationScopeFactory
 {
     public static Pulumi.Keycloak.OpenId.ClientAuthorizationScope Build(
         string name,

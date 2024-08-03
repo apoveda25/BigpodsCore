@@ -1,0 +1,6 @@
+config:
+  minio:minioAccessKey:
+    secure: AAABAGDxGgTut+PmvLJFNz7Gm3OYHTNo48FUs6Qx6ReasQHjA+hXBSHZA200rdTTtUBKQg==
+  minio:minioSecretKey:
+    secure: AAABAGn3wOolk/KG3qQD/yP25dPb4npXo5Qa8L1pfsslYo5ww53TaRYQesB9dEjYNBGFZPNwEhKfePztpDLPKHBZqWOUQnNp
+  minio:minioServer: localhost:9000

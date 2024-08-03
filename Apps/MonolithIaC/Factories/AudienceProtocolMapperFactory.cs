@@ -1,6 +1,6 @@
 namespace Bigpods.MonolithIaC.Factories;
 
-public class AudienceProtocolMapperFactory
+public static class AudienceProtocolMapperFactory
 {
     public static Pulumi.Keycloak.OpenId.AudienceProtocolMapper Build(
         string name,

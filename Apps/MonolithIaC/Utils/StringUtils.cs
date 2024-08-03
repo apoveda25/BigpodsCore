@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Bigpods.MonolithIaC.Utils;
 
-public class StringUtils
+public static class StringUtils
 {
     public static string ToCapitalCase(string s) => char.ToUpper(s[0]) + s[1..].ToLower();
 
